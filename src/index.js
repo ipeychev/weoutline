@@ -1,8 +1,8 @@
 function midPointBtw(p1, p2) {
-  return {
-    x: p1.x + (p2.x - p1.x) / 2,
-    y: p1.y + (p2.y - p1.y) / 2
-  };
+  return [
+    p1[0] + (p2[0] - p1[0]) / 2,
+    p1[1] + (p2[1] - p1[1]) / 2
+  ];
 }
 
 function isTouchDevice() {
@@ -10,29 +10,26 @@ function isTouchDevice() {
 };
 
 var el = document.getElementById('c');
+el.setAttribute('width', window.innerWidth);
+el.setAttribute('height', window.innerHeight);
+
 var ctx = el.getContext('2d');
 
-ctx.lineWidth = 8;
+ctx.lineWidth = 3;
 ctx.lineJoin = ctx.lineCap = 'round';
+ctx.globalCompositeOperation = 'source-over';
 
 var shapePoints = [];
 var isDrawing, points = [];
 
 if (isTouchDevice()) {
   el.addEventListener('touchstart', function(e) {
-    if (e.touches.length > 1) {
-      return;
-    }
-
     isDrawing = true;
 
-    ctx.beginPath();
     var touches = e.touches[0];
-    points.push({ x: touches.pageX, y: touches.pageY});
+    this.lastPoint = [touches.pageX, touches.pageY];
 
-    var p1 = points[0];
-    ctx.lineTo(p1.x, p1.y);
-    ctx.stroke();
+    points.push(this.lastPoint);
   }, {passive: true});
 
   el.addEventListener('touchcancel', function(e) {
@@ -58,15 +55,9 @@ if (isTouchDevice()) {
     e.preventDefault();
 
     var touches = e.touches[0];
-    points.push({ x: touches.pageX, y: touches.pageY});
-
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-    drawPoints(points, ctx);
-
-    for (var i = 0; i < shapePoints.length; i++) {
-      drawPoints(shapePoints[i], ctx);
-    }
+    this.curPoint = [touches.pageX, touches.pageY];
+    this.lastPoint = drawPoints([this.lastPoint, this.curPoint], ctx);
+    points.push(this.curPoint);
   });
 
   el.addEventListener('touchend', function(e) {
@@ -76,25 +67,13 @@ if (isTouchDevice()) {
 
     endDrawing(e);
   }, {passive: true});
-
-  function endDrawing(e) {
-    isDrawing = false;
-
-    if (points.length) {
-      shapePoints.push(points.slice(0));
-      points.length = 0;
-    }
-  }
 } else {
   el.onmousedown = function(e) {
     isDrawing = true;
 
-    ctx.beginPath();
-    points.push({ x: e.offsetX, y: e.offsetY});
+    this.lastPoint = [e.offsetX, e.offsetY];
 
-    var p1 = points[0];
-    ctx.lineTo(p1.x, p1.y);
-    ctx.stroke();
+    points.push(this.lastPoint);
   };
 
   el.onmousemove = function(e) {
@@ -102,23 +81,19 @@ if (isTouchDevice()) {
       return;
     }
 
-    points.push({ x: e.offsetX, y: e.offsetY });
+    var curPoint = [e.offsetX, e.offsetY];
 
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    points.push(curPoint);
 
-    drawPoints(points, ctx);
-
-    for (var i = 0; i < shapePoints.length; i++) {
-      drawPoints(shapePoints[i], ctx);
-    }
+    this.lastPoint = drawPoints([this.lastPoint, curPoint], ctx);
   };
 
-  el.onmouseup = function() {
-    isDrawing = false;
+  el.onmouseup = function(e) {
+    if (!isDrawing) {
+      return;
+    }
 
-    shapePoints.push(points.slice(0));
-
-    points.length = 0;
+    endDrawing(e);
   };
 }
 
@@ -127,19 +102,31 @@ function drawPoints(points, ctx) {
   var p2 = points[1];
 
   ctx.beginPath();
-  ctx.moveTo(p1.x, p1.y);
+  ctx.moveTo(p1[0], p1[1]);
 
   for (var i = 1, len = points.length; i < len; i++) {
-    // we pick the point between pi+1 & pi+2 as the
-    // end point and p1 as our control point
     var midPoint = midPointBtw(p1, p2);
-    ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
+    ctx.quadraticCurveTo(p1[0], p1[1], midPoint[0], midPoint[1]);
     p1 = points[i];
-    p2 = points[i+1];
+    p2 = points[i + 1];
   }
-  // Draw last line as a straight line while
-  // we wait for the next point to be able to calculate
-  // the bezier control point
-  ctx.lineTo(p1.x, p1.y);
+
   ctx.stroke();
+
+  return midPoint;
+}
+
+function endDrawing(e) {
+  isDrawing = false;
+
+  if (points.length) {
+    shapePoints.push(points.slice(0));
+    points.length = 0;
+  }
+
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+  for (var i = 0; i < shapePoints.length; i++) {
+    drawPoints(shapePoints[i], ctx);
+  }
 }
