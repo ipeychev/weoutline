@@ -15,7 +15,7 @@ el.setAttribute('height', window.innerHeight);
 
 var ctx = el.getContext('2d');
 
-ctx.lineWidth = 3;
+ctx.lineWidth = 4;
 ctx.lineJoin = ctx.lineCap = 'round';
 ctx.globalCompositeOperation = 'source-over';
 
@@ -26,8 +26,12 @@ if (isTouchDevice()) {
   el.addEventListener('touchstart', function(e) {
     isDrawing = true;
 
+    ctx.lineWidth = document.getElementById('pencilSizeValue').textContent;
+    ctx.strokeStyle = document.getElementById('pencilColor').value;
+
+    var rect = el.getBoundingClientRect();
     var touches = e.touches[0];
-    this.lastPoint = [touches.pageX, touches.pageY];
+    this.lastPoint = [touches.clientX - rect.left, touches.clientY - rect.top];
 
     points.push(this.lastPoint);
   }, {passive: true});
@@ -54,8 +58,9 @@ if (isTouchDevice()) {
 
     e.preventDefault();
 
+    var rect = el.getBoundingClientRect();
     var touches = e.touches[0];
-    this.curPoint = [touches.pageX, touches.pageY];
+    this.curPoint = [touches.clientX - rect.left, touches.clientY - rect.top];
     this.lastPoint = drawPoints([this.lastPoint, this.curPoint], ctx);
     points.push(this.curPoint);
   });
@@ -70,6 +75,9 @@ if (isTouchDevice()) {
 } else {
   el.onmousedown = function(e) {
     isDrawing = true;
+
+    ctx.lineWidth = document.getElementById('pencilSizeValue').textContent;
+    ctx.strokeStyle = document.getElementById('pencilColor').value;
 
     this.lastPoint = [e.offsetX, e.offsetY];
 
@@ -118,6 +126,8 @@ function drawPoints(points, ctx) {
 
 function endDrawing(e) {
   isDrawing = false;
+
+  var shape = new Shape();
 
   if (points.length) {
     shapePoints.push(points.slice(0));
