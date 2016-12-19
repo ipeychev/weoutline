@@ -2,6 +2,9 @@
 logs
 *.log
 
+# Dist files
+dist
+
 # Runtime data
 pids
 *.pid

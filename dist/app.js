@@ -292,6 +292,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	          p2 = points[i + 1];
 	        }
 	
+	        context.lineTo(p1[0], p1[1]);
+	
 	        context.stroke();
 	      }
 	    }
