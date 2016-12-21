@@ -1,5 +1,5 @@
 export default class Draw {
-  static drawLine(points, context, config) {
+  static line(points, context, config) {
     let p1 = points[0];
     let p2 = points[1];
 
@@ -7,7 +7,7 @@ export default class Draw {
       context.fillStyle = config.color;
 
       context.beginPath();
-      context.arc(p1[0], p1[1], context.lineWidth/2, 0, 2 * Math.PI, false);
+      context.arc(p1[0], p1[1], config.size/2, 0, 2 * Math.PI, false);
       context.fill();
     } else {
       context.lineWidth = config.size;
@@ -29,7 +29,7 @@ export default class Draw {
     }
   }
 
-  static drawLineToMidPoint(p1, p2, context, config) {
+  static lineToMidPoint(p1, p2, context, config) {
     context.lineWidth = config.size;
     context.strokeStyle = config.color;
 
