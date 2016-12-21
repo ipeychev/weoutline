@@ -1,18 +1,23 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width initial-scale=1.0 maximum-scale=1.0 user-scalable=no">
     <title>Team Whiteboard</title>
-    <link rel="stylesheet" href="app.css">
+    <link rel="stylesheet" href="assets/app.css">
+    <link rel="stylesheet" href="assets/normalize.css">
     <script src="app.js" defer></script>
   </head>
 
   <body>
     <div id="mainContainer" class="main-container">
+      <div class="draw-container">
+        <canvas id="canvas" class="draw-area"></canvas>
+      </div>
+
       <div id="controlsContainer" class="controls-container">
         <form name="penSizeForm" oninput="penSizeValue.value = penSize.valueAsNumber">
-          <input id="penSize" name="penSize" type="range" step="4" min="4" max="24" value="12">
-          <output id="penSizeValue" name="penSizeValue" for="penSize">12</output>
+          <input id="penSize" name="penSize" type="range" step="4" min="4" max="24" value="4">
+          <output id="penSizeValue" name="penSizeValue" for="penSize">4</output>
         </form>
 
         <form name="erazerSizeForm" oninput="erazerSizeValue.value = erazerSize.valueAsNumber">
@@ -22,10 +27,6 @@
 
         <input id="penColor" name="color" type="color">
       </div>
-
-      <div class="draw-container">
-        <canvas id="canvas" class="draw-area" width="1280" height="1024"></canvas>
-      </div>
     </div>
   </body>
-/<html>
+<html>

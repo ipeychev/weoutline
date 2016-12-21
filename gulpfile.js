@@ -89,8 +89,9 @@ function buildSrc() {
 
 function copyStatic() {
   return gulp.src([
-      path.join('src', 'index.html'),
-      path.join('src', 'app.css'),
+      'src/index.html',
+      'src/**/*.css',
+      'src/**/*.jpeg'
     ])
     .pipe(gulp.dest(destinationFolder));
 }

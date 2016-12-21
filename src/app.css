@@ -1,8 +1,0 @@
-@-ms-viewport{
-  width: device-width;
-}
-
-.draw-area {
-  border: 1px solid blue;
-  cursor: crosshair;
-}
