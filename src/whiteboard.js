@@ -1,4 +1,4 @@
-import { Shape, ShapeType } from './shape';
+import { ShapeType } from './shape';
 import Draw from './draw';
 import DrawLine from './draw-line';
 import Utils from './utils';
@@ -28,6 +28,7 @@ class Whiteboard {
 
   _attachListeners() {
     if (Utils.isTouchDevice()) {
+      this._canvasElement.addEventListener('touchstart', this._onTouchStart.bind(this));
       this._canvasElement.addEventListener('touchmove', this._onTouchMove.bind(this));
     } else {
       this._canvasElement.addEventListener('wheel', this._onScroll.bind(this));
@@ -65,15 +66,24 @@ class Whiteboard {
 
   _onScroll(event) {
     if (event.deltaMode === 0) {
+      event.preventDefault();
+
       this._offset[0] += event.deltaX;
       this._offset[1] += event.deltaY;
 
-      console.log('DELTA', [event.deltaX, event.deltaY]);
-      console.log('OFFSET', [this._offset[0], this._offset[1]]);
+      this._drawShapes();
+    } else if (event.touches.length > 1) {
+      event.preventDefault();
+
+      let curPoint = [event.touches[0].pageX, event.touches[0].pageY];
+
+      this._offset[0] += (curPoint[0] - this._lastDragPoint[0]) * -1;
+      this._offset[1] += (curPoint[1] - this._lastDragPoint[1]) * -1;
+
+      this._lastDragPoint[0] = curPoint[0];
+      this._lastDragPoint[1] = curPoint[1];
 
       this._drawShapes();
-
-      event.preventDefault();
     }
   }
 
@@ -81,11 +91,8 @@ class Whiteboard {
     // change points coordinates according to 0,0
     for (let i = 0; i < shape.points.length; i++) {
       let point = shape.points[i];
-
-      console.log('OLD POINT', point);
       point[0] += this._offset[0];
       point[1] += this._offset[1];
-      console.log('NEW POINT', point);
     }
 
     this._shapes.push(shape);
@@ -96,6 +103,12 @@ class Whiteboard {
   _onTouchMove(event) {
     if (event.touches.length > 1) {
       this._onScroll(event);
+    }
+  }
+
+  _onTouchStart(event) {
+    if (event.touches.length > 1) {
+      this._lastDragPoint = [event.touches[0].pageX, event.touches[0].pageY];
     }
   }
 

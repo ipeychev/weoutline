@@ -21,7 +21,7 @@ class DrawLine {
 
     this._points.length = 0;
 
-    this._finishDraw(event);
+    this.finishDraw(event);
   }
 
   destroy() {
@@ -42,7 +42,7 @@ class DrawLine {
         this._points.length = 0;
       }
 
-      this._finishDraw(event);
+      this.finishDraw(event);
       return;
     }
 
