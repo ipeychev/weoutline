@@ -1,12 +1,16 @@
+const concatCss = require('gulp-concat-css');
+const cssmin = require('gulp-cssmin');
 const del = require('del');
 const glob = require('glob');
 const gulp = require('gulp');
 const isparta = require('isparta');
 const loadPlugins = require('gulp-load-plugins');
 const path = require('path');
+const rename = require('gulp-rename');
+const runSequence = require('run-sequence');
+const sass = require('gulp-sass');
 const webpack = require('webpack');
 const webpackStream = require('webpack-stream');
-var runSequence = require('run-sequence');
 
 const Instrumenter = isparta.Instrumenter;
 const mochaGlobals = require('./test/setup/.globals');
@@ -52,7 +56,11 @@ function build(done) {
   runSequence(
     'clean',
     'build-src',
-    ['lint', 'copy-static'],
+    ['lint', 'sass'],
+    'concat-css',
+    'min-css',
+    'clean-css',
+    'copy-static',
     done
   );
 }
@@ -90,7 +98,7 @@ function buildSrc() {
 function copyStatic() {
   return gulp.src([
       'src/index.html',
-      'src/**/*.css',
+      'src/**/assets/normalize.css',
       'src/**/*.jpeg'
     ])
     .pipe(gulp.dest(destinationFolder));
@@ -134,6 +142,15 @@ function coverage(done) {
         .on('end', done);
     });
 }
+
+gulp.task('sass', function () {
+  return gulp.src([
+    'src/assets/**/*-structure.scss',
+    'src/assets/**/*-skin.scss'
+  ])
+    .pipe(sass().on('error', sass.logError))
+    .pipe(gulp.dest(path.join(destinationFolder, 'assets')));
+});
 
 const watchFiles = ['src/**/*', 'test/**/*', 'package.json', '**/.eslintrc'];
 
@@ -188,6 +205,34 @@ function testBrowser() {
     }))
     .pipe(gulp.dest('./tmp'));
 }
+
+gulp.task('concat-css', function () {
+  return gulp.src(
+    path.join(destinationFolder, 'assets/**/*.css'))
+    .pipe(concatCss('app.css'))
+    .pipe(gulp.dest(path.join(destinationFolder, 'assets')));
+});
+
+function cleanDist(done) {
+  del([destinationFolder]).then(() => done());
+}
+
+gulp.task('clean-css', function (done) {
+  del([
+    path.join(destinationFolder, 'assets/**/*.css'),
+    '!' + path.join(destinationFolder, 'assets/app.css'),
+    '!' + path.join(destinationFolder, 'assets/app-min.css'),
+    '!' + path.join(destinationFolder, 'assets/normalize.css')
+  ])
+  .then(() => done());
+});
+
+gulp.task('min-css', function () {
+  return gulp.src(path.join(destinationFolder, 'assets/**/*.css'))
+      .pipe(cssmin())
+      .pipe(rename({suffix: '-min'}))
+      .pipe(gulp.dest(path.join(destinationFolder, 'assets')));
+});
 
 // Remove the built files
 gulp.task('clean', cleanDist);
