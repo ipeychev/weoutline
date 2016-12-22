@@ -1,6 +1,34 @@
-.main-container {
+.wb {
   .draw-area {
     background-image: url('canvas-background.jpeg');
     cursor: crosshair;
+  }
+
+  .toolbar {
+    background-color: #32a8e6;
+    border-color: gray;
+    color: white;
+
+    .toolbar-item-options {
+      background-color: #32a8e6;
+
+      .toolbar-item-option {
+        color: white;
+      }
+    }
+
+    .toolbar-item {
+      border-color: white;
+
+      &.drag {
+        .toolbar-item-value {
+          cursor: move;
+        }
+      }
+
+      .toolbar-item-value {
+        cursor: pointer;
+      }
+    }
   }
 }

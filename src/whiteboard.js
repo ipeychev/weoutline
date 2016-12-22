@@ -12,9 +12,6 @@ const MODE = {
 
 class Whiteboard {
   constructor() {
-    this._penSizeValueElement = document.getElementById('penSizeValue');
-    this._penColorElement = document.getElementById('penColor');
-
     this._shapes = [];
     this._offset = [0, 0];
 
@@ -126,8 +123,8 @@ class Whiteboard {
       this._drawer = new DrawLine({
         callback: this._onShapeCreatedCallback.bind(this),
         canvas: this._canvasElement,
-        color: this._penColorElement.value,
-        size: this._penSizeValueElement.textContent
+        color: '#000000',
+        size: 4
       });
     }
   }

@@ -3,29 +3,86 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width initial-scale=1.0 maximum-scale=1.0 user-scalable=no">
     <title>Team Whiteboard</title>
-    <link rel="stylesheet" href="assets/normalize.css">
+    <link rel="stylesheet" href="assets/vendor/normalize.css">
+    <link rel="stylesheet" href="assets/vendor/font-awesome.min.css">
     <link rel="stylesheet" href="assets/app.css">
     <script src="app.js" defer></script>
   </head>
 
   <body>
-    <div id="mainContainer" class="main-container">
+    <div id="mainContainer" class="wb">
       <div class="draw-container">
         <canvas id="canvas" class="draw-area"></canvas>
       </div>
 
-      <div id="controlsContainer" class="controls-container">
-        <form name="penSizeForm" oninput="penSizeValue.value = penSize.valueAsNumber">
-          <input id="penSize" name="penSize" type="range" step="4" min="4" max="24" value="4">
-          <output id="penSizeValue" name="penSizeValue" for="penSize">4</output>
-        </form>
+      <div id="toolbar" class="toolbar">
+        <div id="pen" class="toolbar-item">
+          <div class="toolbar-item-value">
+            <i class="fa fa-pencil" id="penSize" aria-hidden="true"></i>
+          </div>
+          <div class="toolbar-item-options">
+            <div class="toolbar-item-option small">
+              <i class="fa fa-circle" aria-hidden="true"></i>
+            </div>
+            <div class="toolbar-item-option normal">
+              <i class="fa fa-circle" aria-hidden="true"></i>
+            </div>
+            <div class="toolbar-item-option large">
+              <i class="fa fa-circle" aria-hidden="true"></i>
+            </div>
+            <div class="toolbar-item-option extra">
+              <i class="fa fa-circle" aria-hidden="true"></i>
+            </div>
+            <div class="toolbar-item-option huge">
+              <i class="fa fa-circle" aria-hidden="true"></i>
+            </div>
+            <div class="toolbar-item-option giant">
+              <i class="fa fa-circle" aria-hidden="true"></i>
+            </div>
+          </div>
+        </div>
+        <div id="eraser" class="toolbar-item">
+          <div class="toolbar-item-value">
+            <i class="fa fa-eraser" id="eraserSize" aria-hidden="true"></i>
+          </div>
+          <div class="toolbar-item-options hidden">
+            <div class="toolbar-item-option giant">
+              <i class="fa fa-circle" aria-hidden="true"></i>
+            </div>
+            <div class="toolbar-item-option huge">
+              <i class="fa fa-circle" aria-hidden="true"></i>
+            </div>
+            <div class="toolbar-item-option extra">
+              <i class="fa fa-circle" aria-hidden="true"></i>
+            </div>
+            <div class="toolbar-item-option large">
+              <i class="fa fa-circle" aria-hidden="true"></i>
+            </div>
+            <div class="toolbar-item-option normal">
+              <i class="fa fa-circle" aria-hidden="true"></i>
+            </div>
+            <div class="toolbar-item-option small">
+              <i class="fa fa-circle" aria-hidden="true"></i>
+            </div>
+          </div>
+        </div>
+        <div id="color-picker-container" class="toolbar-item">
+          <div class="toolbar-item-value">
+            <input id="penColor" class="color-picker" name="color" type="color">
+          </div>
+        </div>
 
-        <form name="erazerSizeForm" oninput="erazerSizeValue.value = erazerSize.valueAsNumber">
-          <input id="erazerSize" name="erazerSize" type="range" step="4" min="4" max="24" value="12">
-          <output id="erazerSizeValue" name="erazerSizeValue" for="erazerSize">12</output>
-        </form>
+        <div id="share-container" class="toolbar-item">
+          <div class="toolbar-item-value">
+            <i class="fa fa-share-alt" id="share" aria-hidden="true"></i>
+          </div>
+        </div>
 
-        <input id="penColor" name="color" type="color">
+        <div id="share-container" class="toolbar-item drag">
+          <div class="toolbar-item-value">
+            <i class="fa fa-arrows-alt" id="drag" aria-hidden="true"></i>
+          </div>
+        </div>
       </div>
     </div>
   </body>

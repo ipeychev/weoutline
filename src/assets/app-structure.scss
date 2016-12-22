@@ -1,8 +1,5 @@
-.hidden {
-  display: none;
-}
 
-.main-container {
+.wb {
   height: 100%;
   left: 0;
   overflow: hidden;
@@ -10,11 +7,8 @@
   top: 0;
   width: 100%;
 
-  .controls-container {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    zoom: 1;
+  .hidden {
+    display: none !important;
   }
 
   .draw-container {
@@ -22,11 +16,113 @@
     overflow: hidden;
     position: relative;
     width: 100%;
+
+    .draw-area {
+      cursor: crosshair;
+    }
   }
 
-  .draw-area {
-    cursor: crosshair;
+  .toolbar {
+    align-items: flex-start;
+    border-radius: 4px;
+    display: flex;
+    height: 42px;
+    justify-content: flex-start;
+    left: 20px;
+    padding: 5px;
+    position: absolute;
+    top: 20px;
+    width: 260px;
+
+    .toolbar-item {
+      display: flex;
+      height: 38px;
+      position: relative;
+      width: 38px;
+      margin-left: 5px;
+
+      &.drag {
+        position: absolute;
+        right: 5px;
+      }
+
+      .color-picker {
+        height: 28px;
+        width: 28px;
+      }
+
+      .toolbar-item-value {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        position: relative;
+        width: 100%;
+
+        i {
+          font-size: 22px;
+        }
+      }
+
+      .toolbar-item-options {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        left: -10px;
+        position: absolute;
+        top: 44px;
+        width: 48px;
+        margin: 5px;
+        border-radius: 4px;
+
+        .toolbar-item-option {
+          align-items: center;
+          display: flex;
+          height: 38px;
+          justify-content: center;
+          position: relative;
+          width: 38px;
+
+          &.small {
+            i {
+              font-size: 4px;
+            }
+          }
+
+          &.normal {
+            i {
+              font-size: 8px;
+            }
+          }
+
+          &.large {
+            i {
+              font-size: 12px;
+            }
+          }
+
+          &.extra {
+            i {
+              font-size: 16px;
+            }
+          }
+
+          &.huge {
+            i {
+              font-size: 18px;
+            }
+          }
+
+          &.giant {
+            i {
+              font-size: 22px;
+            }
+          }
+        }
+      }
+    }
   }
+
 }
 
 @-ms-viewport{

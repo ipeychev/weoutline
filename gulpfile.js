@@ -95,10 +95,15 @@ function buildSrc() {
     .pipe(gulp.dest(destinationFolder));
 }
 
+function copyFonts() {
+  return gulp.src('src/assets/vendor/fonts/*.*')
+    .pipe(gulp.dest(destinationFolder + '/assets/fonts'));
+}
+
 function copyStatic() {
   return gulp.src([
       'src/index.html',
-      'src/**/assets/normalize.css',
+      'src/**/assets/vendor/**/*.css',
       'src/**/*.jpeg'
     ])
     .pipe(gulp.dest(destinationFolder));
@@ -222,7 +227,7 @@ gulp.task('clean-css', function (done) {
     path.join(destinationFolder, 'assets/**/*.css'),
     '!' + path.join(destinationFolder, 'assets/app.css'),
     '!' + path.join(destinationFolder, 'assets/app-min.css'),
-    '!' + path.join(destinationFolder, 'assets/normalize.css')
+    '!' + path.join(destinationFolder, 'assets/vendor')
   ])
   .then(() => done());
 });
@@ -258,8 +263,8 @@ gulp.task('build', build);
 // Build the src files
 gulp.task('build-src', buildSrc);
 
-// Build two versions of the library
-gulp.task('copy-static',  copyStatic);
+gulp.task('copy-fonts', copyFonts);
+gulp.task('copy-static', ['copy-fonts'], copyStatic);
 
 // Lint and run our tests
 gulp.task('test', ['lint'], test);
