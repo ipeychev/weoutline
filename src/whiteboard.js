@@ -1,41 +1,33 @@
 import { ShapeType } from './shape';
 import Draw from './draw';
 import DrawLine from './draw-line';
+import Toolbar from './toolbar';
+import { Mode } from './mode';
 import Utils from './utils';
 
-const MODE = {
-  ellipse: 1,
-  eraser: 2,
-  line: 3,
-  polygon: 4
-};
-
 class Whiteboard {
-  constructor() {
-    this._shapes = [];
-    this._offset = [0, 0];
+  constructor(config) {
+    config = config || {};
+
+    this._config = config;
+
+    this._shapes = config.shapes || [];
+    this._offset = config.offset || [0, 0];
 
     this._setupCanvas();
     this._setupContext();
+    this._setupToolbar();
 
     this._attachListeners();
 
-    this._setMode(MODE.line);
+    this._setMode(config.mode || Mode.line);
   }
 
-  _attachListeners() {
-    if (Utils.isTouchDevice()) {
-      this._canvasElement.addEventListener('touchstart', this._onTouchStart.bind(this));
-      this._canvasElement.addEventListener('touchmove', this._onTouchMove.bind(this));
-    } else {
-      this._canvasElement.addEventListener('wheel', this._onScroll.bind(this));
-      this._canvasElement.addEventListener('contextmenu', function(e) { e.preventDefault(); });
-    }
-
-    window.addEventListener('resize', this._onBrowserResize.bind(this));
+  destroy() {
+    this._detachListeners();
   }
 
-  _drawShapes() {
+  drawShapes() {
     this._context.clearRect(0, 0, this._context.canvas.width, this._context.canvas.height);
 
     for (let i = 0; i < this._shapes.length; i++) {
@@ -52,13 +44,41 @@ class Whiteboard {
     }
   }
 
+  setConfig(config) {
+    this._config = config;
+  }
+
+  _attachListeners() {
+    this._onTouchStartListener = this._onTouchStart.bind(this);
+    this._onTouchMoveListener = this._onTouchMove.bind(this);
+    this._onWheelListener = this._onScroll.bind(this);
+    this._onContextMenuListener = function(e) { e.preventDefault(); };
+
+    if (Utils.isTouchDevice()) {
+      this._canvasElement.addEventListener('touchstart', this._onTouchStartListener);
+      this._canvasElement.addEventListener('touchmove', this._onTouchMoveListener);
+    } else {
+      this._canvasElement.addEventListener('wheel', this._onWheelListener);
+      this._canvasElement.addEventListener('contextmenu', this._onContextMenuListener);
+    }
+
+    window.addEventListener('resize', this._onBrowserResize.bind(this));
+  }
+
+  _detachListeners() {
+    this._canvasElement.removeEventListener('touchstart', this._onTouchStartListener);
+    this._canvasElement.removeEventListener('touchmove', this._onTouchMoveListener);
+    this._canvasElement.removeEventListener('wheel', this._onWheelListener);
+    this._canvasElement.removeEventListener('contextmenu', this._onContextMenuListener);
+  }
+
   _onBrowserResize() {
     let canvasContainerEl = this._canvasElement.parentNode;
 
     this._canvasElement.setAttribute('height', canvasContainerEl.offsetHeight);
     this._canvasElement.setAttribute('width', canvasContainerEl.offsetWidth);
 
-    this._drawShapes();
+    this.drawShapes();
   }
 
   _onScroll(event) {
@@ -68,7 +88,7 @@ class Whiteboard {
       this._offset[0] += event.deltaX;
       this._offset[1] += event.deltaY;
 
-      this._drawShapes();
+      this.drawShapes();
     } else if (event.touches.length > 1) {
       event.preventDefault();
 
@@ -80,7 +100,7 @@ class Whiteboard {
       this._lastDragPoint[0] = curPoint[0];
       this._lastDragPoint[1] = curPoint[1];
 
-      this._drawShapes();
+      this.drawShapes();
     }
   }
 
@@ -94,7 +114,7 @@ class Whiteboard {
 
     this._shapes.push(shape);
 
-    this._drawShapes();
+    this.drawShapes();
   }
 
   _onTouchMove(event) {
@@ -117,7 +137,7 @@ class Whiteboard {
   }
 
   _setMode(mode) {
-    if (mode === MODE.line) {
+    if (mode === Mode.line) {
       this._mode = mode;
 
       this._drawer = new DrawLine({
@@ -137,6 +157,13 @@ class Whiteboard {
 
   _setupContext() {
     this._context = this._canvasElement.getContext('2d');
+  }
+
+  _setupToolbar() {
+    this._toolbar = new Toolbar({
+      callback: this.setConfig.bind(this),
+      srcNode: 'toolbar'
+    });
   }
 };
 

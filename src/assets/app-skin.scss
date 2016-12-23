@@ -9,16 +9,21 @@
     border-color: gray;
     color: white;
 
-    .toolbar-item-options {
-      background-color: #32a8e6;
-
-      .toolbar-item-option {
-        color: white;
-      }
-    }
-
     .toolbar-item {
       border-color: white;
+
+      .toolbar-item-options {
+        background-color: #32a8e6;
+
+        .toolbar-item-option {
+          color: white;
+          cursor: pointer;
+
+          &.active {
+            border-color: white;
+          }
+        }
+      }
 
       &.drag {
         .toolbar-item-value {
@@ -28,6 +33,10 @@
 
       .toolbar-item-value {
         cursor: pointer;
+
+        &.active {
+          border-color: white;
+        }
       }
     }
   }
