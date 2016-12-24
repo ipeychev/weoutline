@@ -34,12 +34,15 @@ class Toolbar {
 
   _attachListeners() {
     this._clickListener = this._onClick.bind(this);
+    this._documentInteractionListener = this._onDocumentInteraction.bind(this);
     this._touchEndListener = this._onTouchEnd.bind(this);
 
     if (Utils.isTouchDevice()) {
       this._element.addEventListener('touchend', this._touchEndListener);
+      document.addEventListener('touchstart', this._documentInteractionListener);
     } else {
       this._element.addEventListener('click', this._clickListener);
+      document.addEventListener('mousedown', this._documentInteractionListener);
     }
   }
 
@@ -56,8 +59,10 @@ class Toolbar {
   }
 
   _detachListeners() {
-    this._element.addEventListener('touchend', this._touchEndListener);
+    document.addEventListener('mousedown', this._documentInteractionListener);
+    document.addEventListener('touchstart', this._documentInteractionListener);
     this._element.addEventListener('click', this._clickListener);
+    this._element.addEventListener('touchend', this._touchEndListener);
   }
 
   _getActiveTool() {
@@ -109,6 +114,12 @@ class Toolbar {
     let values = this.getValues();
 
     this._config.callback(values);
+  }
+
+  _onDocumentInteraction(event) {
+    if (!this._element.contains(event.target)) {
+      this._hideMenu();
+    }
   }
 
   _onTouchEnd(event) {
