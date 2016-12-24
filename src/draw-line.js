@@ -52,7 +52,7 @@ class DrawLine {
 
     this._lastPoint = Draw.lineToMidPoint(this._lastPoint, curPoint, this._context, {
       color: this._config.color,
-      size: this._config.size
+      size: this._getSize()
     });
 
     this._points.push(curPoint);
@@ -71,7 +71,7 @@ class DrawLine {
       let shape = new Shape({
         color: this._config.color,
         points: this._points.slice(0),
-        size: this._config.size,
+        size: this._getSize(),
         type: ShapeType.LINE
       });
 
@@ -82,13 +82,13 @@ class DrawLine {
   }
 
   setConfig(config) {
-    this._config = config;
+    this._config = Object.assign(this._config, config);
   }
 
   start(event) {
     this._isDrawing = true;
 
-    this._context.lineWidth = this._config.size;
+    this._context.lineWidth = this._getSize();
     this._context.strokeStyle = this._config.color;
 
     this._lastPoint = Utils.getPointFromEvent(event, this._canvasElement);
@@ -122,6 +122,10 @@ class DrawLine {
     this._canvasElement.removeEventListener('touchend', this._finishDrawListener);
     this._canvasElement.removeEventListener('touchmove', this._drawListener);
     this._canvasElement.removeEventListener('touchstart', this._startListener);
+  }
+
+  _getSize() {
+    return this._config.size / window.devicePixelRatio;
   }
 
   _setupCanvas() {

@@ -1,4 +1,4 @@
-import { Mode } from './mode';
+import { Tools } from './tools';
 import Utils from './utils';
 
 class Toolbar {
@@ -7,9 +7,8 @@ class Toolbar {
 
     this._config = config;
 
-    this.setValues(config);
-
     this._setupContainer()
+    this.setValues(config);
     this._attachListeners();
   }
 
@@ -19,30 +18,42 @@ class Toolbar {
 
   getValues() {
     let values = {
+      activeTool: this._getActiveTool(),
       color: this._getColor(),
       eraserSize: this._getEraserSize(),
-      penSize: this._getPenSize(),
-      tool: this._getActiveTool()
+      penSize: this._getPenSize()
     };
 
     return values;
   }
 
-  setValues(values) {
+  setValues() {
+    if (this._config.activeTool === Tools.line) {
+      this._penNode.querySelector('.toolbar-item-value').classList.add('active');
+    } else if (this._config.activeTool === Tools.eraser) {
+      this._eraserNode.querySelector('.toolbar-item-value').classList.add('active');
+    }
 
+    this._setToolSize(this._penNode, this._config.penSize);
+    this._setToolSize(this._eraserNode, this._config.eraserSize);
+
+    this._setColor();
   }
 
   _attachListeners() {
     this._clickListener = this._onClick.bind(this);
     this._documentInteractionListener = this._onDocumentInteraction.bind(this);
     this._touchEndListener = this._onTouchEnd.bind(this);
+    this._colorNodeChangeListener = this._onColorChange.bind(this);
 
     if (Utils.isTouchDevice()) {
       this._element.addEventListener('touchend', this._touchEndListener);
       document.addEventListener('touchstart', this._documentInteractionListener);
+      this._colorNode.addEventListener('change', this._colorNodeChangeListener);
     } else {
       this._element.addEventListener('click', this._clickListener);
       document.addEventListener('mousedown', this._documentInteractionListener);
+      this._colorNode.addEventListener('change', this._colorNodeChangeListener);
     }
   }
 
@@ -59,24 +70,25 @@ class Toolbar {
   }
 
   _detachListeners() {
-    document.addEventListener('mousedown', this._documentInteractionListener);
-    document.addEventListener('touchstart', this._documentInteractionListener);
-    this._element.addEventListener('click', this._clickListener);
-    this._element.addEventListener('touchend', this._touchEndListener);
+    document.removeEventListener('mousedown', this._documentInteractionListener);
+    document.removeEventListener('touchstart', this._documentInteractionListener);
+    this._element.removeEventListener('click', this._clickListener);
+    this._element.removeEventListener('touchend', this._touchEndListener);
+    this._colorNode.removeEventListener('change', this._colorNodeChangeListener);
   }
 
   _getActiveTool() {
     let activeNode = this._element.querySelector('.toolbar-item-value.active').parentNode;
 
     if (activeNode === this._penNode) {
-      return Mode.line;
+      return Tools.line;
     } else if (activeNode === this._eraserNode) {
-      return Mode.eraser;
+      return Tools.eraser;
     }
   }
 
   _getColor() {
-    return this._element.querySelector('#penColor').value;
+    return this._colorNode.value;
   }
 
   _getPenSize() {
@@ -116,6 +128,12 @@ class Toolbar {
     this._config.callback(values);
   }
 
+  _onColorChange() {
+    let values = this.getValues();
+
+    this._config.callback(values);
+  }
+
   _onDocumentInteraction(event) {
     if (!this._element.contains(event.target)) {
       this._hideMenu();
@@ -128,11 +146,28 @@ class Toolbar {
     }
   }
 
+  _setColor() {
+    this._colorNode.value = this._config.color;
+  }
+
+  _setToolSize(rootNode, value) {
+    this._deactivateOptions(rootNode);
+
+    rootNode.querySelectorAll('.toolbar-item-option .fa').forEach((optionNode) => {
+      let style = window.getComputedStyle(optionNode);
+
+      if (parseInt(style.getPropertyValue('font-size'), 10) === value) {
+        optionNode.parentNode.classList.add('active');
+      }
+    })
+  }
+
   _setupContainer() {
     this._element = document.getElementById(this._config.srcNode);
 
     this._penNode = document.getElementById('pen');
     this._eraserNode = document.getElementById('eraser');
+    this._colorNode = this._element.querySelector('#penColor');
   }
 
   _updateToolbarView(rootNode, targetNode) {

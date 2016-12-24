@@ -2,7 +2,7 @@ import { ShapeType } from './shape';
 import Draw from './draw';
 import DrawLine from './draw-line';
 import Toolbar from './toolbar';
-import { Mode } from './mode';
+import { Tools } from './tools';
 import Utils from './utils';
 
 class Whiteboard {
@@ -20,7 +20,7 @@ class Whiteboard {
 
     this._attachListeners();
 
-    this._setMode(config.mode || Mode.line);
+    this._setActiveTool();
   }
 
   destroy() {
@@ -45,7 +45,14 @@ class Whiteboard {
   }
 
   setConfig(config) {
-    this._config = config;
+    Object.assign(this._config, config);
+
+    if (this._drawer) {
+      this._drawer.setConfig({
+        color: config.color,
+        size: this._getToolSize()
+      });
+    }
   }
 
   _attachListeners() {
@@ -70,6 +77,18 @@ class Whiteboard {
     this._canvasElement.removeEventListener('touchmove', this._onTouchMoveListener);
     this._canvasElement.removeEventListener('wheel', this._onWheelListener);
     this._canvasElement.removeEventListener('contextmenu', this._onContextMenuListener);
+  }
+
+  _getToolSize() {
+    let size;
+
+    if (this._config.activeTool === Tools.line) {
+      size = this._config.penSize;
+    } else if (this._config.activeTool === Tools.eraser) {
+      size = this._config.eraserSize;
+    }
+
+    return size;
   }
 
   _onBrowserResize() {
@@ -136,15 +155,13 @@ class Whiteboard {
     this._canvasElement.setAttribute('width', canvasContainerEl.offsetWidth);
   }
 
-  _setMode(mode) {
-    if (mode === Mode.line) {
-      this._mode = mode;
-
+  _setActiveTool() {
+    if (this._config.activeTool === Tools.line) {
       this._drawer = new DrawLine({
         callback: this._onShapeCreatedCallback.bind(this),
         canvas: this._canvasElement,
-        color: '#000000',
-        size: 4
+        color: this._config.color,
+        size: this._getToolSize()
       });
     }
   }
@@ -160,10 +177,12 @@ class Whiteboard {
   }
 
   _setupToolbar() {
-    this._toolbar = new Toolbar({
+    let config = {
       callback: this.setConfig.bind(this),
       srcNode: 'toolbar'
-    });
+    };
+
+    this._toolbar = new Toolbar(Object.assign(config, this._config));
   }
 };
 
