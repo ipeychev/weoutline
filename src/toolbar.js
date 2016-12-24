@@ -75,14 +75,14 @@ class Toolbar {
   }
 
   _getPenSize() {
-    return this._getModeize(this._penNode);
+    return this._getToolSize(this._penNode);
   }
 
   _getEraserSize() {
-    return this._getModeize(this._eraserNode);
+    return this._getToolSize(this._eraserNode);
   }
 
-  _getModeize(rootNode) {
+  _getToolSize(rootNode) {
     let node = rootNode.querySelector('.toolbar-item-option.active .fa');
     let style = window.getComputedStyle(node);
 
