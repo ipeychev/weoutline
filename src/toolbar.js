@@ -47,7 +47,7 @@ class Toolbar {
     this._colorNodeChangeListener = this._onColorChange.bind(this);
 
     if (Utils.isTouchDevice()) {
-      this._element.addEventListener('touchend', this._touchEndListener);
+      this._element.addEventListener('touchend', this._touchEndListener, { passive: true });
       document.addEventListener('touchstart', this._documentInteractionListener);
       this._colorNode.addEventListener('change', this._colorNodeChangeListener);
     } else {
@@ -141,7 +141,7 @@ class Toolbar {
   }
 
   _onTouchEnd(event) {
-    if (event.touches.length === 1) {
+    if (event.changedTouches.length === 1) {
       this._onClick(event);
     }
   }
