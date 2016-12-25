@@ -60,6 +60,7 @@ class Whiteboard {
     this._onTouchMoveListener = this._onTouchMove.bind(this);
     this._onWheelListener = this._onScroll.bind(this);
     this._onContextMenuListener = function(e) { e.preventDefault(); };
+    this._resizeListener = this._onResize.bind(this);
 
     if (Utils.isTouchDevice()) {
       this._canvasElement.addEventListener('touchstart', this._onTouchStartListener);
@@ -69,7 +70,8 @@ class Whiteboard {
       this._canvasElement.addEventListener('contextmenu', this._onContextMenuListener);
     }
 
-    window.addEventListener('resize', this._onBrowserResize.bind(this));
+    window.addEventListener('resize', this._resizeListener);
+    window.addEventListener('orientationchange', this._resizeListener);
   }
 
   _detachListeners() {
@@ -77,6 +79,8 @@ class Whiteboard {
     this._canvasElement.removeEventListener('touchmove', this._onTouchMoveListener);
     this._canvasElement.removeEventListener('wheel', this._onWheelListener);
     this._canvasElement.removeEventListener('contextmenu', this._onContextMenuListener);
+    window.removeEventListener('resize', this._resizeListener);
+    window.removeEventListener('orientationchange', this._resizeListener);
   }
 
   _getToolSize() {
@@ -91,7 +95,7 @@ class Whiteboard {
     return size;
   }
 
-  _onBrowserResize() {
+  _onResize() {
     let canvasContainerEl = this._canvasElement.parentNode;
 
     this._canvasElement.setAttribute('height', canvasContainerEl.offsetHeight);
