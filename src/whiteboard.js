@@ -38,6 +38,9 @@ class Whiteboard {
 
         Draw.line(points, this._context, {
           color: this._shapes[i].color,
+          globalCompositeOperation: 'source-over',
+          lineCap: 'round',
+          lineJoin: 'round',
           size: this._shapes[i].size
         });
       }
@@ -165,6 +168,9 @@ class Whiteboard {
         callback: this._onShapeCreatedCallback.bind(this),
         canvas: this._canvasElement,
         color: this._config.color,
+        globalCompositeOperation: 'source-over',
+        lineCap: 'round',
+        lineJoin: 'round',
         size: this._getToolSize()
       });
     }

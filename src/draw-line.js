@@ -52,6 +52,9 @@ class DrawLine {
 
     this._lastPoint = Draw.lineToMidPoint(this._lastPoint, curPoint, this._context, {
       color: this._config.color,
+      globalCompositeOperation: this._config.globalCompositeOperation,
+      lineCap: this._config.lineCap,
+      lineJoin: this._config.lineJoin,
       size: this._getSize()
     });
 
@@ -134,9 +137,6 @@ class DrawLine {
 
   _setupContext() {
     this._context = this._canvasElement.getContext('2d');
-
-    this._context.lineJoin = this._context.lineCap = 'round';
-    this._context.globalCompositeOperation = 'source-over';
   }
 }
 

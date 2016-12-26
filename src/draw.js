@@ -3,6 +3,8 @@ export default class Draw {
     let p1 = points[0];
     let p2 = points[1];
 
+    context.globalCompositeOperation = config.globalCompositeOperation;
+
     if (p1 && !p2) {
       context.fillStyle = config.color;
 
@@ -10,6 +12,8 @@ export default class Draw {
       context.arc(p1[0], p1[1], config.size/2, 0, 2 * Math.PI, false);
       context.fill();
     } else {
+      context.lineCap = config.lineCap;
+      context.lineJoin = config.lineJoin;
       context.lineWidth = config.size;
       context.strokeStyle = config.color;
 
@@ -30,6 +34,9 @@ export default class Draw {
   }
 
   static lineToMidPoint(p1, p2, context, config) {
+    context.globalCompositeOperation = config.globalCompositeOperation;
+    context.lineCap = config.lineCap;
+    context.lineJoin = config.lineJoin;
     context.lineWidth = config.size;
     context.strokeStyle = config.color;
 
