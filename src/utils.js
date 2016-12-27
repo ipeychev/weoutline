@@ -39,4 +39,19 @@ export default class Utils {
 
     return point;
   }
+
+  static componentToHex(c) {
+    let hex = c.toString(16);
+
+    return hex.length == 1 ? '0' + hex : hex;
+  }
+
+  static rgbToHex(value) {
+    let result = /rgb\s*\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)/.exec(value);
+    let r = parseInt(result[1], 10);
+    let g = parseInt(result[2], 10);
+    let b = parseInt(result[3], 10);
+
+    return "#" + Utils.componentToHex(r) + Utils.componentToHex(g) + Utils.componentToHex(b);
+  }
 }

@@ -34,25 +34,21 @@ class Toolbar {
     }
 
     this._setToolSize(this._penNode, this._config.penSize);
-    this._setToolSize(this._eraserNode, this._config.eraserSize);
 
-    this._setColor();
+    this._setColor(this._config.color);
   }
 
   _attachListeners() {
     this._clickListener = this._onClick.bind(this);
     this._documentInteractionListener = this._onDocumentInteraction.bind(this);
     this._touchEndListener = this._onTouchEnd.bind(this);
-    this._colorNodeChangeListener = this._onColorChange.bind(this);
 
     if (Utils.isTouchDevice()) {
       this._element.addEventListener('touchend', this._touchEndListener, { passive: true });
       document.addEventListener('touchstart', this._documentInteractionListener);
-      this._colorNode.addEventListener('change', this._colorNodeChangeListener);
     } else {
       this._element.addEventListener('click', this._clickListener);
       document.addEventListener('mousedown', this._documentInteractionListener);
-      this._colorNode.addEventListener('change', this._colorNodeChangeListener);
     }
   }
 
@@ -73,7 +69,6 @@ class Toolbar {
     document.removeEventListener('touchstart', this._documentInteractionListener);
     this._element.removeEventListener('click', this._clickListener);
     this._element.removeEventListener('touchend', this._touchEndListener);
-    this._colorNode.removeEventListener('change', this._colorNodeChangeListener);
   }
 
   _getActiveTool() {
@@ -87,7 +82,10 @@ class Toolbar {
   }
 
   _getColor() {
-    return this._colorNode.value;
+    let node = this._colorNode.querySelector('.toolbar-item-option.active .fa');
+    let style = window.getComputedStyle(node);
+
+    return Utils.rgbToHex(style.getPropertyValue('color'));
   }
 
   _getPenSize() {
@@ -111,9 +109,17 @@ class Toolbar {
     let targetNode = event.target;
 
     if (this._penNode.contains(targetNode)) {
-      this._updateToolbarView(this._penNode, targetNode);
+      this._updateToolbarView(this._penNode, targetNode, {
+        activateTool: true
+      });
     } else if (this._eraserNode.contains(targetNode)) {
-      this._updateToolbarView(this._eraserNode, targetNode);
+      this._updateToolbarView(this._eraserNode, targetNode, {
+        activateTool: true
+      });
+    } else if (this._colorNode.contains(targetNode)) {
+      this._updateToolbarView(this._colorNode, targetNode, {
+        activateTool: false
+      });
     } else {
       this._hideMenu();
     }
@@ -141,8 +147,18 @@ class Toolbar {
     }
   }
 
-  _setColor() {
-    this._colorNode.value = this._config.color;
+  _setColor(value) {
+    this._deactivateOptions(this._colorNode);
+
+    this._colorNode.querySelectorAll('.toolbar-item-option .fa').forEach((optionNode) => {
+      let style = window.getComputedStyle(optionNode);
+
+      console.log(style.getPropertyValue('color'));
+
+      if (Utils.rgbToHex(style.getPropertyValue('color')) === value) {
+        optionNode.parentNode.classList.add('active');
+      }
+    });
   }
 
   _setToolSize(rootNode, value) {
@@ -154,7 +170,7 @@ class Toolbar {
       if (parseInt(style.getPropertyValue('font-size'), 10) === value) {
         optionNode.parentNode.classList.add('active');
       }
-    })
+    });
   }
 
   _setupContainer() {
@@ -162,21 +178,22 @@ class Toolbar {
 
     this._penNode = document.getElementById('pen');
     this._eraserNode = document.getElementById('eraser');
-    this._colorNode = this._element.querySelector('#penColor');
+    this._colorNode = document.getElementById('color');
   }
 
-  _updateToolbarView(rootNode, targetNode) {
-    this._hideMenu();
-    this._deactivateValues();
-
+  _updateToolbarView(rootNode, targetNode, config) {
+    config = config || {};
     let optionsNode = rootNode.querySelector('.toolbar-item-options');
-
-    rootNode.querySelector('.toolbar-item-value').classList.add('active');
 
     if (optionsNode) {
       let isMenuShown = !optionsNode.classList.contains('hidden');
 
-      rootNode.querySelector('.toolbar-item-value').classList.add('active');
+      this._hideMenu();
+
+      if (config.activateTool) {
+        this._deactivateValues();
+        rootNode.querySelector('.toolbar-item-value').classList.add('active');
+      }
 
       if (optionsNode.contains(targetNode)) {
         this._deactivateOptions(rootNode);
@@ -188,6 +205,13 @@ class Toolbar {
         targetNode.classList.add('active');
       } else if (!isMenuShown) {
         optionsNode.classList.remove('hidden');
+      }
+    } else {
+      this._hideMenu();
+
+      if (config.activateTool) {
+        this._deactivateValues();
+        rootNode.querySelector('.toolbar-item-value').classList.add('active');
       }
     }
   }

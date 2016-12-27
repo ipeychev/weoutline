@@ -87,8 +87,6 @@ class Whiteboard {
 
     if (this._config.activeTool === Tools.line) {
       size = this._config.penSize;
-    } else if (this._config.activeTool === Tools.eraser) {
-      size = this._config.eraserSize;
     }
 
     return size;

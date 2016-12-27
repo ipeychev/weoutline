@@ -22,6 +22,42 @@
           &.active {
             border-color: white;
           }
+
+          &.black {
+            i {
+              color: #000000;
+            }
+          }
+
+          &.red {
+            i {
+              color: #ff0000;
+            }
+          }
+
+          &.green {
+            i {
+              color: #00cc33;
+            }
+          }
+
+          &.blue {
+            i {
+              color: #0000ff;
+            }
+          }
+
+          &.yellow {
+            i {
+              color: #ffff00;
+            }
+          }
+
+          &.orange {
+            i {
+              color: #ff9933;
+            }
+          }
         }
       }
 
