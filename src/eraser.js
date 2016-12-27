@@ -87,42 +87,34 @@ class Eraser {
       let point2 = points[j];
 
       if (!point2) {
-        point2 = point1;
+        point2 = [point1[0] + 10, point1[1] + 10];
       }
 
-      let res;
+      let p1 = [], p2 = [], p3 = [], p4 = [];
 
-      let dxc = curPoint[0] - point1[0];
-      let dyc = curPoint[1] - point1[1];
+      p1[0] = [curPoint[0] - 10];
+      p1[1] = [curPoint[1]];
 
-      let dxl = point2[0] - point1[0];
-      let dyl = point2[1] - point1[1];
+      p2[0] = [curPoint[0] + 10];
+      p2[1] = [curPoint[1]];
 
-      let cross = dxc * dyl - dyc * dxl;
+      p3[0] = curPoint[0];
+      p3[1] = curPoint[1] - 10;
 
+      p4[0] = curPoint[0];
+      p4[1] = curPoint[1] + 10;
 
-      res = Math.abs(cross) <= 0.5;
+      let option1 = this._isIntersecting(p1, p2, point1, point2);
+      let option2 = this._isIntersecting(p3, p4, point1, point2);
 
-      if (!res) {
-        continue;
-      }
-
-      console.log(Math.abs(cross));
-      if (Math.abs(dxl) >= Math.abs(dyl)) {
-        res = dxl > 0 ?
-          point1[0] <= curPoint[0] && curPoint[0] <= point2[0] :
-          point2[0] <= curPoint[0] && curPoint[0] <= point1[0];
-      }
-      else {
-        res = dyl > 0 ?
-          point1[1] <= curPoint[1] && curPoint[1] <= point2[1] :
-          point2[1] <= curPoint[1] && curPoint[1] <= point1[1];
-      }
-
-      if (res) {
+      if (option1 || option2) {
         return true;
       }
     }
+  }
+
+  _counterClockwise(p1, p2, p3) {
+    return (p3[1] - p1[1]) * (p2[0] - p1[0]) > (p2[1] - p1[1]) * (p3[0] - p1[0]);
   }
 
   _detachListeners() {
@@ -147,6 +139,11 @@ class Eraser {
     }
 
     return matchingShapes;
+  }
+
+  _isIntersecting(p1, p2, p3, p4) {
+    return (this._counterClockwise(p1, p3, p4) !== this._counterClockwise(p2, p3, p4)) &&
+      (this._counterClockwise(p1, p2, p3) != this._counterClockwise(p1, p2, p4));
   }
 
   _setupCanvas() {
