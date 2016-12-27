@@ -20,7 +20,6 @@ class Toolbar {
     let values = {
       activeTool: this._getActiveTool(),
       color: this._getColor(),
-      eraserSize: this._getEraserSize(),
       penSize: this._getPenSize()
     };
 
@@ -95,10 +94,6 @@ class Toolbar {
     return this._getToolSize(this._penNode);
   }
 
-  _getEraserSize() {
-    return this._getToolSize(this._eraserNode);
-  }
-
   _getToolSize(rootNode) {
     let node = rootNode.querySelector('.toolbar-item-option.active .fa');
     let style = window.getComputedStyle(node);
@@ -171,24 +166,29 @@ class Toolbar {
   }
 
   _updateToolbarView(rootNode, targetNode) {
-    let optionsNode = rootNode.querySelector('.toolbar-item-options');
-    let isMenuShown = !optionsNode.classList.contains('hidden');
-
     this._hideMenu();
     this._deactivateValues();
 
+    let optionsNode = rootNode.querySelector('.toolbar-item-options');
+
     rootNode.querySelector('.toolbar-item-value').classList.add('active');
 
-    if (optionsNode.contains(targetNode)) {
-      this._deactivateOptions(rootNode);
+    if (optionsNode) {
+      let isMenuShown = !optionsNode.classList.contains('hidden');
 
-      while (!targetNode.matches('.toolbar-item-option')) {
-        targetNode = targetNode.parentNode;
+      rootNode.querySelector('.toolbar-item-value').classList.add('active');
+
+      if (optionsNode.contains(targetNode)) {
+        this._deactivateOptions(rootNode);
+
+        while (!targetNode.matches('.toolbar-item-option')) {
+          targetNode = targetNode.parentNode;
+        }
+
+        targetNode.classList.add('active');
+      } else if (!isMenuShown) {
+        optionsNode.classList.remove('hidden');
       }
-
-      targetNode.classList.add('active');
-    } else if (!isMenuShown) {
-      optionsNode.classList.remove('hidden');
     }
   }
 }

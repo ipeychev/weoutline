@@ -1,5 +1,6 @@
 import { ShapeType } from './shape';
 import Draw from './draw';
+import Eraser from './eraser';
 import DrawLine from './draw-line';
 import Toolbar from './toolbar';
 import { Tools } from './tools';
@@ -50,12 +51,7 @@ class Whiteboard {
   setConfig(config) {
     Object.assign(this._config, config);
 
-    if (this._drawer) {
-      this._drawer.setConfig({
-        color: config.color,
-        size: this._getToolSize()
-      });
-    }
+    this._setActiveTool();
   }
 
   _attachListeners() {
@@ -138,7 +134,25 @@ class Whiteboard {
       point[1] += this._offset[1];
     }
 
+    shape.id = Date.now().toString() + window.crypto.getRandomValues(new Uint32Array(1))[0];
+
     this._shapes.push(shape);
+
+    this.drawShapes();
+  }
+
+  _onShapesErasedCallback(shapes) {
+    for (let i = 0; i < shapes.length; i++) {
+      let deletedShape = shapes[i];
+
+      this._shapes = this._shapes.filter((oldShape) => {
+        if (deletedShape.id === oldShape.id) {
+          return false;
+        }
+
+        return true;
+      });
+    }
 
     this.drawShapes();
   }
@@ -163,6 +177,10 @@ class Whiteboard {
   }
 
   _setActiveTool() {
+    if (this._drawer) {
+      this._drawer.destroy();
+    }
+
     if (this._config.activeTool === Tools.line) {
       this._drawer = new DrawLine({
         callback: this._onShapeCreatedCallback.bind(this),
@@ -172,6 +190,12 @@ class Whiteboard {
         lineCap: 'round',
         lineJoin: 'round',
         size: this._getToolSize()
+      });
+    } else if (this._config.activeTool === Tools.eraser) {
+      this._drawer = new Eraser({
+        callback: this._onShapesErasedCallback.bind(this),
+        canvas: this._canvasElement,
+        shapes: this._shapes
       });
     }
   }

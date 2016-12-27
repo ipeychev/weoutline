@@ -1,12 +1,8 @@
-import Draw from './draw';
-import { Shape, ShapeType }  from './shape';
 import Utils from './utils';
 
-class DrawLine {
+class Eraser {
   constructor(config) {
     this._config = config;
-
-    this._points = [];
 
     this._setupCanvas();
     this._setupContext();
@@ -15,13 +11,11 @@ class DrawLine {
   }
 
   cancel() {
-    if (!this._isDrawing) {
+    if (!this._isErasing) {
       return;
     }
 
-    this._points.length = 0;
-
-    this.finish(event);
+    this._isErasing = false;
   }
 
   destroy() {
@@ -29,20 +23,12 @@ class DrawLine {
   }
 
   draw(event) {
-    if (!this._isDrawing) {
+    if (!this._isErasing) {
       return;
     }
 
     if (event.touches && event.touches.length > 1) {
-      // Less or equal to two points into the points array from
-      // the start event and two fingers now means that the user
-      // meant to scroll
-      // in this case we won't draw anything
-      if (this._points.length <= 2) {
-        this._points.length = 0;
-      }
-
-      this.finish(event);
+      this._isErasing = false;
       return;
     }
 
@@ -50,38 +36,19 @@ class DrawLine {
 
     let curPoint = Utils.getPointFromEvent(event, this._canvasElement);
 
-    this._lastPoint = Draw.lineToMidPoint(this._lastPoint, curPoint, this._context, {
-      color: this._config.color,
-      globalCompositeOperation: this._config.globalCompositeOperation,
-      lineCap: this._config.lineCap,
-      lineJoin: this._config.lineJoin,
-      size: this._getSize()
-    });
+    let matchingShapes = this._getMatchingShapes(curPoint);
 
-    this._points.push(curPoint);
+    if (matchingShapes.length) {
+      this._config.callback(matchingShapes);
+    }
   }
 
   finish() {
-    if (!this._isDrawing) {
+    if (!this._isErasing) {
       return;
     }
 
-    this._isDrawing = false;
-
-    // In case of draw canceling, there won't be any points
-    // Creating a shape is not needed in this case
-    if (this._points.length) {
-      let shape = new Shape({
-        color: this._config.color,
-        points: this._points.slice(0),
-        size: this._getSize(),
-        type: ShapeType.LINE
-      });
-
-      this._config.callback(shape);
-
-      this._points.length = 0;
-    }
+    this._isErasing = false;
   }
 
   setConfig(config) {
@@ -89,14 +56,9 @@ class DrawLine {
   }
 
   start(event) {
-    this._isDrawing = true;
-
-    this._context.lineWidth = this._getSize();
-    this._context.strokeStyle = this._config.color;
+    this._isErasing = true;
 
     this._lastPoint = Utils.getPointFromEvent(event, this._canvasElement);
-
-    this._points.push(this._lastPoint);
   }
 
   _attachListeners() {
@@ -117,6 +79,52 @@ class DrawLine {
     }
   }
 
+  _checkShapeMatching(curPoint, shape) {
+    let points = shape.points;
+
+    for (let i = 0, j = 1; i < points.length; i++, j++) {
+      let point1 = points[i];
+      let point2 = points[j];
+
+      if (!point2) {
+        point2 = point1;
+      }
+
+      let res;
+
+      let dxc = curPoint[0] - point1[0];
+      let dyc = curPoint[1] - point1[1];
+
+      let dxl = point2[0] - point1[0];
+      let dyl = point2[1] - point1[1];
+
+      let cross = dxc * dyl - dyc * dxl;
+
+
+      res = Math.abs(cross) <= 0.5;
+
+      if (!res) {
+        continue;
+      }
+
+      console.log(Math.abs(cross));
+      if (Math.abs(dxl) >= Math.abs(dyl)) {
+        res = dxl > 0 ?
+          point1[0] <= curPoint[0] && curPoint[0] <= point2[0] :
+          point2[0] <= curPoint[0] && curPoint[0] <= point1[0];
+      }
+      else {
+        res = dyl > 0 ?
+          point1[1] <= curPoint[1] && curPoint[1] <= point2[1] :
+          point2[1] <= curPoint[1] && curPoint[1] <= point1[1];
+      }
+
+      if (res) {
+        return true;
+      }
+    }
+  }
+
   _detachListeners() {
     this._canvasElement.removeEventListener('mousedown', this._startListener);
     this._canvasElement.removeEventListener('mousemove', this._drawListener);
@@ -127,8 +135,18 @@ class DrawLine {
     this._canvasElement.removeEventListener('touchstart', this._startListener);
   }
 
-  _getSize() {
-    return this._config.size / window.devicePixelRatio;
+  _getMatchingShapes(curPoint) {
+    let matchingShapes = [];
+
+    for (let i = 0; i < this._config.shapes.length; i++) {
+      let matchedShape = this._checkShapeMatching(curPoint, this._config.shapes[i]);
+
+      if (matchedShape) {
+        matchingShapes.push(this._config.shapes[i]);
+      }
+    }
+
+    return matchingShapes;
   }
 
   _setupCanvas() {
@@ -140,4 +158,4 @@ class DrawLine {
   }
 }
 
-export default DrawLine;
+export default Eraser;
