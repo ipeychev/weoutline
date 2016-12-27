@@ -118,7 +118,13 @@ class Toolbar {
       });
     } else if (this._colorNode.contains(targetNode)) {
       this._updateToolbarView(this._colorNode, targetNode, {
-        activateTool: false
+        activateTool: false,
+        setCurrentValue: {
+          from: 'style',
+          nodeSelector: '.fa',
+          transformFn: Utils.rgbToHex,
+          property: 'color'
+        }
       });
     } else {
       this._hideMenu();
@@ -153,12 +159,30 @@ class Toolbar {
     this._colorNode.querySelectorAll('.toolbar-item-option .fa').forEach((optionNode) => {
       let style = window.getComputedStyle(optionNode);
 
-      console.log(style.getPropertyValue('color'));
-
       if (Utils.rgbToHex(style.getPropertyValue('color')) === value) {
         optionNode.parentNode.classList.add('active');
+
+        this._setItemValue(optionNode.parentNode, this._colorNode, {
+          setCurrentValue: {
+            from: 'style',
+            nodeSelector: '.fa',
+            transformFn: Utils.rgbToHex,
+            property: 'color'
+          }
+        });
       }
     });
+  }
+
+  _setItemValue(optionNode, rootNode, config) {
+    if (config.setCurrentValue.from === 'style') {
+      let style = window.getComputedStyle(optionNode.querySelector(config.setCurrentValue.nodeSelector));
+
+      let value = config.setCurrentValue.transformFn ?  config.setCurrentValue.transformFn(style.getPropertyValue(config.setCurrentValue.property)) :
+        style.getPropertyValue(config.setCurrentValue.property);
+
+      rootNode.querySelector('.toolbar-item-value').querySelector(config.setCurrentValue.nodeSelector).style[config.setCurrentValue.property] = value;
+    }
   }
 
   _setToolSize(rootNode, value) {
@@ -182,7 +206,6 @@ class Toolbar {
   }
 
   _updateToolbarView(rootNode, targetNode, config) {
-    config = config || {};
     let optionsNode = rootNode.querySelector('.toolbar-item-options');
 
     if (optionsNode) {
@@ -203,6 +226,10 @@ class Toolbar {
         }
 
         targetNode.classList.add('active');
+
+        if (config.setCurrentValue) {
+          this._setItemValue(targetNode, rootNode, config);
+        }
       } else if (!isMenuShown) {
         optionsNode.classList.remove('hidden');
       }
