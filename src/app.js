@@ -4,5 +4,5 @@ import Whiteboard from './whiteboard';
 new Whiteboard({
   activeTool: Tools.line,
   color: '#000000',
-  penSize: 8
+  penSize: 6
 });
