@@ -1,4 +1,5 @@
 import { Tools } from './tools';
+import Draggable from './draggable';
 import Utils from './utils';
 
 class Toolbar {
@@ -10,10 +11,13 @@ class Toolbar {
     this._setupContainer()
     this.setValues(config);
     this._attachListeners();
+
+    this._draggable = new Draggable(this._element);
   }
 
   destroy() {
     this._detachListeners();
+    this._draggable.destroy();
   }
 
   getValues() {
@@ -178,7 +182,7 @@ class Toolbar {
     if (config.setCurrentValue.from === 'style') {
       let style = window.getComputedStyle(optionNode.querySelector(config.setCurrentValue.nodeSelector));
 
-      let value = config.setCurrentValue.transformFn ?  config.setCurrentValue.transformFn(style.getPropertyValue(config.setCurrentValue.property)) :
+      let value = config.setCurrentValue.transformFn ? config.setCurrentValue.transformFn(style.getPropertyValue(config.setCurrentValue.property)) :
         style.getPropertyValue(config.setCurrentValue.property);
 
       rootNode.querySelector('.toolbar-item-value').querySelector(config.setCurrentValue.nodeSelector).style[config.setCurrentValue.property] = value;
