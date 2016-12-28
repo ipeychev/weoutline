@@ -153,6 +153,10 @@ class Whiteboard {
     }
 
     this.drawShapes();
+
+    this._drawer.setConfig({
+      shapes: this._shapes
+    });
   }
 
   _onTouchMove(event) {
