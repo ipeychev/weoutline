@@ -35,6 +35,7 @@ class Eraser {
     event.preventDefault();
 
     let curPoint = Utils.getPointFromEvent(event, this._canvasElement);
+    curPoint = Utils.getPointWithoutOffset(curPoint, this._config.offset);
 
     let matchingShapes = this._getMatchingShapes(curPoint);
 
@@ -59,6 +60,7 @@ class Eraser {
     this._isErasing = true;
 
     let curPoint = Utils.getPointFromEvent(event, this._canvasElement);
+    curPoint = Utils.getPointWithoutOffset(curPoint, this._config.offset);
 
     let matchingShapes = this._getMatchingShapes(curPoint);
 

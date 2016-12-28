@@ -122,6 +122,10 @@ class Whiteboard {
 
       this.drawShapes();
     }
+
+    this._drawer.setConfig({
+      offset: this._offset
+    });
   }
 
   _onShapeCreatedCallback(shape) {
@@ -191,12 +195,14 @@ class Whiteboard {
         globalCompositeOperation: 'source-over',
         lineCap: 'round',
         lineJoin: 'round',
+        offset: this._offset,
         size: this._getToolSize()
       });
     } else if (this._config.activeTool === Tools.eraser) {
       this._drawer = new Eraser({
         callback: this._onShapesErasedCallback.bind(this),
         canvas: this._canvasElement,
+        offset: this._offset,
         shapes: this._shapes
       });
     }
