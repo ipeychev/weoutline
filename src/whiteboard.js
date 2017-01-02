@@ -60,6 +60,7 @@ class Whiteboard {
     this._onWheelListener = this._onScroll.bind(this);
     this._onContextMenuListener = function(e) { e.preventDefault(); };
     this._resizeListener = this._onResize.bind(this);
+    this._onLoadListener = this._onLoad.bind(this);
 
     if (Utils.isTouchDevice()) {
       this._canvasElement.addEventListener('touchstart', this._onTouchStartListener);
@@ -69,17 +70,21 @@ class Whiteboard {
       this._canvasElement.addEventListener('contextmenu', this._onContextMenuListener);
     }
 
-    window.addEventListener('resize', this._resizeListener);
+    window.addEventListener('load', this._onLoadListener, {
+      once: true
+    });
     window.addEventListener('orientationchange', this._resizeListener);
+    window.addEventListener('resize', this._resizeListener);
   }
 
   _detachListeners() {
-    this._canvasElement.removeEventListener('touchstart', this._onTouchStartListener);
-    this._canvasElement.removeEventListener('touchmove', this._onTouchMoveListener);
-    this._canvasElement.removeEventListener('wheel', this._onWheelListener);
     this._canvasElement.removeEventListener('contextmenu', this._onContextMenuListener);
-    window.removeEventListener('resize', this._resizeListener);
+    this._canvasElement.removeEventListener('touchmove', this._onTouchMoveListener);
+    this._canvasElement.removeEventListener('touchstart', this._onTouchStartListener);
+    this._canvasElement.removeEventListener('wheel', this._onWheelListener);
+    window.removeEventListener('load', this._onLoadListener);
     window.removeEventListener('orientationchange', this._resizeListener);
+    window.removeEventListener('resize', this._resizeListener);
   }
 
   _getToolSize() {
@@ -90,6 +95,10 @@ class Whiteboard {
     }
 
     return size;
+  }
+
+  _onLoad() {
+    this._resizeCanvas();
   }
 
   _onResize() {
@@ -210,8 +219,6 @@ class Whiteboard {
 
   _setupCanvas() {
     this._canvasElement = document.getElementById('canvas');
-
-    this._resizeCanvas();
   }
 
   _setupContext() {
