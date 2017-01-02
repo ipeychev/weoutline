@@ -87,6 +87,31 @@ class Whiteboard {
     window.removeEventListener('resize', this._resizeListener);
   }
 
+  _getAllowedOffset(scrollData) {
+    let tmpWidth = this._offset[0] + scrollData[0];
+    let tmpHeight = this._offset[1] + scrollData[1];
+
+    let allowedOffset = [];
+
+    if (tmpWidth < 0) {
+      allowedOffset[0] = 0;
+    } else if (tmpWidth > this._config.width) {
+      allowedOffset[0] = this._config.width - this._offset[0];
+    } else {
+      allowedOffset[0] = scrollData[0];
+    }
+
+    if (tmpHeight < 0) {
+      allowedOffset[1] = 0;
+    } else if (tmpHeight > this._config.height) {
+      allowedOffset[1] = this._config.height - this._offset[1];
+    } else {
+      allowedOffset[1] = scrollData[1];
+    }
+
+    return allowedOffset;
+  }
+
   _getToolSize() {
     let size;
 
@@ -111,11 +136,15 @@ class Whiteboard {
   }
 
   _onScroll(event) {
+    let allowedOffset;
+
     if (event.deltaMode === 0) {
       event.preventDefault();
 
-      this._offset[0] += event.deltaX;
-      this._offset[1] += event.deltaY;
+      allowedOffset = this._getAllowedOffset([event.deltaX, event.deltaY]);
+
+      this._offset[0] += allowedOffset[0];
+      this._offset[1] += allowedOffset[1];
 
       this.drawShapes();
     } else if (event.touches.length > 1) {
@@ -123,8 +152,13 @@ class Whiteboard {
 
       let curPoint = [event.touches[0].pageX, event.touches[0].pageY];
 
-      this._offset[0] += (curPoint[0] - this._lastDragPoint[0]) * -1;
-      this._offset[1] += (curPoint[1] - this._lastDragPoint[1]) * -1;
+      allowedOffset = this._getAllowedOffset([
+        (curPoint[0] - this._lastDragPoint[0]) * -1,
+        (curPoint[1] - this._lastDragPoint[1]) * -1
+      ]);
+
+      this._offset[0] += allowedOffset[0];
+      this._offset[1] += allowedOffset[1];
 
       this._lastDragPoint[0] = curPoint[0];
       this._lastDragPoint[1] = curPoint[1];
