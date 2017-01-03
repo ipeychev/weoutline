@@ -73,6 +73,7 @@ class Whiteboard {
     this._onContextMenuListener = function(e) { e.preventDefault(); };
     this._resizeListener = this._onResize.bind(this);
     this._onLoadListener = this._onLoad.bind(this);
+    this._onFullscreenChangeListener = this._onFullscreenChange.bind(this);
 
     if (Utils.isTouchDevice()) {
       this._canvasElement.addEventListener('touchstart', this._onTouchStartListener);
@@ -81,6 +82,8 @@ class Whiteboard {
       this._canvasElement.addEventListener('wheel', this._onWheelListener);
       this._canvasElement.addEventListener('contextmenu', this._onContextMenuListener);
     }
+
+    document.addEventListener(Utils.getFullscreenChangeEventName(this._canvasElement), this._onFullscreenChangeListener);
 
     window.addEventListener('load', this._onLoadListener, {
       once: true
@@ -101,6 +104,7 @@ class Whiteboard {
   }
 
   _detachListeners() {
+    document.removeEventListener(Utils.getFullscreenChangeEventName(this._canvasElement), this._onFullscreenChangeListener);
     this._canvasElement.removeEventListener('contextmenu', this._onContextMenuListener);
     this._canvasElement.removeEventListener('touchmove', this._onTouchMoveListener);
     this._canvasElement.removeEventListener('touchstart', this._onTouchStartListener);
@@ -113,6 +117,7 @@ class Whiteboard {
   _drawHorizontalRuler() {
     for (let i = 0; i < this._context.canvas.width; i += 20) {
       this._context.beginPath();
+      this._context.strokeStyle = '#000000';
       this._context.lineWidth = 1;
       this._context.moveTo(i, 0);
 
@@ -124,6 +129,7 @@ class Whiteboard {
       this._context.stroke();
 
       if (i % 500 === 0 && i > 0) {
+        this._context.strokeStyle = '#000000';
         this._context.textAlign = 'center';
         this._context.textBaseline = 'alphabetic';
         this._context.font = this._config.rulerFontSize + 'px';
@@ -135,6 +141,7 @@ class Whiteboard {
   _drawVerticalRuler() {
     for (let i = 20; i < this._context.canvas.height; i += 20) {
       this._context.beginPath();
+      this._context.strokeStyle = '#000000';
       this._context.lineWidth = 1;
       this._context.moveTo(0, i);
 
@@ -146,6 +153,7 @@ class Whiteboard {
       this._context.stroke();
 
       if (i % 500 === 0) {
+        this._context.strokeStyle = '#000000';
         this._context.textAlign = 'start';
         this._context.textBaseline = 'middle';
         this._context.font = this._config.rulerFontSize + 'px';
@@ -179,6 +187,18 @@ class Whiteboard {
     return allowedOffset;
   }
 
+  _handleFullscreen() {
+    let mainContainerNode = document.getElementById('mainContainer');
+
+    let inFullscreen = Utils.getFullScreenModeValue();
+
+    if (inFullscreen) {
+      Utils.exitFullscreen(mainContainerNode);
+    } else {
+      Utils.requestFullscreen(mainContainerNode);
+    }
+  }
+
   _getToolSize() {
     let size;
 
@@ -187,6 +207,14 @@ class Whiteboard {
     }
 
     return size;
+  }
+
+  _onFullscreenChange() {
+    let values = this._toolbar.getValues();
+
+    values.fullscreen = Utils.getFullScreenModeValue();
+
+    this._toolbar.setValues(values);
   }
 
   _onLoad() {
@@ -331,6 +359,7 @@ class Whiteboard {
   _setupToolbar() {
     let config = {
       clearWhiteboardCallback: this._clearWhiteboard.bind(this),
+      fullscreenCallback: this._handleFullscreen.bind(this),
       shareWhiteboardCallback: this._shareWhiteboard.bind(this),
       srcNode: 'toolbar',
       valuesCallback: this.setConfig.bind(this)

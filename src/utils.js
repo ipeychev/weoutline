@@ -1,6 +1,42 @@
 export default class Utils {
-  static isTouchDevice() {
-    return 'ontouchstart' in window || navigator.maxTouchPoints;
+  static componentToHex(c) {
+    let hex = c.toString(16);
+
+    return hex.length == 1 ? '0' + hex : hex;
+  }
+
+  static exitFullscreen() {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
+  }
+
+  static getFullscreenChangeEventName(element) {
+    if (element.requestFullscreen) {
+      return 'fullscreenchange';
+    } else if (element.mozRequestFullScreen) {
+      return 'mozfullscreenchange';
+    } else if (element.webkitRequestFullscreen) {
+      return 'webkitfullscreenchange';
+    } else if (element.msRequestFullscreen) {
+      return 'msfullscreenchange';
+    }
+  }
+
+  static getFullScreenModeValue() {
+    if (document.fullscreen) {
+      return document.fullscreen;
+    } else if (document.mozFullScreen) {
+      return document.mozFullScreen;
+    } else if (document.webkitIsFullScreen) {
+      return document.webkitIsFullScreen;
+    } else if (document.msIsFullScreen) {
+      return document.msIsFullScreen;
+    }
   }
 
   static getPointFromEvent(event, canvas) {
@@ -40,10 +76,20 @@ export default class Utils {
     return point;
   }
 
-  static componentToHex(c) {
-    let hex = c.toString(16);
+  static isTouchDevice() {
+    return 'ontouchstart' in window || navigator.maxTouchPoints;
+  }
 
-    return hex.length == 1 ? '0' + hex : hex;
+  static requestFullscreen(element) {
+    if (element.requestFullscreen) {
+      element.requestFullscreen();
+    } else if (element.mozRequestFullScreen) {
+      element.mozRequestFullScreen();
+    } else if (element.webkitRequestFullscreen) {
+      element.webkitRequestFullscreen();
+    } else if (element.msRequestFullscreen) {
+      element.msRequestFullscreen();
+    }
   }
 
   static rgbToHex(value) {

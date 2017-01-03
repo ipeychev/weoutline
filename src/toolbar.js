@@ -30,16 +30,16 @@ class Toolbar {
     return values;
   }
 
-  setValues() {
-    if (this._config.activeTool === Tools.line) {
+  setValues(config) {
+    if (config.activeTool === Tools.line) {
       this._penNode.querySelector('.toolbar-item-value').classList.add('active');
-    } else if (this._config.activeTool === Tools.eraser) {
+    } else if (config.activeTool === Tools.eraser) {
       this._eraserNode.querySelector('.toolbar-item-value').classList.add('active');
     }
 
-    this._setToolSize(this._penNode, this._config.penSize);
-
-    this._setColor(this._config.color);
+    this._setToolSize(this._penNode, config.penSize);
+    this._setColor(config.color);
+    this._setFullscreen(config.fullscreen);
   }
 
   _attachListeners() {
@@ -124,16 +124,18 @@ class Toolbar {
       this._updateToolbarView(this._colorNode, targetNode, {
         activateTool: false,
         setCurrentValue: {
-          from: 'style',
+          source: 'style',
           nodeSelector: '.fa',
           transformFn: Utils.rgbToHex,
           property: 'color'
         }
       });
-    }  else if (this._clearNode.contains(targetNode)) {
+    } else if (this._clearNode.contains(targetNode)) {
       this._config.clearWhiteboardCallback();
-    }  else if (this._shareNode.contains(targetNode)) {
+    } else if (this._shareNode.contains(targetNode)) {
       this._config.shareWhiteboardCallback();
+    } else if (this._fullScreenNode.contains(targetNode)) {
+      this._config.fullscreenCallback();
     } else {
       this._hideMenu();
     }
@@ -172,7 +174,7 @@ class Toolbar {
 
         this._setItemValue(optionNode.parentNode, this._colorNode, {
           setCurrentValue: {
-            from: 'style',
+            source: 'style',
             nodeSelector: '.fa',
             transformFn: Utils.rgbToHex,
             property: 'color'
@@ -182,8 +184,20 @@ class Toolbar {
     });
   }
 
+  _setFullscreen(fullscreen) {
+    let node = this._fullScreenNode.querySelector('.fa');
+
+    if (fullscreen) {
+      node.classList.remove('fa-expand');
+      node.classList.add('fa-compress');
+    } else {
+      node.classList.remove('fa-compress');
+      node.classList.add('fa-expand');
+    }
+  }
+
   _setItemValue(optionNode, rootNode, config) {
-    if (config.setCurrentValue.from === 'style') {
+    if (config.setCurrentValue.source === 'style') {
       let style = window.getComputedStyle(optionNode.querySelector(config.setCurrentValue.nodeSelector));
 
       let value = config.setCurrentValue.transformFn ? config.setCurrentValue.transformFn(style.getPropertyValue(config.setCurrentValue.property)) :
@@ -211,6 +225,7 @@ class Toolbar {
     this._clearNode = document.getElementById('clear');
     this._colorNode = document.getElementById('color');
     this._eraserNode = document.getElementById('eraser');
+    this._fullScreenNode = document.getElementById('fullscreen');
     this._penNode = document.getElementById('pen');
     this._shareNode = document.getElementById('share');
   }
