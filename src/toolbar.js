@@ -130,19 +130,23 @@ class Toolbar {
           property: 'color'
         }
       });
+    }  else if (this._clearNode.contains(targetNode)) {
+      this._config.clearWhiteboardCallback();
+    }  else if (this._shareNode.contains(targetNode)) {
+      this._config.shareWhiteboardCallback();
     } else {
       this._hideMenu();
     }
 
     let values = this.getValues();
 
-    this._config.callback(values);
+    this._config.valuesCallback(values);
   }
 
   _onColorChange() {
     let values = this.getValues();
 
-    this._config.callback(values);
+    this._config.valuesCallback(values);
   }
 
   _onDocumentInteraction(event) {
@@ -204,9 +208,11 @@ class Toolbar {
   _setupContainer() {
     this._element = document.getElementById(this._config.srcNode);
 
-    this._penNode = document.getElementById('pen');
-    this._eraserNode = document.getElementById('eraser');
+    this._clearNode = document.getElementById('clear');
     this._colorNode = document.getElementById('color');
+    this._eraserNode = document.getElementById('eraser');
+    this._penNode = document.getElementById('pen');
+    this._shareNode = document.getElementById('share');
   }
 
   _updateToolbarView(rootNode, targetNode, config) {

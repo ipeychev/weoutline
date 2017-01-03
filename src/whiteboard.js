@@ -28,9 +28,13 @@ class Whiteboard {
     this._detachListeners();
   }
 
-  drawShapes() {
-    this._context.clearRect(0, 0, this._context.canvas.width, this._context.canvas.height);
+  drawRulers() {
+    this._drawHorizontalRuler();
 
+    this._drawVerticalRuler();
+  }
+
+  drawShapes() {
     for (let i = 0; i < this._shapes.length; i++) {
       if (this._shapes[i].type === ShapeType.LINE) {
         let points = this._shapes[i].points.map((point) => {
@@ -46,6 +50,14 @@ class Whiteboard {
         });
       }
     }
+  }
+
+  redraw() {
+    this._context.clearRect(0, 0, this._context.canvas.width, this._context.canvas.height);
+
+    this.drawRulers();
+
+    this.drawShapes();
   }
 
   setConfig(config) {
@@ -77,6 +89,17 @@ class Whiteboard {
     window.addEventListener('resize', this._resizeListener);
   }
 
+  _clearWhiteboard() {
+    if (confirm('Are you sure you want to erase the whole whiteboard?')) {
+      this._shapes.length = 0;
+
+      this._offset[0] = 0;
+      this._offset[1] = 0;
+
+      this.redraw();
+    }
+  }
+
   _detachListeners() {
     this._canvasElement.removeEventListener('contextmenu', this._onContextMenuListener);
     this._canvasElement.removeEventListener('touchmove', this._onTouchMoveListener);
@@ -85,6 +108,50 @@ class Whiteboard {
     window.removeEventListener('load', this._onLoadListener);
     window.removeEventListener('orientationchange', this._resizeListener);
     window.removeEventListener('resize', this._resizeListener);
+  }
+
+  _drawHorizontalRuler() {
+    for (let i = 0; i < this._context.canvas.width; i += 20) {
+      this._context.beginPath();
+      this._context.lineWidth = 1;
+      this._context.moveTo(i, 0);
+
+      if (i % 100 === 0) {
+        this._context.lineTo(i, 10);
+      } else {
+        this._context.lineTo(i, 5);
+      }
+      this._context.stroke();
+
+      if (i % 500 === 0 && i > 0) {
+        this._context.textAlign = 'center';
+        this._context.textBaseline = 'alphabetic';
+        this._context.font = this._config.rulerFontSize + 'px';
+        this._context.fillText(i, i, 20);
+      }
+    }
+  }
+
+  _drawVerticalRuler() {
+    for (let i = 20; i < this._context.canvas.height; i += 20) {
+      this._context.beginPath();
+      this._context.lineWidth = 1;
+      this._context.moveTo(0, i);
+
+      if (i % 100 === 0) {
+        this._context.lineTo(10, i);
+      } else {
+        this._context.lineTo(5, i);
+      }
+      this._context.stroke();
+
+      if (i % 500 === 0) {
+        this._context.textAlign = 'start';
+        this._context.textBaseline = 'middle';
+        this._context.font = this._config.rulerFontSize + 'px';
+        this._context.fillText(i, 12, i);
+      }
+    }
   }
 
   _getAllowedOffset(scrollData) {
@@ -124,6 +191,8 @@ class Whiteboard {
 
   _onLoad() {
     this._resizeCanvas();
+
+    this.drawRulers();
   }
 
   _onResize() {
@@ -132,7 +201,7 @@ class Whiteboard {
     this._canvasElement.setAttribute('height', canvasContainerEl.offsetHeight);
     this._canvasElement.setAttribute('width', canvasContainerEl.offsetWidth);
 
-    this.drawShapes();
+    this.redraw();
   }
 
   _onScroll(event) {
@@ -146,7 +215,7 @@ class Whiteboard {
       this._offset[0] += allowedOffset[0];
       this._offset[1] += allowedOffset[1];
 
-      this.drawShapes();
+      this.redraw();
     } else if (event.touches.length > 1) {
       event.preventDefault();
 
@@ -163,7 +232,7 @@ class Whiteboard {
       this._lastDragPoint[0] = curPoint[0];
       this._lastDragPoint[1] = curPoint[1];
 
-      this.drawShapes();
+      this.redraw();
     }
 
     this._drawer.setConfig({
@@ -183,7 +252,7 @@ class Whiteboard {
 
     this._shapes.push(shape);
 
-    this.drawShapes();
+    this.redraw();
   }
 
   _onShapesErasedCallback(shapes) {
@@ -199,7 +268,7 @@ class Whiteboard {
       });
     }
 
-    this.drawShapes();
+    this.redraw();
 
     this._drawer.setConfig({
       shapes: this._shapes
@@ -261,11 +330,17 @@ class Whiteboard {
 
   _setupToolbar() {
     let config = {
-      callback: this.setConfig.bind(this),
-      srcNode: 'toolbar'
+      clearWhiteboardCallback: this._clearWhiteboard.bind(this),
+      shareWhiteboardCallback: this._shareWhiteboard.bind(this),
+      srcNode: 'toolbar',
+      valuesCallback: this.setConfig.bind(this)
     };
 
     this._toolbar = new Toolbar(Object.assign(config, this._config));
+  }
+
+  _shareWhiteboard() {
+    // TODO: Share the whiteboard via WeDeploy
   }
 };
 

@@ -6,5 +6,6 @@ new Whiteboard({
   color: '#000000',
   height: 4096,
   penSize: 6,
-  width: 4096
+  rulerFontSize: 10,
+  width: 4096,
 });
