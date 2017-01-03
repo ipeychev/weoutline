@@ -1,3 +1,3 @@
-### [0.0.1](https://github.com/ipeychev/whiteboard/releases/tag/v0.0.1)
+### [1.0.0](https://github.com/ipeychev/whiteboard/releases/tag/v1.0.0)
 
 - The first release
