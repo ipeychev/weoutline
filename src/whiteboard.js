@@ -115,71 +115,69 @@ class Whiteboard {
   }
 
   _drawHorizontalRuler() {
-    for (let i = 0; i < this._context.canvas.width; i += 20) {
+    for (let i = 0; i <= this._config.width; i += 20) {
       this._context.beginPath();
       this._context.strokeStyle = '#000000';
       this._context.lineWidth = 1;
-      this._context.moveTo(i, 0);
+      this._context.moveTo(i - this._offset[0], 0);
 
       if (i % 100 === 0) {
-        this._context.lineTo(i, 10);
+        this._context.lineTo(i - this._offset[0], 10);
       } else {
-        this._context.lineTo(i, 5);
+        this._context.lineTo(i - this._offset[0], 5);
       }
       this._context.stroke();
 
       if (i % 500 === 0 && i > 0) {
         this._context.strokeStyle = '#000000';
-        this._context.textAlign = 'center';
+        this._context.textAlign = i + 20 < this._config.width ? 'center' : 'end';
         this._context.textBaseline = 'alphabetic';
         this._context.font = this._config.rulerFontSize + 'px';
-        this._context.fillText(i, i, 20);
+        this._context.fillText(i, i - this._offset[0], 20);
       }
     }
   }
 
   _drawVerticalRuler() {
-    for (let i = 20; i < this._context.canvas.height; i += 20) {
+    for (let i = 20; i <= this._config.height; i += 20) {
       this._context.beginPath();
       this._context.strokeStyle = '#000000';
       this._context.lineWidth = 1;
-      this._context.moveTo(0, i);
+      this._context.moveTo(0, i - this._offset[1]);
 
       if (i % 100 === 0) {
-        this._context.lineTo(10, i);
+        this._context.lineTo(10, i - this._offset[1]);
       } else {
-        this._context.lineTo(5, i);
+        this._context.lineTo(5, i - this._offset[1]);
       }
       this._context.stroke();
 
       if (i % 500 === 0) {
         this._context.strokeStyle = '#000000';
         this._context.textAlign = 'start';
-        this._context.textBaseline = 'middle';
+        this._context.textBaseline = i + 20 < this._config.height ? 'middle' : 'bottom';
         this._context.font = this._config.rulerFontSize + 'px';
-        this._context.fillText(i, 12, i);
+        this._context.fillText(i, 12, i - this._offset[1]);
       }
     }
   }
 
   _getAllowedOffset(scrollData) {
-    let tmpWidth = this._offset[0] + scrollData[0];
-    let tmpHeight = this._offset[1] + scrollData[1];
+    let tmpOffsetWidth = this._offset[0] + scrollData[0];
+    let tmpOffsetHeight = this._offset[1] + scrollData[1];
 
     let allowedOffset = [];
 
-    if (tmpWidth < 0) {
+    if ((scrollData[0] < 0 && tmpOffsetWidth < 0) ||
+      (scrollData[0] > 0 && tmpOffsetWidth + this._canvasElement.width > this._config.width)) {
       allowedOffset[0] = 0;
-    } else if (tmpWidth > this._config.width) {
-      allowedOffset[0] = this._config.width - this._offset[0];
     } else {
       allowedOffset[0] = scrollData[0];
     }
 
-    if (tmpHeight < 0) {
+    if ((scrollData[1] < 0 && tmpOffsetHeight < 0) ||
+      (scrollData[1] > 0 && tmpOffsetHeight + this._canvasElement.height > this._config.height)) {
       allowedOffset[1] = 0;
-    } else if (tmpHeight > this._config.height) {
-      allowedOffset[1] = this._config.height - this._offset[1];
     } else {
       allowedOffset[1] = scrollData[1];
     }
@@ -220,14 +218,24 @@ class Whiteboard {
   _onLoad() {
     this._resizeCanvas();
 
-    this.drawRulers();
+    this.redraw();
   }
 
   _onResize() {
     let canvasContainerEl = this._canvasElement.parentNode;
 
-    this._canvasElement.setAttribute('height', canvasContainerEl.offsetHeight);
-    this._canvasElement.setAttribute('width', canvasContainerEl.offsetWidth);
+    let newHeight = canvasContainerEl.offsetHeight;
+    let newWidth = canvasContainerEl.offsetWidth;
+
+    this._canvasElement.setAttribute('height', newHeight);
+    this._canvasElement.setAttribute('width', newWidth);
+
+    this._updateOffset({
+      canvasHeight: newHeight,
+      canvasWidth: newWidth,
+      height: this._config.height,
+      width: this._config.width
+    });
 
     this.redraw();
   }
@@ -329,6 +337,7 @@ class Whiteboard {
 
     if (this._config.activeTool === Tools.line) {
       this._drawer = new DrawLine({
+        boardSize: [this._config.width, this._config.height],
         callback: this._onShapeCreatedCallback.bind(this),
         canvas: this._canvasElement,
         color: this._config.color,
@@ -340,6 +349,7 @@ class Whiteboard {
       });
     } else if (this._config.activeTool === Tools.eraser) {
       this._drawer = new Eraser({
+        boardSize: [this._config.width, this._config.height],
         callback: this._onShapesErasedCallback.bind(this),
         canvas: this._canvasElement,
         offset: this._offset,
@@ -370,6 +380,16 @@ class Whiteboard {
 
   _shareWhiteboard() {
     // TODO: Share the whiteboard via WeDeploy
+  }
+
+  _updateOffset(params) {
+    if (params.height > params.canvasHeight && params.height - this._offset[1] < params.canvasHeight) {
+      this._offset[1] += params.height - this._offset[1] - params.canvasHeight;
+    }
+
+    if (params.width > params.canvasWidth && params.width - this._offset[0] < params.canvasWidth) {
+      this._offset[0] += params.width - this._offset[0] - params.canvasWidth;
+    }
   }
 };
 

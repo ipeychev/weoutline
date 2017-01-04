@@ -28,19 +28,28 @@ class Eraser {
     }
 
     if (event.touches && event.touches.length > 1) {
-      this._isErasing = false;
+      this.finish();
       return;
     }
 
     event.preventDefault();
 
     let curPoint = Utils.getPointFromEvent(event, this._canvasElement);
-    curPoint = Utils.getPointWithoutOffset(curPoint, this._config.offset);
 
-    let matchingShapes = this._getMatchingShapes(curPoint);
+    let tmpX = curPoint[0] + this._config.offset[0];
+    let tmpY = curPoint[1] + this._config.offset[1];
 
-    if (matchingShapes.length) {
-      this._config.callback(matchingShapes);
+    if (tmpX > 0 && tmpX < this._config.boardSize[0] && tmpY > 0 && tmpY < this._config.boardSize[1]) {
+      curPoint = Utils.getPointWithoutOffset(curPoint, this._config.offset);
+
+      let matchingShapes = this._getMatchingShapes(curPoint);
+
+      if (matchingShapes.length) {
+        this._config.callback(matchingShapes);
+      }
+    } else {
+      this.finish();
+      return;
     }
   }
 
@@ -57,15 +66,21 @@ class Eraser {
   }
 
   start(event) {
-    this._isErasing = true;
-
     let curPoint = Utils.getPointFromEvent(event, this._canvasElement);
-    curPoint = Utils.getPointWithoutOffset(curPoint, this._config.offset);
 
-    let matchingShapes = this._getMatchingShapes(curPoint);
+    let tmpX = curPoint[0] + this._config.offset[0];
+    let tmpY = curPoint[1] + this._config.offset[1];
 
-    if (matchingShapes.length) {
-      this._config.callback(matchingShapes);
+    if (tmpX > 0 && tmpX < this._config.boardSize[0] && tmpY > 0 && tmpY < this._config.boardSize[1]) {
+      curPoint = Utils.getPointWithoutOffset(curPoint, this._config.offset);
+
+      let matchingShapes = this._getMatchingShapes(curPoint);
+
+      if (matchingShapes.length) {
+        this._config.callback(matchingShapes);
+      }
+
+      this._isErasing = true;
     }
   }
 

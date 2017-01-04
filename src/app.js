@@ -5,8 +5,8 @@ new Whiteboard({
   activeTool: Tools.line,
   color: '#000000',
   fullscreen: false,
-  height: 4096,
+  height: 3000,
   penSize: 6,
   rulerFontSize: 10,
-  width: 4096
+  width: 3000
 });

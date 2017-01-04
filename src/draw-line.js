@@ -50,15 +50,23 @@ class DrawLine {
 
     let curPoint = Utils.getPointFromEvent(event, this._canvasElement);
 
-    this._lastPoint = Draw.lineToMidPoint(this._lastPoint, curPoint, this._context, {
-      color: this._config.color,
-      globalCompositeOperation: this._config.globalCompositeOperation,
-      lineCap: this._config.lineCap,
-      lineJoin: this._config.lineJoin,
-      size: this._getSize()
-    });
+    let tmpX = this._lastPoint[0] + this._config.offset[0];
+    let tmpY = this._lastPoint[1] + this._config.offset[1];
 
-    this._points.push(curPoint);
+    if (tmpX > 0 && tmpX < this._config.boardSize[0] && tmpY > 0 && tmpY < this._config.boardSize[1]) {
+      this._lastPoint = Draw.lineToMidPoint(this._lastPoint, curPoint, this._context, {
+        color: this._config.color,
+        globalCompositeOperation: this._config.globalCompositeOperation,
+        lineCap: this._config.lineCap,
+        lineJoin: this._config.lineJoin,
+        size: this._getSize()
+      });
+
+      this._points.push(curPoint);
+    } else {
+      this.finish(event);
+      return;
+    }
   }
 
   finish() {
@@ -89,14 +97,19 @@ class DrawLine {
   }
 
   start(event) {
-    this._isDrawing = true;
-
-    this._context.lineWidth = this._getSize();
-    this._context.strokeStyle = this._config.color;
-
     this._lastPoint = Utils.getPointFromEvent(event, this._canvasElement);
 
-    this._points.push(this._lastPoint);
+    let tmpX = this._lastPoint[0] + this._config.offset[0];
+    let tmpY = this._lastPoint[1] + this._config.offset[1];
+
+    if (tmpX > 0 && tmpX < this._config.boardSize[0] && tmpY > 0 && tmpY < this._config.boardSize[1]) {
+      this._context.lineWidth = this._getSize();
+      this._context.strokeStyle = this._config.color;
+
+      this._points.push(this._lastPoint);
+
+      this._isDrawing = true;
+    }
   }
 
   _attachListeners() {
