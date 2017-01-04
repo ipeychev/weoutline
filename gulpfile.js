@@ -3,6 +3,7 @@ const cssmin = require('gulp-cssmin');
 const del = require('del');
 const glob = require('glob');
 const gulp = require('gulp');
+const htmlreplace = require('gulp-html-replace');
 const isparta = require('isparta');
 const loadPlugins = require('gulp-load-plugins');
 const path = require('path');
@@ -23,7 +24,7 @@ const $ = loadPlugins();
 const config = manifest.babelBoilerplateOptions;
 const mainFile = manifest.main;
 const destinationFolder = path.dirname(mainFile);
-const exportFileName = path.basename(mainFile, path.extname(mainFile));
+const exportJSFileName = path.basename(mainFile, path.extname(mainFile));
 
 function cleanDist(done) {
   del([destinationFolder]).then(() => done());
@@ -56,11 +57,12 @@ function build(done) {
   runSequence(
     'clean',
     'build-src',
-    ['lint', 'sass'],
+    ['lint', 'compile-sass'],
     'concat-css',
     'min-css',
     'clean-css',
     'copy-static',
+    'update-index-file',
     done
   );
 }
@@ -69,7 +71,7 @@ function buildSrc() {
   return gulp.src(path.join('src', config.entryFileName))
     .pipe(webpackStream({
       output: {
-        filename: `${exportFileName}.js`,
+        filename: `${exportJSFileName}.${manifest.version}.js`,
         libraryTarget: 'umd',
         library: config.mainVarName
       },
@@ -88,7 +90,7 @@ function buildSrc() {
     }).on('error', errorHandler))
     .pipe(gulp.dest(destinationFolder))
     .pipe($.filter(['**', '!**/*.js.map']))
-    .pipe($.rename(`${exportFileName}.min.js`))
+    .pipe($.rename(`${exportJSFileName}.${manifest.version}.min.js`))
     .pipe($.sourcemaps.init({loadMaps: true}))
     .pipe($.uglify())
     .pipe($.sourcemaps.write('./'))
@@ -109,10 +111,62 @@ function copyStatic() {
     .pipe(gulp.dest(destinationFolder));
 }
 
+function coverage(done) {
+  _registerBabel();
+  gulp.src(['src/**/*.js'])
+    .pipe($.istanbul({
+      instrumenter: Instrumenter,
+      includeUntested: true
+    }))
+    .pipe($.istanbul.hookRequire())
+    .on('finish', () => {
+      return test()
+        .pipe($.istanbul.writeReports())
+        .on('end', done);
+    });
+}
+
 function errorHandler(error) {
   console.log(error.toString());
 
   this.emit('end');
+}
+
+function cleanCSS(done) {
+  del([
+    path.join(destinationFolder, 'assets/**/*.css'),
+    '!' + path.join(destinationFolder, `assets/app.${manifest.version}.css`),
+    '!' + path.join(destinationFolder, `assets/app.${manifest.version}.min.css`),
+    '!' + path.join(destinationFolder, 'assets/vendor')
+  ])
+  .then(() => done());
+}
+
+function cleanDist(done) {
+  del([destinationFolder]).then(() => done());
+}
+
+function concatCSS() {
+  return gulp.src(
+    path.join(destinationFolder, 'assets/**/*.css'))
+    .pipe(concatCss(`app.${manifest.version}.css`))
+    .pipe(gulp.dest(path.join(destinationFolder, 'assets')));
+}
+
+function compileSASS() {
+  return gulp.src([
+    'src/assets/**/*-structure.scss',
+    'src/assets/**/*-skin.scss'
+  ])
+    .pipe(sass().on('error', sass.logError))
+    .pipe(gulp.dest(path.join(destinationFolder, 'assets')));
+}
+
+function minCSS() {
+  return gulp.src(path.join(destinationFolder, 'assets/**/*.css'))
+      .pipe(cssmin())
+      .pipe(rename({suffix: `.min`}))
+      .pipe(gulp.dest(path.join(destinationFolder, 'assets')));
 }
 
 function _mocha() {
@@ -133,29 +187,17 @@ function test() {
   return _mocha();
 }
 
-function coverage(done) {
-  _registerBabel();
-  gulp.src(['src/**/*.js'])
-    .pipe($.istanbul({
-      instrumenter: Instrumenter,
-      includeUntested: true
+function updateIndexFile() {
+  return gulp.src(path.join(destinationFolder, 'index.html'))
+    .pipe(htmlreplace({
+        'css': `assets/app.${manifest.version}.css`,
+        'js': {
+          src: `${exportJSFileName}.${manifest.version}.js`,
+          tpl: '<script src="%s" defer></script>'
+        }
     }))
-    .pipe($.istanbul.hookRequire())
-    .on('finish', () => {
-      return test()
-        .pipe($.istanbul.writeReports())
-        .on('end', done);
-    });
+    .pipe(gulp.dest(destinationFolder));
 }
-
-gulp.task('sass', function () {
-  return gulp.src([
-    'src/assets/**/*-structure.scss',
-    'src/assets/**/*-skin.scss'
-  ])
-    .pipe(sass().on('error', sass.logError))
-    .pipe(gulp.dest(path.join(destinationFolder, 'assets')));
-});
 
 const watchFiles = ['src/**/*', 'test/**/*', 'package.json', '**/.eslintrc'];
 
@@ -211,34 +253,6 @@ function testBrowser() {
     .pipe(gulp.dest('./tmp'));
 }
 
-gulp.task('concat-css', function () {
-  return gulp.src(
-    path.join(destinationFolder, 'assets/**/*.css'))
-    .pipe(concatCss('app.css'))
-    .pipe(gulp.dest(path.join(destinationFolder, 'assets')));
-});
-
-function cleanDist(done) {
-  del([destinationFolder]).then(() => done());
-}
-
-gulp.task('clean-css', function (done) {
-  del([
-    path.join(destinationFolder, 'assets/**/*.css'),
-    '!' + path.join(destinationFolder, 'assets/app.css'),
-    '!' + path.join(destinationFolder, 'assets/app-min.css'),
-    '!' + path.join(destinationFolder, 'assets/vendor')
-  ])
-  .then(() => done());
-});
-
-gulp.task('min-css', function () {
-  return gulp.src(path.join(destinationFolder, 'assets/**/*.css'))
-      .pipe(cssmin())
-      .pipe(rename({suffix: '-min'}))
-      .pipe(gulp.dest(path.join(destinationFolder, 'assets')));
-});
-
 // Remove the built files
 gulp.task('clean', cleanDist);
 
@@ -263,8 +277,13 @@ gulp.task('build', build);
 // Build the src files
 gulp.task('build-src', buildSrc);
 
+gulp.task('clean-css', cleanCSS);
 gulp.task('copy-fonts', copyFonts);
+gulp.task('compile-sass', compileSASS);
+gulp.task('concat-css', concatCSS);
 gulp.task('copy-static', ['copy-fonts'], copyStatic);
+gulp.task('min-css', minCSS);
+gulp.task('update-index-file', ['copy-fonts'], updateIndexFile);
 
 // Lint and run our tests
 gulp.task('test', ['lint'], test);
