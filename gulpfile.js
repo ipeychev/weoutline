@@ -26,6 +26,8 @@ const mainFile = manifest.main;
 const destinationFolder = path.dirname(mainFile);
 const exportJSFileName = path.basename(mainFile, path.extname(mainFile));
 
+let releaseBuild = false;
+
 function cleanDist(done) {
   del([destinationFolder]).then(() => done());
 }
@@ -169,6 +171,15 @@ function minCSS() {
       .pipe(gulp.dest(path.join(destinationFolder, 'assets')));
 }
 
+function release(done) {
+  releaseBuild = true;
+
+  runSequence(
+    'build',
+    done
+  );
+}
+
 function _mocha() {
   return gulp.src(['test/setup/node.js', 'test/unit/**/*.js'], {read: false})
     .pipe($.mocha({
@@ -188,11 +199,14 @@ function test() {
 }
 
 function updateIndexFile() {
+  let cssFileName = releaseBuild ? `assets/app.${manifest.version}.min.css` : `assets/app.${manifest.version}.css`;
+  let jsFileName = releaseBuild ? `${exportJSFileName}.${manifest.version}.min.js` : `${exportJSFileName}.${manifest.version}.js`;
+
   return gulp.src(path.join(destinationFolder, 'index.html'))
     .pipe(htmlreplace({
-        'css': `assets/app.${manifest.version}.css`,
+        'css': cssFileName,
         'js': {
-          src: `${exportJSFileName}.${manifest.version}.js`,
+          src: jsFileName,
           tpl: '<script src="%s" defer></script>'
         }
     }))
@@ -273,6 +287,7 @@ gulp.task('lint', ['lint-src', 'lint-test', 'lint-gulpfile']);
 
 // Build two versions of the library
 gulp.task('build', build);
+gulp.task('release', release);
 
 // Build the src files
 gulp.task('build-src', buildSrc);
