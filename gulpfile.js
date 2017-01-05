@@ -148,6 +148,13 @@ function cleanDist(done) {
   del([destinationFolder]).then(() => done());
 }
 
+function cleanMap(done) {
+  del([
+    path.join(destinationFolder, '**/*.map')
+  ])
+  .then(() => done());
+}
+
 function concatCSS() {
   return gulp.src(
     path.join(destinationFolder, 'assets/**/*.css'))
@@ -176,6 +183,7 @@ function release(done) {
 
   runSequence(
     'build',
+    'clean-map',
     done
   );
 }
@@ -272,6 +280,9 @@ gulp.task('clean', cleanDist);
 
 // Remove our temporary files
 gulp.task('clean-tmp', cleanTmp);
+
+// Remove map files
+gulp.task('clean-map', cleanMap);
 
 // Lint our source code
 gulp.task('lint-src', lintSrc);
