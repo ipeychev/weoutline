@@ -5,6 +5,9 @@ logs
 # Dist files
 dist
 
+# VS Code
+.vscode
+
 # Runtime data
 pids
 *.pid
