@@ -19,7 +19,7 @@ WeOutline is a shared whiteboard, designed to work among distributed teams
      npm start
      ```
 
-# Watch and build automatically the client files:
+# Watch and build automatically the client files
 
 Execute the following command:
   ```bash
