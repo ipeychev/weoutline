@@ -19,14 +19,18 @@ WeOutline is a shared whiteboard, designed to work among distributed teams
      npm start
      ```
 
-To build automatically on every change in the client files, run the following command:
-     ```bash
-     npm run watch
-     ```
+# Watch and build automatically the client files:
+
+Execute the following command:
+  ```bash
+  npm run watch
+  ```
 
 # Running in production
-     ```bash
-     npm run start:prod
-     ```
+
+Execute the following command:
+  ```bash
+  npm run start:prod
+  ```
 
 License: LGPL v3
