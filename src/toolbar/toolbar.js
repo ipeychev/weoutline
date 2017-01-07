@@ -73,10 +73,10 @@ class Toolbar {
   }
 
   _detachListeners() {
-    document.removeEventListener('mousedown', this._documentInteractionListener);
+    this._element.removeEventListener('touchend', this._touchEndListener, { passive: true });
     document.removeEventListener('touchstart', this._documentInteractionListener);
     this._element.removeEventListener('click', this._clickListener);
-    this._element.removeEventListener('touchend', this._touchEndListener);
+    document.removeEventListener('mousedown', this._documentInteractionListener);
   }
 
   _getActiveTool() {

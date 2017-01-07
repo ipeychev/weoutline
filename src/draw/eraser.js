@@ -147,10 +147,10 @@ class Eraser {
     this._canvasElement.removeEventListener('mousedown', this._startListener);
     this._canvasElement.removeEventListener('mousemove', this._eraseListener);
     this._canvasElement.removeEventListener('mouseup', this._finishListener);
-    this._canvasElement.removeEventListener('touchcancel', this._cancelListener);
-    this._canvasElement.removeEventListener('touchend', this._finishListener);
+    this._canvasElement.removeEventListener('touchcancel', this._cancelListener, {passive: true});
+    this._canvasElement.removeEventListener('touchend', this._finishListener, {passive: true});
     this._canvasElement.removeEventListener('touchmove', this._eraseListener);
-    this._canvasElement.removeEventListener('touchstart', this._startListener);
+    this._canvasElement.removeEventListener('touchstart', this._startListener, {passive: true});
   }
 
   _getMatchingShapes(curPoint) {

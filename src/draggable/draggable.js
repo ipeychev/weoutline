@@ -31,7 +31,7 @@ class Draggable {
     document.body.removeEventListener('drop', this._dropListener);
     this._dragElement.removeEventListener('dragstart', this._dragStartListener);
     this._dragElement.removeEventListener('touchmove', this._touchMoveListener);
-    this._dragElement.removeEventListener('touchstart', this._touchStartListener);
+    this._dragElement.removeEventListener('touchstart', this._touchStartListener, {passive: true});
   }
 
   _onDragStart(event) {
