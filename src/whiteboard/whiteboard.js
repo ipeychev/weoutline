@@ -22,6 +22,9 @@ class Whiteboard {
     this._attachListeners();
 
     this._setActiveTool();
+
+    this._resizeCanvas();
+    this.redraw();
   }
 
   destroy() {
@@ -72,7 +75,6 @@ class Whiteboard {
     this._onWheelListener = this._onScroll.bind(this);
     this._onContextMenuListener = function(e) { e.preventDefault(); };
     this._resizeListener = this._onResize.bind(this);
-    this._onLoadListener = this._onLoad.bind(this);
     this._onFullscreenChangeListener = this._onFullscreenChange.bind(this);
 
     if (Utils.isTouchDevice()) {
@@ -85,9 +87,6 @@ class Whiteboard {
 
     document.addEventListener(Utils.getFullscreenChangeEventName(this._canvasElement), this._onFullscreenChangeListener);
 
-    window.addEventListener('load', this._onLoadListener, {
-      once: true
-    });
     window.addEventListener('orientationchange', this._resizeListener);
     window.addEventListener('resize', this._resizeListener);
   }
@@ -109,7 +108,6 @@ class Whiteboard {
     this._canvasElement.removeEventListener('touchmove', this._onTouchMoveListener);
     this._canvasElement.removeEventListener('touchstart', this._onTouchStartListener);
     this._canvasElement.removeEventListener('wheel', this._onWheelListener);
-    window.removeEventListener('load', this._onLoadListener);
     window.removeEventListener('orientationchange', this._resizeListener);
     window.removeEventListener('resize', this._resizeListener);
   }
@@ -213,12 +211,6 @@ class Whiteboard {
     values.fullscreen = Utils.getFullScreenModeValue();
 
     this._toolbar.setValues(values);
-  }
-
-  _onLoad() {
-    this._resizeCanvas();
-
-    this.redraw();
   }
 
   _onResize() {
