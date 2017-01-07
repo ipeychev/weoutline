@@ -14,15 +14,19 @@ WeOutline is a shared whiteboard, designed to work among distributed teams
      $ yarn
      ```
 
-3. Run the following command to build project on each code change:
+3. Run the following command to build project and run NodeJS server on port 3000:
+     ```bash
+     npm start
+     ```
+
+To build automatically on every change in the client files, run the following command:
      ```bash
      npm run watch
      ```
 
-4. Run a static web server in the `dist` directory. For example:
+# Running in production
      ```bash
-     $ brew install mongoose
-     $ mongoose -p 8080  -document_root dist
+     npm run start:prod
      ```
 
 License: LGPL v3

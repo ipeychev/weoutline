@@ -1,6 +1,6 @@
-import { Tools } from './tools';
-import Draggable from './draggable';
-import Utils from './utils';
+import Draggable from '../draggable/draggable';
+import Tools from '../draw/tools';
+import Utils from '../utils/utils';
 
 class Toolbar {
   constructor(config) {

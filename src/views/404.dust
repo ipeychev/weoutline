@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1.0 maximum-scale=1.0 user-scalable=no">
+
+    <title>Page not found</title>
+
+    <link rel="stylesheet" href="/assets/vendor/normalize.min.css">
+    <link rel="stylesheet" href="/assets/vendor/font-awesome.min.css">
+  </head>
+
+  <body>
+    <h1>Page not found</h1>
+    <a href="/">Home</a>
+  </body>
+<html>

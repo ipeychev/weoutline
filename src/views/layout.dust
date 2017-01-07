@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1.0 maximum-scale=1.0 user-scalable=no">
+
+    <title>{title}</title>
+
+    <link rel="stylesheet" href="/assets/vendor/normalize.min.css">
+    <link rel="stylesheet" href="/assets/vendor/font-awesome.min.css">
+
+    <link rel="stylesheet" href="/assets/app.{version}.{?production}min.{/production}css">
+    <script src="/app.{version}.{?production}min.{/production}js" defer></script>
+  </head>
+
+  <body>
+    {+bodyContent/}
+  </body>
+<html>

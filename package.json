@@ -2,15 +2,17 @@
   "name": "weoutline",
   "version": "1.0.0",
   "description": "WeOutline, a shared team whiteboard",
-  "main": "dist/app.js",
+  "main": "src/server.js",
   "scripts": {
-    "build": "gulp build",
-    "coverage": "gulp coverage",
-    "lint": "gulp lint",
-    "release": "gulp release",
-    "test-browser": "gulp test-browser",
-    "test": "gulp",
-    "watch": "gulp watch"
+    "build": "./node_modules/.bin/gulp build",
+    "coverage": "./node_modules/.bin/gulp coverage",
+    "lint": "./node_modules/.bin/gulp lint",
+    "release": "./node_modules/.bin/gulp release",
+    "start:prod": "npm run release && NODE_ENV=production node ./bin/www",
+    "start": "npm run build && DEBUG=weoutline:* PORT=3000 ./node_modules/.bin/nodemon --watch src/routes --watch src/server.js ./bin/www",
+    "test:browser": "./node_modules/.bin/gulp test-browser",
+    "test": "./node_modules/.bin/gulp",
+    "watch": "./node_modules/.bin/gulp watch"
   },
   "repository": {
     "type": "git",
@@ -18,11 +20,21 @@
   },
   "keywords": [],
   "author": "Iliyan Peychev <iliyan.peychev@gmail.com>",
-  "license": "MIT",
+  "license": "LGPL-3.0",
   "bugs": {
     "url": "https://github.com/ipeychev/whiteboard/issues"
   },
   "homepage": "https://github.com/ipeychev/whiteboard",
+  "dependencies": {
+    "body-parser": "1.15.2",
+    "compression": "1.6.2",
+    "cookie-parser": "1.4.3",
+    "debug": "2.2.0",
+    "express": "4.14.0",
+    "express-dustjs": "^1.1.1",
+    "morgan": "1.7.0",
+    "serve-favicon": "2.3.0"
+  },
   "devDependencies": {
     "babel-core": "6.14.0",
     "babel-loader": "6.2.5",
@@ -37,7 +49,7 @@
     "gulp-cssmin": "0.1.7",
     "gulp-eslint": "3.0.1",
     "gulp-filter": "4.0.0",
-    "gulp-html-replace": "^1.6.2",
+    "gulp-html-replace": "1.6.2",
     "gulp-istanbul": "1.1.1",
     "gulp-livereload": "3.8.1",
     "gulp-load-plugins": "1.2.4",
@@ -50,14 +62,11 @@
     "isparta": "4.0.0",
     "json-loader": "0.5.4",
     "mocha": "3.0.2",
+    "nodemon": "1.11.0",
     "run-sequence": "1.2.2",
     "sinon": "1.17.5",
     "sinon-chai": "2.8.0",
     "webpack": "1.13.2",
     "webpack-stream": "3.2.0"
-  },
-  "babelBoilerplateOptions": {
-    "entryFileName": "app.js",
-    "mainVarName": "app"
   }
 }

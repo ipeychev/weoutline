@@ -1,10 +1,10 @@
-import { ShapeType } from './shape';
-import Draw from './draw';
-import Eraser from './eraser';
-import DrawLine from './draw-line';
-import Toolbar from './toolbar';
-import { Tools } from './tools';
-import Utils from './utils';
+import { ShapeType } from '../draw/shape';
+import Draw from '../draw/draw';
+import DrawLine from '../draw/draw-line';
+import Eraser from '../draw/eraser';
+import Toolbar from '../toolbar/toolbar';
+import Tools from '../draw/tools';
+import Utils from '../utils/utils';
 
 class Whiteboard {
   constructor(config) {

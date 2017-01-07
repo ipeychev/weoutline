@@ -1,32 +1,31 @@
-const concatCss = require('gulp-concat-css');
-const cssmin = require('gulp-cssmin');
-const del = require('del');
-const glob = require('glob');
-const gulp = require('gulp');
-const htmlreplace = require('gulp-html-replace');
-const isparta = require('isparta');
-const loadPlugins = require('gulp-load-plugins');
-const path = require('path');
-const rename = require('gulp-rename');
-const runSequence = require('run-sequence');
-const sass = require('gulp-sass');
-const webpack = require('webpack');
-const webpackStream = require('webpack-stream');
+var concatCss = require('gulp-concat-css');
+var cssmin = require('gulp-cssmin');
+var del = require('del');
+var glob = require('glob');
+var gulp = require('gulp');
+var isparta = require('isparta');
+var loadPlugins = require('gulp-load-plugins');
+var path = require('path');
+var rename = require('gulp-rename');
+var runSequence = require('run-sequence');
+var sass = require('gulp-sass');
+var webpack = require('webpack');
+var webpackStream = require('webpack-stream');
 
-const Instrumenter = isparta.Instrumenter;
-const mochaGlobals = require('./test/setup/.globals');
-const manifest = require('./package.json');
+var Instrumenter = isparta.Instrumenter;
+var mochaGlobals = require('./test/setup/.globals');
+var manifest = require('./package.json');
 
 // Load all of our Gulp plugins
-const $ = loadPlugins();
+var $ = loadPlugins();
 
-// Gather the library data from `package.json`
-const config = manifest.babelBoilerplateOptions;
-const mainFile = manifest.main;
-const destinationFolder = path.dirname(mainFile);
-const exportJSFileName = path.basename(mainFile, path.extname(mainFile));
+var config = {
+  entryFileName: 'app.js',
+  mainVarName: 'app'
+};
 
-let releaseBuild = false;
+var destinationFolder = 'dist';
+var exportJSFileName = path.basename(config.entryFileName, path.extname(config.entryFileName));
 
 function cleanDist(done) {
   del([destinationFolder]).then(() => done());
@@ -64,7 +63,6 @@ function build(done) {
     'min-css',
     'clean-css',
     'copy-static',
-    'update-index-file',
     done
   );
 }
@@ -91,7 +89,7 @@ function buildSrc() {
       devtool: 'source-map'
     }).on('error', errorHandler))
     .pipe(gulp.dest(destinationFolder))
-    .pipe($.filter(['**', '!**/*.js.map']))
+    .pipe($.filter(['**', '!**/*.js.map', '!**/server.js', '!**/views', '!**/routes']))
     .pipe($.rename(`${exportJSFileName}.${manifest.version}.min.js`))
     .pipe($.sourcemaps.init({loadMaps: true}))
     .pipe($.uglify())
@@ -115,7 +113,7 @@ function copyStatic() {
 
 function coverage(done) {
   _registerBabel();
-  gulp.src(['src/**/*.js'])
+  gulp.src(['src/**/*.js', '!**/server.js', '!**/views', '!**/routes'])
     .pipe($.istanbul({
       instrumenter: Instrumenter,
       includeUntested: true
@@ -179,8 +177,6 @@ function minCSS() {
 }
 
 function release(done) {
-  releaseBuild = true;
-
   runSequence(
     'build',
     'clean-map',
@@ -206,22 +202,7 @@ function test() {
   return _mocha();
 }
 
-function updateIndexFile() {
-  let cssFileName = releaseBuild ? `assets/app.${manifest.version}.min.css` : `assets/app.${manifest.version}.css`;
-  let jsFileName = releaseBuild ? `${exportJSFileName}.${manifest.version}.min.js` : `${exportJSFileName}.${manifest.version}.js`;
-
-  return gulp.src(path.join(destinationFolder, 'index.html'))
-    .pipe(htmlreplace({
-        'css': cssFileName,
-        'js': {
-          src: jsFileName,
-          tpl: '<script src="%s" defer></script>'
-        }
-    }))
-    .pipe(gulp.dest(destinationFolder));
-}
-
-const watchFiles = ['src/**/*', 'test/**/*', 'package.json', '**/.eslintrc'];
+var watchFiles = ['src/**/*', 'test/**/*', 'package.json', '**/.eslintrc', '!**/server.js', '!**/views/*', '!**/routes/*'];
 
 // Run the headless unit tests as you make changes.
 function watch() {
@@ -232,10 +213,10 @@ function testBrowser() {
   // Our testing bundle is made up of our unit tests, which
   // should individually load up pieces of our application.
   // We also include the browser setup file.
-  const testFiles = glob.sync('./test/unit/**/*.js');
-  const allFiles = ['./test/setup/browser.js'].concat(testFiles);
+  var testFiles = glob.sync('./test/unit/**/*.js');
+  var allFiles = ['./test/setup/browser.js'].concat(testFiles);
 
-  // Lets us differentiate between the first build and subsequent builds
+  // vars us differentiate between the first build and subsequent builds
   var firstBuild = true;
 
   // This empty stream might seem like a hack, but we need to specify all of our files through
@@ -309,7 +290,6 @@ gulp.task('compile-sass', compileSASS);
 gulp.task('concat-css', concatCSS);
 gulp.task('copy-static', ['copy-fonts'], copyStatic);
 gulp.task('min-css', minCSS);
-gulp.task('update-index-file', ['copy-fonts'], updateIndexFile);
 
 // Lint and run our tests
 gulp.task('test', ['lint'], test);

@@ -1,6 +1,6 @@
 import Draw from './draw';
 import { Shape, ShapeType }  from './shape';
-import Utils from './utils';
+import Utils from '../utils/utils';
 
 class DrawLine {
   constructor(config) {
