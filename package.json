@@ -8,8 +8,8 @@
     "coverage": "./node_modules/.bin/gulp coverage",
     "lint": "./node_modules/.bin/gulp lint",
     "release": "./node_modules/.bin/gulp release",
-    "start:prod": "npm run release && NODE_ENV=production node ./bin/www",
-    "start": "npm run build && DEBUG=weoutline:* PORT=3000 ./node_modules/.bin/nodemon --watch src/routes --watch src/server.js ./bin/www",
+    "start": "npm run release && NODE_ENV=production node ./bin/www",
+    "start:dev": "npm run build && DEBUG=weoutline:* PORT=3000 ./node_modules/.bin/nodemon --watch src/routes --watch src/server.js ./bin/www",
     "test:browser": "./node_modules/.bin/gulp test-browser",
     "test": "./node_modules/.bin/gulp",
     "watch": "./node_modules/.bin/gulp watch"

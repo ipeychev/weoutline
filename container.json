@@ -2,7 +2,6 @@
 	"id": "app",
 	"type": "wedeploy/nodejs",
 	"hooks": {
-		"build": "npm install",
-    "start": "npm run start:prod"
+		"build": "npm install"
 	}
 }
