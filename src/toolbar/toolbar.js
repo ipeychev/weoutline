@@ -57,15 +57,19 @@ class Toolbar {
   }
 
   _deactivateOptions(rootNode) {
-    rootNode.querySelectorAll('.toolbar-item-option').forEach((valueNode) => {
-      valueNode.classList.remove('active');
-    });
+    var nodes = rootNode.querySelectorAll('.toolbar-item-option');
+
+    for (let i = 0; nodes && i < nodes.length; i++) {
+      nodes.item(i).classList.remove('active');
+    }
   }
 
   _deactivateValues() {
-    this._element.querySelectorAll('.toolbar-item-value').forEach((valueNode) => {
-      valueNode.classList.remove('active');
-    });
+    var nodes = this._element.querySelectorAll('.toolbar-item-value');
+
+    for (let i = 0; nodes && i < nodes.length; i++) {
+      nodes.item(i).classList.remove('active');
+    }
   }
 
   _detachListeners() {
@@ -104,9 +108,11 @@ class Toolbar {
   }
 
   _hideMenu() {
-    this._element.querySelectorAll('.toolbar-item-options').forEach((optionNode) => {
-      optionNode.classList.add('hidden');
-    });
+    let nodes = this._element.querySelectorAll('.toolbar-item-options');
+
+    for (let i = 0; nodes && i < nodes.length; i++) {
+      nodes.item(i).classList.add('hidden');
+    }
   }
 
   _onClick(event) {
@@ -166,7 +172,11 @@ class Toolbar {
   _setColor(value) {
     this._deactivateOptions(this._colorNode);
 
-    this._colorNode.querySelectorAll('.toolbar-item-option .fa').forEach((optionNode) => {
+    let nodes = this._colorNode.querySelectorAll('.toolbar-item-option .fa');
+
+    for (let i = 0; nodes && i < nodes.length; i++) {
+      let optionNode = nodes.item(i);
+
       let style = window.getComputedStyle(optionNode);
 
       if (Utils.rgbToHex(style.getPropertyValue('color')) === value) {
@@ -181,7 +191,7 @@ class Toolbar {
           }
         });
       }
-    });
+    }
   }
 
   _setFullscreen(fullscreen) {
@@ -210,13 +220,17 @@ class Toolbar {
   _setToolSize(rootNode, value) {
     this._deactivateOptions(rootNode);
 
-    rootNode.querySelectorAll('.toolbar-item-option .fa').forEach((optionNode) => {
+    let nodes = rootNode.querySelectorAll('.toolbar-item-option .fa');
+
+    for (let i = 0; nodes && i < nodes.length; i++) {
+      let optionNode = nodes.item(i);
+
       let style = window.getComputedStyle(optionNode);
 
       if (parseInt(style.getPropertyValue('font-size'), 10) === value) {
         optionNode.parentNode.classList.add('active');
       }
-    });
+    }
   }
 
   _setupContainer() {
