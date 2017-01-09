@@ -2,14 +2,14 @@
   "name": "weoutline",
   "version": "1.0.0",
   "description": "WeOutline, a shared team whiteboard",
-  "main": "src/server.js",
+  "main": "app/server.js",
   "scripts": {
     "build": "./node_modules/.bin/gulp build",
     "coverage": "./node_modules/.bin/gulp coverage",
     "lint": "./node_modules/.bin/gulp lint",
     "release": "./node_modules/.bin/gulp release",
     "start": "npm run release && NODE_ENV=production node ./bin/www",
-    "start:dev": "npm run build && DEBUG=weoutline:* PORT=3000 ./node_modules/.bin/nodemon -e js,dust --watch src/routes --watch src/views --watch src/server.js ./bin/www",
+    "start:dev": "npm run build && DEBUG=weoutline:* PORT=3000 ./node_modules/.bin/nodemon -e js,dust --watch app/routes --watch app/views --watch app/server.js ./bin/www",
     "test:browser": "./node_modules/.bin/gulp test-browser",
     "test": "./node_modules/.bin/gulp",
     "watch": "./node_modules/.bin/gulp watch"

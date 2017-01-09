@@ -43,7 +43,7 @@ function lint(files) {
 }
 
 function lintSrc() {
-  return lint('src/**/*.js');
+  return lint('app/**/*.js');
 }
 
 function lintTest() {
@@ -68,7 +68,7 @@ function build(done) {
 }
 
 function buildSrc() {
-  return gulp.src(path.join('src', config.entryFileName))
+  return gulp.src(path.join('app', config.entryFileName))
     .pipe(webpackStream({
       output: {
         filename: `${exportJSFileName}.${manifest.version}.js`,
@@ -98,22 +98,22 @@ function buildSrc() {
 }
 
 function copyFonts() {
-  return gulp.src('src/assets/vendor/fonts/*.*')
+  return gulp.src('app/assets/vendor/fonts/*.*')
     .pipe(gulp.dest(destinationFolder + '/assets/fonts'));
 }
 
 function copyStatic() {
   return gulp.src([
-      'src/index.html',
-      'src/**/assets/vendor/**/*.css',
-      'src/**/*.jpeg'
+      'app/index.html',
+      'app/**/assets/vendor/**/*.css',
+      'app/**/*.jpeg'
     ])
     .pipe(gulp.dest(destinationFolder));
 }
 
 function coverage(done) {
   _registerBabel();
-  gulp.src(['src/**/*.js', '!**/server.js', '!**/views', '!**/routes'])
+  gulp.src(['app/**/*.js', '!**/server.js', '!**/views', '!**/routes'])
     .pipe($.istanbul({
       instrumenter: Instrumenter,
       includeUntested: true
@@ -162,8 +162,8 @@ function concatCSS() {
 
 function compileSASS() {
   return gulp.src([
-    'src/assets/**/*-structure.scss',
-    'src/assets/**/*-skin.scss'
+    'app/assets/**/*-structure.scss',
+    'app/assets/**/*-skin.scss'
   ])
     .pipe(sass().on('error', sass.logError))
     .pipe(gulp.dest(path.join(destinationFolder, 'assets')));
@@ -202,7 +202,7 @@ function test() {
   return _mocha();
 }
 
-var watchFiles = ['src/**/*', 'test/**/*', 'package.json', '**/.eslintrc', '!**/server.js', '!**/views/*', '!**/routes/*'];
+var watchFiles = ['app/**/*', 'test/**/*', 'package.json', '**/.eslintrc', '!**/server.js', '!**/views/*', '!**/routes/*'];
 
 // Run the headless unit tests as you make changes.
 function watch() {
