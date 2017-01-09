@@ -9,6 +9,7 @@ WeOutline is a shared whiteboard, designed to work among distributed teams
 1. Install NodeJS, preferable version 6.x
 2. Clone the repository, then install package dependencies using Yarn or NPM:
      ```bash
+     $ cd app
      $ npm i
      or
      $ yarn

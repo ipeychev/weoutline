@@ -43,7 +43,7 @@ function lint(files) {
 }
 
 function lintSrc() {
-  return lint('app/**/*.js');
+  return lint('src/**/*.js');
 }
 
 function lintTest() {
@@ -68,7 +68,7 @@ function build(done) {
 }
 
 function buildSrc() {
-  return gulp.src(path.join('app', config.entryFileName))
+  return gulp.src(path.join('src', config.entryFileName))
     .pipe(webpackStream({
       output: {
         filename: `${exportJSFileName}.${manifest.version}.js`,
@@ -89,7 +89,7 @@ function buildSrc() {
       devtool: 'source-map'
     }).on('error', errorHandler))
     .pipe(gulp.dest(destinationFolder))
-    .pipe($.filter(['**', '!**/*.js.map', '!**/server.js', '!**/views', '!**/routes']))
+    .pipe($.filter(['**', '!**/*.js.map', '!**/test', '!**/server.js', '!**/views', '!**/routes']))
     .pipe($.rename(`${exportJSFileName}.${manifest.version}.min.js`))
     .pipe($.sourcemaps.init({loadMaps: true}))
     .pipe($.uglify())
@@ -98,22 +98,22 @@ function buildSrc() {
 }
 
 function copyFonts() {
-  return gulp.src('app/assets/vendor/fonts/*.*')
+  return gulp.src('src/assets/vendor/fonts/*.*')
     .pipe(gulp.dest(destinationFolder + '/assets/fonts'));
 }
 
 function copyStatic() {
   return gulp.src([
-      'app/index.html',
-      'app/**/assets/vendor/**/*.css',
-      'app/**/*.jpeg'
+      'src/index.html',
+      'src/**/assets/vendor/**/*.css',
+      'src/**/*.jpeg'
     ])
     .pipe(gulp.dest(destinationFolder));
 }
 
 function coverage(done) {
   _registerBabel();
-  gulp.src(['app/**/*.js', '!**/server.js', '!**/views', '!**/routes'])
+  gulp.src(['src/**/*.js', '!**/server.js', '!**/views', '!**/routes'])
     .pipe($.istanbul({
       instrumenter: Instrumenter,
       includeUntested: true
@@ -162,8 +162,8 @@ function concatCSS() {
 
 function compileSASS() {
   return gulp.src([
-    'app/assets/**/*-structure.scss',
-    'app/assets/**/*-skin.scss'
+    'src/assets/**/*-structure.scss',
+    'src/assets/**/*-skin.scss'
   ])
     .pipe(sass().on('error', sass.logError))
     .pipe(gulp.dest(path.join(destinationFolder, 'assets')));
@@ -202,7 +202,7 @@ function test() {
   return _mocha();
 }
 
-var watchFiles = ['app/**/*', 'test/**/*', 'package.json', '**/.eslintrc', '!**/server.js', '!**/views/*', '!**/routes/*'];
+var watchFiles = ['src/**/*', 'test/**/*', 'package.json', '**/.eslintrc', '!**/server.js', '!**/views/*', '!**/routes/*'];
 
 // Run the headless unit tests as you make changes.
 function watch() {
