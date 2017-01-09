@@ -1,0 +1,6 @@
+[
+	{
+		"path": "/shapes/*",
+		"data": true
+	}
+]
