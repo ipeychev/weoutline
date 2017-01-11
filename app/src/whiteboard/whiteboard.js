@@ -202,6 +202,10 @@ class Whiteboard {
     let ratioX = this._config.width / this._mapElement.width;
     let ratioY = this._config.height / this._mapElement.height;
 
+    this._mapContext.strokeStyle = 'black';
+    this._mapContext.lineWidth = 1;
+    this._mapContext.strokeRect(this._offset[0] / ratioX, this._offset[1] / ratioY, this._canvasElement.width / ratioX, this._canvasElement.height / ratioY);
+
     for (let i = 0; i < this._shapes.length; i++) {
       if (this._shapes[i].type === ShapeType.LINE) {
         let points = simplify(this._shapes[i].points, 10);
