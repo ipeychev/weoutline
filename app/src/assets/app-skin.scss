@@ -8,6 +8,7 @@
     border-color: gray;
     color: white;
     cursor: move;
+    opacity: 0.9;
 
     .toolbar-item {
       border-color: white;
@@ -78,6 +79,8 @@
   }
 
   .map-container {
+    background-color: white;
     border: 1px solid darkblue;
+    opacity: 0.9;
   }
 }

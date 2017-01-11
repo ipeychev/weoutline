@@ -1,3 +1,4 @@
+const simplify = require('simplify-path');
 import { ShapeType } from '../draw/shape';
 import Data from '../data/data';
 import Draw from '../draw/draw';
@@ -87,7 +88,6 @@ class Whiteboard {
 
   redraw() {
     this._context.clearRect(0, 0, this._context.canvas.width, this._context.canvas.height);
-    this._mapContext.clearRect(0, 0, this._mapContext.canvas.width, this._mapContext.canvas.height);
 
     this.drawRulers();
 
@@ -197,12 +197,16 @@ class Whiteboard {
   }
 
   _drawMap() {
+    this._mapContext.clearRect(0, 0, this._mapContext.canvas.width, this._mapContext.canvas.height);
+
     let ratioX = this._config.width / this._mapElement.width;
     let ratioY = this._config.height / this._mapElement.height;
 
     for (let i = 0; i < this._shapes.length; i++) {
       if (this._shapes[i].type === ShapeType.LINE) {
-        let points = this._shapes[i].points.map((point) => {
+        let points = simplify(this._shapes[i].points, 10);
+
+        points = points.map((point) => {
           return [point[0] / ratioX, point[1] / ratioY];
         });
 
