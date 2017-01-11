@@ -1,4 +1,5 @@
 import { ShapeType } from '../draw/shape';
+import Data from '../data/data';
 import Draw from '../draw/draw';
 import DrawLine from '../draw/draw-line';
 import Eraser from '../draw/eraser';
@@ -12,19 +13,41 @@ class Whiteboard {
 
     this._config = config;
 
-    this._shapes = config.shapes || [];
     this._offset = config.offset || [0, 0];
+    this._shapes = config.shapes || [];
+    this._sessionId = window.crypto.getRandomValues(new Uint32Array(1))[0];
+    this._whiteboardId = config.whiteboardId;
 
     this._setupCanvas();
     this._setupContext();
     this._setupToolbar();
+    this._setupData();
 
     this._attachListeners();
 
     this._setActiveTool();
 
+    this._fetchShapes();
+
     this._resizeCanvas();
     this.redraw();
+  }
+
+  addShapes(shapes) {
+    for (let i = 0; i < shapes.length; i++) {
+      this._shapes.push(shapes[i]);
+    }
+
+    if (this._whiteboardId) {
+      this._data.saveShapes(shapes)
+        .then(() => {
+          console.log('Shapes saved successfully on whiteboard', this._whiteboardId);
+        })
+        .catch((error) => {
+          alert('Creating whiteboard and saving shapes failed!');
+          console.log(error);
+        });
+    }
   }
 
   destroy() {
@@ -63,6 +86,21 @@ class Whiteboard {
     this.drawShapes();
   }
 
+  removeShapes(shapes) {
+    for (let i = this._shapes.length - 1; i >= 0 ; i--) {
+      for (let j = 0; j < shapes.length; j++) {
+        let curShape = this._shapes[i];
+        let deletedShape = shapes[j];
+
+        if (deletedShape.id === curShape.id) {
+          this._shapes.splice(i, 1);
+          shapes.splice(j, i);
+          break;
+        }
+      }
+    }
+  }
+
   setConfig(config) {
     Object.assign(this._config, config);
 
@@ -93,6 +131,17 @@ class Whiteboard {
 
   _clearWhiteboard() {
     if (confirm('Are you sure you want to erase the whole whiteboard?')) {
+      if (this._whiteboardId) {
+        this._data.deleteShapes(this._shapes)
+          .then(() => {
+            console.log('Shapes deleted successfully on whiteboard', this._whiteboardId);
+          })
+          .catch((error) => {
+            alert('Deleting the shapes failed!');
+            console.log(error);
+          });
+      }
+
       this._shapes.length = 0;
 
       this._offset[0] = 0;
@@ -157,6 +206,17 @@ class Whiteboard {
         this._context.font = this._config.rulerFontSize + 'px';
         this._context.fillText(i, 12, i - this._offset[1]);
       }
+    }
+  }
+
+  _fetchShapes() {
+    if (this._whiteboardId) {
+      this._data.fetchShapes(this._whiteboardId)
+        .then((shapes) => {
+          this._shapes = shapes;
+
+          this.redraw();
+        });
     }
   }
 
@@ -270,32 +330,35 @@ class Whiteboard {
 
   _onShapeCreatedCallback(shape) {
     // change points coordinates according to 0,0
-    for (let i = 0; i < shape.points.length; i++) {
-      let point = shape.points[i];
-      point[0] += this._offset[0];
-      point[1] += this._offset[1];
-    }
+    shape.points = shape.points.map((point) => {
+      return Utils.getPointWithoutOffset(point, this._offset);
+    });
 
     shape.id = Date.now().toString() + window.crypto.getRandomValues(new Uint32Array(1))[0];
 
-    this._shapes.push(shape);
+    if (this._whiteboardId) {
+      shape.board = this._whiteboardId;
+    }
 
+    shape.sessionId = this._sessionId;
+
+    this.addShapes([shape]);
     this.redraw();
   }
 
   _onShapesErasedCallback(shapes) {
-    for (let i = 0; i < shapes.length; i++) {
-      let deletedShape = shapes[i];
-
-      this._shapes = this._shapes.filter((oldShape) => {
-        if (deletedShape.id === oldShape.id) {
-          return false;
-        }
-
-        return true;
-      });
+    if (this._whiteboardId) {
+      this._data.deleteShapes(shapes)
+        .then(() => {
+          console.log('Shapes deleted successfully on whiteboard', this._whiteboardId);
+        })
+        .catch((error) => {
+          alert('Deleting the shapes failed!');
+          console.log(error);
+        });
     }
 
+    this.removeShapes(shapes);
     this.redraw();
 
     this._drawer.setConfig({
@@ -358,6 +421,12 @@ class Whiteboard {
     this._context = this._canvasElement.getContext('2d');
   }
 
+  _setupData() {
+    this._data = new Data({
+      url: this._config.dataURL
+    });
+  }
+
   _setupToolbar() {
     let config = {
       clearWhiteboardCallback: this._clearWhiteboard.bind(this),
@@ -371,7 +440,28 @@ class Whiteboard {
   }
 
   _shareWhiteboard() {
-    // TODO: Share the whiteboard via WeDeploy
+    if (!this._whiteboardId) {
+      let whiteboardId = Utils.getRandomBase64(12);
+
+      this._whiteboardId = whiteboardId;
+
+      history.pushState(null, null, window.location.origin + '/wb/' + this._whiteboardId);
+
+      for (let i = 0; i < this._shapes.length; i++) {
+        this._shapes[i].board = this._whiteboardId;
+      }
+
+      this._data.saveShapes(this._shapes)
+        .then(() => {
+          console.log('Shapes saved successfully on whiteboard', whiteboardId);
+        })
+        .catch((error) => {
+          alert('Creating whiteboard and saving shapes failed!');
+          console.log(error);
+        });
+    }
+
+    alert('Copy and share the following URL: ' + window.location.origin + '/wb/' + this._whiteboardId);
   }
 
   _updateOffset(params) {

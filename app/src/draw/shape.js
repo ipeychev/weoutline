@@ -1,7 +1,10 @@
 export class Shape {
   constructor(config) {
+    this.board = config.board;
     this.color = config.color;
+    this.id = config.id;
     this.points = config.points;
+    this.sessionId = config.sessionId;
     this.size = config.size;
     this.type = config.type;
   }

@@ -76,6 +76,20 @@ export default class Utils {
     return point;
   }
 
+  static getRandomBase64(length) {
+    let ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+
+    let str = '';
+
+    for (var i = 0; i < length; i++) {
+        let rand = Math.floor(Math.random() * ALPHABET.length);
+
+        str += ALPHABET.substring(rand, rand+1);
+    }
+
+    return str;
+  }
+
   static isTouchDevice() {
     return 'ontouchstart' in window || navigator.maxTouchPoints;
   }
