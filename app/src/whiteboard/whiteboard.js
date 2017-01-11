@@ -119,6 +119,7 @@ class Whiteboard {
     this._onWheelListener = this._onScroll.bind(this);
     this._onContextMenuListener = function(e) { e.preventDefault(); };
     this._resizeListener = this._onResize.bind(this);
+    this._orientationChangeListener = () => {setTimeout(this._onResize.bind(this), 100)};
     this._onFullscreenChangeListener = this._onFullscreenChange.bind(this);
 
     if (Utils.isTouchDevice()) {
@@ -131,7 +132,7 @@ class Whiteboard {
 
     document.addEventListener(Utils.getFullscreenChangeEventName(this._canvasElement), this._onFullscreenChangeListener);
 
-    window.addEventListener('orientationchange', this._resizeListener);
+    window.addEventListener('orientationchange', this._orientationChangeListener);
     window.addEventListener('resize', this._resizeListener);
   }
 
@@ -163,7 +164,7 @@ class Whiteboard {
     this._canvasElement.removeEventListener('touchmove', this._onTouchMoveListener);
     this._canvasElement.removeEventListener('touchstart', this._onTouchStartListener, { passive: true });
     this._canvasElement.removeEventListener('wheel', this._onWheelListener);
-    window.removeEventListener('orientationchange', this._resizeListener);
+    window.removeEventListener('orientationchange', this._orientationChangeListener);
     window.removeEventListener('resize', this._resizeListener);
   }
 
