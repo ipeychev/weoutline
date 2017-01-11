@@ -1,6 +1,7 @@
 const simplify = require('simplify-path');
 import { ShapeType } from '../draw/shape';
 import Data from '../data/data';
+import Draggable from '../draggable/draggable';
 import Draw from '../draw/draw';
 import DrawLine from '../draw/draw-line';
 import Eraser from '../draw/eraser';
@@ -58,6 +59,7 @@ class Whiteboard {
     }
 
     this._toolbar.destroy();
+    this._draggableMap.destroy();
 
     this._detachListeners();
   }
@@ -468,8 +470,10 @@ class Whiteboard {
   }
 
   _setupMap() {
-    this._mapElement = document.querySelector('#map');
+    this._mapElement = document.getElementById('map');
     this._mapContext = this._mapElement.getContext('2d');
+
+    this._draggableMap = new Draggable('#mapContainer');
   }
 
   _setupToolbar() {

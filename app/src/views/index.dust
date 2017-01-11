@@ -85,7 +85,7 @@
     </div>
 
     <div id="mapContainer" class="map-container">
-      <canvas width="150" height="150" id="map"></canvas>
+      <canvas width="150" height="150" id="map" class="map"></canvas>
     </div>
   </div>
 {/bodyContent}

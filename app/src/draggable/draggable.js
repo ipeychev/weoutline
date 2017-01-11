@@ -37,23 +37,34 @@ class Draggable {
   _onDragStart(event) {
       let style = window.getComputedStyle(event.target);
 
+      this._draggedElement = event.target;
+
       event.dataTransfer.setData('text/plain',
         (parseInt(style.getPropertyValue('left'), 10) - event.clientX) + ',' +
         (parseInt(style.getPropertyValue('top'), 10) - event.clientY));
+
+      event.dataTransfer.effectAllowed = 'move';
   }
 
   _onDragOver(event) {
+      event.dataTransfer.dropEffect = 'move';
       event.preventDefault();
       return false;
   }
 
   _onDrop(event) {
-      let offset = event.dataTransfer.getData('text/plain').split(',');
+    if (this._dragElement !== this._draggedElement) {
+      return;
+    }
 
-      this._dragElement.style.left = (event.clientX + parseInt(offset[0], 10)) + 'px';
-      this._dragElement.style.top = (event.clientY + parseInt(offset[1], 10)) + 'px';
-      event.preventDefault();
-      return false;
+    this._draggedElement = null;
+
+    let offset = event.dataTransfer.getData('text/plain').split(',');
+
+    this._dragElement.style.left = (event.clientX + parseInt(offset[0], 10)) + 'px';
+    this._dragElement.style.top = (event.clientY + parseInt(offset[1], 10)) + 'px';
+    event.preventDefault();
+    return false;
   }
 
   _onTouchMove(event) {
