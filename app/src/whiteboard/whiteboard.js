@@ -51,6 +51,12 @@ class Whiteboard {
   }
 
   destroy() {
+    if (this._drawer) {
+      this._drawer.destroy();
+    }
+
+    this._toolbar.destroy();
+
     this._detachListeners();
   }
 
