@@ -22,6 +22,7 @@ class Whiteboard {
     this._setupContext();
     this._setupToolbar();
     this._setupData();
+    this._setupMap();
 
     this._attachListeners();
 
@@ -86,10 +87,13 @@ class Whiteboard {
 
   redraw() {
     this._context.clearRect(0, 0, this._context.canvas.width, this._context.canvas.height);
+    this._mapContext.clearRect(0, 0, this._mapContext.canvas.width, this._mapContext.canvas.height);
 
     this.drawRulers();
 
     this.drawShapes();
+
+    this._drawMap();
   }
 
   removeShapes(shapes) {
@@ -188,6 +192,27 @@ class Whiteboard {
         this._context.textBaseline = 'alphabetic';
         this._context.font = this._config.rulerFontSize + 'px';
         this._context.fillText(i, i - this._offset[0], 20);
+      }
+    }
+  }
+
+  _drawMap() {
+    let ratioX = this._config.width / this._mapElement.width;
+    let ratioY = this._config.height / this._mapElement.height;
+
+    for (let i = 0; i < this._shapes.length; i++) {
+      if (this._shapes[i].type === ShapeType.LINE) {
+        let points = this._shapes[i].points.map((point) => {
+          return [point[0] / ratioX, point[1] / ratioY];
+        });
+
+        Draw.line(points, this._mapContext, {
+          color: this._shapes[i].color,
+          globalCompositeOperation: 'source-over',
+          lineCap: 'round',
+          lineJoin: 'round',
+          size: Math.round(this._shapes[i].size / 4)
+        });
       }
     }
   }
@@ -432,6 +457,11 @@ class Whiteboard {
     this._data = new Data({
       url: this._config.dataURL
     });
+  }
+
+  _setupMap() {
+    this._mapElement = document.querySelector('#map');
+    this._mapContext = this._mapElement.getContext('2d');
   }
 
   _setupToolbar() {

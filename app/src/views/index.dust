@@ -83,5 +83,9 @@
         </div>
       </div>
     </div>
+
+    <div id="mapContainer" class="map-container">
+      <canvas width="150" height="150" id="map"></canvas>
+    </div>
   </div>
 {/bodyContent}
