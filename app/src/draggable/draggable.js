@@ -35,13 +35,13 @@ class Draggable {
   }
 
   _onDragStart(event) {
-      let style = window.getComputedStyle(event.target);
+      let targetRect = event.target.getBoundingClientRect();
 
       this._draggedElement = event.target;
 
       event.dataTransfer.setData('text/plain',
-        (parseInt(style.getPropertyValue('left'), 10) - event.clientX) + ',' +
-        (parseInt(style.getPropertyValue('top'), 10) - event.clientY));
+        (targetRect.left - event.clientX) + ',' +
+        (targetRect.top - event.clientY));
 
       event.dataTransfer.effectAllowed = 'move';
   }
@@ -82,15 +82,13 @@ class Draggable {
     if (event.targetTouches.length === 1) {
       let touch = event.targetTouches[0];
 
-      let style = window.getComputedStyle(event.target);
+      let targetRect = event.target.getBoundingClientRect();
 
-      let elementLeft = parseInt(style.getPropertyValue('left'), 10);
-      let elementTop = parseInt(style.getPropertyValue('top'), 10);
-      this._elementWidth = parseInt(style.getPropertyValue('width'), 10);
-      this._elementHeight = parseInt(style.getPropertyValue('height'), 10);
+      this._elementHeight = targetRect.height;
+      this._elementWidth = targetRect.width;
 
-      this._startOffsetX = (elementLeft + this._elementWidth - touch.pageX);
-      this._startOffsetY = (elementTop + this._elementHeight - touch.pageY);
+      this._startOffsetX = (targetRect.left + this._elementWidth - touch.pageX);
+      this._startOffsetY = (targetRect.top + this._elementHeight - touch.pageY);
     }
   }
 }
