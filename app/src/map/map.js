@@ -72,9 +72,13 @@ class Map {
   _attachListeners() {
     this._clickListener = this._onClick.bind(this);
     this._touchEndListener = this._onTouchEnd.bind(this);
+    this._touchMoveListener = this._onTouchMove.bind(this);
+    this._touchStartListener = this._onTouchStart.bind(this);
 
     if (Utils.isTouchDevice()) {
       this._mapElement.addEventListener('touchend', this._touchEndListener, { passive: true });
+      this._mapElement.addEventListener('touchmove', this._touchMoveListener, { passive: true });
+      this._mapElement.addEventListener('touchstart', this._touchStartListener, { passive: true });
     } else {
       this._mapElement.addEventListener('click', this._clickListener);
     }
@@ -83,19 +87,37 @@ class Map {
   _detachListeners() {
     this._mapElement.removeEventListener('click', this._clickListener);
     this._mapElement.removeEventListener('touchend', this._touchEndListener, { passive: true });
+    this._mapElement.removeEventListener('touchmove', this._touchMoveListener, { passive: true });
+    this._mapElement.removeEventListener('touchstart', this._touchStartListener, { passive: true });
   }
 
   _onClick(event) {
+    this._setPoint(event.offsetX, event.offsetY);
+  }
+
+  _setPoint(pointX, pointY) {
     let ratioX = this._config.width / this._mapElement.width;
     let ratioY = this._config.height / this._mapElement.height;
 
-    this._config.callback([event.offsetX * ratioX, event.offsetY * ratioY]);
+    this._config.callback([pointX * ratioX, pointY * ratioY]);
   }
 
   _onTouchEnd(event) {
-    if (event.changedTouches.length === 1) {
-      this._onClick(event);
+    if (event.changedTouches.length === 1 && !this._dragged) {
+      let touch = event.changedTouches[0];
+
+      let mapRect = this._mapElement.getBoundingClientRect();
+
+      this._setPoint(touch.pageX - mapRect.left, touch.pageY -  mapRect.top);
     }
+  }
+
+  _onTouchMove() {
+    this._dragged = true;
+  }
+
+  _onTouchStart(event) {
+    this._dragged = false;
   }
 }
 
