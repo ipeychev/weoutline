@@ -5,7 +5,7 @@
       <canvas id="canvas" class="draw-area"></canvas>
     </div>
 
-    <div id="toolbar" class="toolbar">
+    <div id="toolbar" class="toolbar hidden">
       <div id="pen" class="toolbar-item">
         <div class="toolbar-item-value active" id="penSize">
           <i class="fa fa-pencil" aria-hidden="true"></i>
@@ -77,7 +77,7 @@
         </div>
       </div>
 
-      <div id="fullscreen" class="toolbar-item">
+      <div id="fullscreen" class="toolbar-item hidden">
         <div class="toolbar-item-value">
           <i class="fa fa-expand" id="share" aria-hidden="true"></i>
         </div>

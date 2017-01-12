@@ -8,11 +8,14 @@ class Toolbar {
 
     this._config = config;
 
-    this._setupContainer()
-    this.setValues(config);
+    this._setupContainer();
     this._attachListeners();
+    this._initItems();
+    this.setValues(config);
 
     this._draggable = new Draggable(this._element);
+
+    this._element.classList.remove('hidden');
   }
 
   destroy() {
@@ -112,6 +115,12 @@ class Toolbar {
 
     for (let i = 0; nodes && i < nodes.length; i++) {
       nodes.item(i).classList.add('hidden');
+    }
+  }
+
+  _initItems() {
+    if (Utils.isFullScreenSupported()) {
+      this._fullScreenNode.classList.remove('hidden');
     }
   }
 

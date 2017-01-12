@@ -28,17 +28,16 @@
     display: flex;
     height: 42px;
     left: 20px;
-    padding: 5px;
+    padding: 2px 20px 2px 2px;
     position: fixed;
     top: 20px;
-    width: 290px;
 
     .toolbar-item {
       display: flex;
       height: 38px;
       position: relative;
       width: 38px;
-      margin-left: 5px;
+      margin-left: 2px;
 
       &.drag {
         position: absolute;
@@ -74,7 +73,7 @@
         padding-bottom: 5px;
         padding-top: 5px;
         position: absolute;
-        top: 46px;
+        top: 44px;
         width: 48px;
 
         .toolbar-item-option {

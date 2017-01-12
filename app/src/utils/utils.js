@@ -27,14 +27,20 @@ export default class Utils {
     }
   }
 
+  static isFullScreenSupported() {
+    let res = Utils.getFullScreenModeValue();
+
+    return (typeof res === 'boolean');
+  }
+
   static getFullScreenModeValue() {
-    if (document.fullscreen) {
+    if (typeof document.fullscreen === 'boolean') {
       return document.fullscreen;
-    } else if (document.mozFullScreen) {
+    } else if (typeof document.mozFullScreen === 'boolean') {
       return document.mozFullScreen;
-    } else if (document.webkitIsFullScreen) {
+    } else if (typeof document.webkitIsFullScreen === 'boolean') {
       return document.webkitIsFullScreen;
-    } else if (document.msIsFullScreen) {
+    } else if (typeof document.msIsFullScreen === 'boolean') {
       return document.msIsFullScreen;
     }
   }
