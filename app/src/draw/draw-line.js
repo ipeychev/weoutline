@@ -59,7 +59,7 @@ class DrawLine {
         globalCompositeOperation: this._config.globalCompositeOperation,
         lineCap: this._config.lineCap,
         lineJoin: this._config.lineJoin,
-        size: this._getSize()
+        lineWidth: this._getLineWidth()
       });
 
       this._points.push(curPoint);
@@ -82,7 +82,7 @@ class DrawLine {
       let shape = new Shape({
         color: this._config.color,
         points: this._points.slice(0),
-        size: this._getSize(),
+        lineWidth: this._getLineWidth(),
         type: ShapeType.LINE
       });
 
@@ -103,7 +103,7 @@ class DrawLine {
     let tmpY = this._lastPoint[1] + this._config.offset[1];
 
     if (tmpX > 0 && tmpX < this._config.boardSize[0] && tmpY > 0 && tmpY < this._config.boardSize[1]) {
-      this._context.lineWidth = this._getSize();
+      this._context.lineWidth = this._getLineWidth();
       this._context.strokeStyle = this._config.color;
 
       this._points.push(this._lastPoint);
@@ -140,7 +140,7 @@ class DrawLine {
     this._canvasElement.removeEventListener('touchstart', this._startListener, {passive: true});
   }
 
-  _getSize() {
+  _getLineWidth() {
     return this._config.lineWidth / window.devicePixelRatio;
   }
 

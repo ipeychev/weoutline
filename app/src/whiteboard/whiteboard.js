@@ -270,14 +270,14 @@ class Whiteboard {
     }
   }
 
-  _getToolSize() {
-    let size;
+  _getLineWidth() {
+    let lineWidth;
 
     if (this._config.activeTool === Tools.line) {
-      size = this._config.penSize;
+      lineWidth = this._config.penSize;
     }
 
-    return size;
+    return lineWidth;
   }
 
   _onFullscreenChange() {
@@ -440,7 +440,7 @@ class Whiteboard {
         lineCap: 'round',
         lineJoin: 'round',
         offset: this._offset,
-        size: this._getToolSize()
+        lineWidth: this._getLineWidth()
       });
     } else if (this._config.activeTool === Tools.eraser) {
       this._drawer = new Eraser({
