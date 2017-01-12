@@ -1,10 +1,9 @@
-const simplify = require('simplify-path');
 import { ShapeType } from '../draw/shape';
 import Data from '../data/data';
-import Draggable from '../draggable/draggable';
 import Draw from '../draw/draw';
 import DrawLine from '../draw/draw-line';
 import Eraser from '../draw/eraser';
+import Map from '../map/map';
 import Toolbar from '../toolbar/toolbar';
 import Tools from '../draw/tools';
 import Utils from '../utils/utils';
@@ -59,7 +58,7 @@ class Whiteboard {
     }
 
     this._toolbar.destroy();
-    this._draggableMap.destroy();
+    this._map.destroy();
 
     this._detachListeners();
   }
@@ -82,7 +81,7 @@ class Whiteboard {
           globalCompositeOperation: 'source-over',
           lineCap: 'round',
           lineJoin: 'round',
-          size: this._shapes[i].size
+          lineWidth: this._shapes[i].lineWidth
         });
       }
     }
@@ -95,7 +94,10 @@ class Whiteboard {
 
     this.drawShapes();
 
-    this._drawMap();
+    this._map.draw(this._shapes, this._offset, {
+      width: this._canvasElement.width,
+      height: this._canvasElement.height
+    });
   }
 
   removeShapes(shapes) {
@@ -194,35 +196,6 @@ class Whiteboard {
         this._context.textBaseline = 'alphabetic';
         this._context.font = this._config.rulerFontSize + 'px';
         this._context.fillText(i, i - this._offset[0], 20);
-      }
-    }
-  }
-
-  _drawMap() {
-    this._mapContext.clearRect(0, 0, this._mapContext.canvas.width, this._mapContext.canvas.height);
-
-    let ratioX = this._config.width / this._mapElement.width;
-    let ratioY = this._config.height / this._mapElement.height;
-
-    this._mapContext.strokeStyle = 'black';
-    this._mapContext.lineWidth = 1;
-    this._mapContext.strokeRect(this._offset[0] / ratioX, this._offset[1] / ratioY, this._canvasElement.width / ratioX, this._canvasElement.height / ratioY);
-
-    for (let i = 0; i < this._shapes.length; i++) {
-      if (this._shapes[i].type === ShapeType.LINE) {
-        let points = simplify(this._shapes[i].points, 10);
-
-        points = points.map((point) => {
-          return [point[0] / ratioX, point[1] / ratioY];
-        });
-
-        Draw.line(points, this._mapContext, {
-          color: this._shapes[i].color,
-          globalCompositeOperation: 'source-over',
-          lineCap: 'round',
-          lineJoin: 'round',
-          size: Math.round(this._shapes[i].size / 4)
-        });
       }
     }
   }
@@ -370,6 +343,31 @@ class Whiteboard {
     });
   }
 
+  _onMapClickCallback(point) {
+    let canvasHeight = this._canvasElement.height;
+    let canvasWidth = this._canvasElement.width;
+
+    let x = point[0] - canvasWidth / 2;
+    let y = point[1] - canvasHeight / 2;
+
+    if (x + canvasWidth > this._config.width) {
+      x = this._config.width - canvasWidth;
+    } else if (x < 0) {
+      x = 0;
+    }
+
+    if (y + canvasHeight > this._config.height) {
+      y = this._config.height - canvasHeight;
+    } else if (y < 0) {
+      y = 0;
+    }
+
+    this._offset[0] = x;
+    this._offset[1] = y;
+
+    this.redraw();
+  }
+
   _onShapeCreatedCallback(shape) {
     // change points coordinates according to 0,0
     shape.points = shape.points.map((point) => {
@@ -470,10 +468,15 @@ class Whiteboard {
   }
 
   _setupMap() {
-    this._mapElement = document.getElementById('map');
-    this._mapContext = this._mapElement.getContext('2d');
-
-    this._draggableMap = new Draggable('#mapContainer');
+    this._map = new Map({
+      callback: this._onMapClickCallback.bind(this),
+      color: 'black',
+      container: '#mapContainer',
+      height: this._config.height,
+      lineWidth: 1,
+      srcNode: '#map',
+      width: this._config.width
+    });
   }
 
   _setupToolbar() {

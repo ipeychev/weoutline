@@ -5,7 +5,7 @@ export class Shape {
     this.id = config.id;
     this.points = config.points;
     this.sessionId = config.sessionId;
-    this.size = config.size;
+    this.lineWidth = config.lineWidth;
     this.type = config.type;
   }
 }

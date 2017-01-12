@@ -141,7 +141,7 @@ class DrawLine {
   }
 
   _getSize() {
-    return this._config.size / window.devicePixelRatio;
+    return this._config.lineWidth / window.devicePixelRatio;
   }
 
   _setupCanvas() {

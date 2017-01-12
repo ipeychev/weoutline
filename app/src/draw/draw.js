@@ -9,12 +9,12 @@ export default class Draw {
       context.fillStyle = config.color;
 
       context.beginPath();
-      context.arc(p1[0], p1[1], config.size/2, 0, 2 * Math.PI, false);
+      context.arc(p1[0], p1[1], config.lineWidth/2, 0, 2 * Math.PI, false);
       context.fill();
     } else {
       context.lineCap = config.lineCap;
       context.lineJoin = config.lineJoin;
-      context.lineWidth = config.size;
+      context.lineWidth = config.lineWidth;
       context.strokeStyle = config.color;
 
       context.beginPath();
@@ -37,7 +37,7 @@ export default class Draw {
     context.globalCompositeOperation = config.globalCompositeOperation;
     context.lineCap = config.lineCap;
     context.lineJoin = config.lineJoin;
-    context.lineWidth = config.size;
+    context.lineWidth = config.lineWidth;
     context.strokeStyle = config.color;
 
     context.beginPath();

@@ -1,11 +1,11 @@
 import Utils from '../utils/utils';
 
 class Draggable {
-  constructor(element) {
-    if (typeof element === 'string') {
-      this._dragElement = document.querySelector(element);
+  constructor(target) {
+    if (typeof target === 'string') {
+      this._dragElement = document.querySelector(target);
     } else {
-      this._dragElement = element;
+      this._dragElement = target;
     }
 
     this._dragElement.setAttribute('draggable', 'true');
