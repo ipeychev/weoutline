@@ -31,14 +31,14 @@ html, body {
     display: flex;
     height: 42px;
     left: 20px;
-    padding: 2px 20px 2px 2px;
+    padding: 2px 30px 2px 2px;
     position: fixed;
     top: 20px;
 
     &.vertical {
       flex-direction: column;
       height: auto;
-      padding: 2px 2px 20px 2px;
+      padding: 2px 2px 30px 2px;
       width: 42px;
 
       .toolbar-item {
