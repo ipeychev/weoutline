@@ -1,3 +1,6 @@
+html, body {
+    height: 100%;
+}
 
 .wb {
   height: 100%;
@@ -31,6 +34,31 @@
     padding: 2px 20px 2px 2px;
     position: fixed;
     top: 20px;
+
+    &.vertical {
+      flex-direction: column;
+      height: auto;
+      padding: 2px 2px 20px 2px;
+      width: 42px;
+
+      .toolbar-item {
+        margin-left: 0px;
+        margin-top: 2px;
+
+        .toolbar-item-options {
+          flex-direction: row;
+          left: 44px;
+          padding: 4px;
+          top: -4px;
+          width: auto;
+
+          .toolbar-item-option {
+            height: 36px;
+            width: 36px;
+          }
+        }
+      }
+    }
 
     .toolbar-item {
       display: flex;

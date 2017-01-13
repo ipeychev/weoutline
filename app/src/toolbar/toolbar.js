@@ -10,6 +10,7 @@ class Toolbar {
 
     this._setupContainer();
     this._attachListeners();
+    this._positionToolbar();
     this._initItems();
     this.setValues(config);
 
@@ -48,6 +49,8 @@ class Toolbar {
   _attachListeners() {
     this._clickListener = this._onClick.bind(this);
     this._documentInteractionListener = this._onDocumentInteraction.bind(this);
+    this._resizeListener = this._onResize.bind(this);
+    this._orientationChangeListener = () => {setTimeout(this._onResize.bind(this), 100)};
     this._touchEndListener = this._onTouchEnd.bind(this);
 
     if (Utils.isTouchDevice()) {
@@ -57,6 +60,9 @@ class Toolbar {
       this._element.addEventListener('click', this._clickListener);
       document.addEventListener('mousedown', this._documentInteractionListener);
     }
+
+    window.addEventListener('orientationchange', this._orientationChangeListener);
+    window.addEventListener('resize', this._resizeListener);
   }
 
   _deactivateOptions(rootNode) {
@@ -76,10 +82,12 @@ class Toolbar {
   }
 
   _detachListeners() {
-    this._element.removeEventListener('touchend', this._touchEndListener, { passive: true });
+    document.removeEventListener('mousedown', this._documentInteractionListener);
     document.removeEventListener('touchstart', this._documentInteractionListener);
     this._element.removeEventListener('click', this._clickListener);
-    document.removeEventListener('mousedown', this._documentInteractionListener);
+    this._element.removeEventListener('touchend', this._touchEndListener, { passive: true });
+    window.removeEventListener('orientationchange', this._orientationChangeListener);
+    window.removeEventListener('resize', this._resizeListener);
   }
 
   _getActiveTool() {
@@ -172,6 +180,10 @@ class Toolbar {
     }
   }
 
+  _onResize() {
+    this._positionToolbar();
+  }
+
   _onTouchEnd(event) {
     if (event.changedTouches.length === 1) {
       this._onClick(event);
@@ -200,6 +212,16 @@ class Toolbar {
           }
         });
       }
+    }
+  }
+
+  _positionToolbar() {
+    let bodyBoundingRect = document.body.getBoundingClientRect();
+
+    if (bodyBoundingRect.width > bodyBoundingRect.height) {
+      this._element.classList.remove('vertical');
+    } else {
+      this._element.classList.add('vertical');
     }
   }
 

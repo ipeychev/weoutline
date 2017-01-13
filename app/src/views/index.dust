@@ -5,6 +5,10 @@
       <canvas id="canvas" class="draw-area"></canvas>
     </div>
 
+    <div id="mapContainer" class="map-container">
+      <canvas width="150" height="150" id="map" class="map"></canvas>
+    </div>
+
     <div id="toolbar" class="toolbar hidden">
       <div id="pen" class="toolbar-item">
         <div class="toolbar-item-value active" id="penSize">
@@ -82,10 +86,6 @@
           <i class="fa fa-expand" id="share" aria-hidden="true"></i>
         </div>
       </div>
-    </div>
-
-    <div id="mapContainer" class="map-container">
-      <canvas width="150" height="150" id="map" class="map"></canvas>
     </div>
   </div>
 {/bodyContent}
