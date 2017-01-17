@@ -89,7 +89,7 @@ function buildSrc() {
       devtool: 'source-map'
     }).on('error', errorHandler))
     .pipe(gulp.dest(destinationFolder))
-    .pipe($.filter(['**', '!**/*.js.map', '!**/test', '!**/server.js', '!**/views', '!**/routes']))
+    .pipe($.filter(['**', '!**/*.js.map', '!**/test', '!**/lib', '!**/server.js', '!**/views', '!**/routes']))
     .pipe($.rename(`${exportJSFileName}.${manifest.version}.min.js`))
     .pipe($.sourcemaps.init({loadMaps: true}))
     .pipe($.uglify())
@@ -106,7 +106,8 @@ function copyStatic() {
   return gulp.src([
       'src/index.html',
       'src/**/assets/vendor/**/*.css',
-      'src/**/*.jpeg'
+      'src/**/*.jpeg',
+      'lib/**/*.js'
     ])
     .pipe(gulp.dest(destinationFolder));
 }
@@ -202,7 +203,7 @@ function test() {
   return _mocha();
 }
 
-var watchFiles = ['src/**/*', 'test/**/*', 'package.json', '**/.eslintrc', '!**/server.js', '!**/views/*', '!**/routes/*'];
+var watchFiles = ['src/**/*', 'lib/**/*.js', 'test/**/*', 'package.json', '**/.eslintrc', '!**/server.js', '!**/views/*', '!**/routes/*'];
 
 // Run the headless unit tests as you make changes.
 function watch() {

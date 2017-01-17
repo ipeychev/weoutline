@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="/assets/vendor/font-awesome.min.css">
 
     <link rel="stylesheet" href="/assets/app.{version}.{?production}min.{/production}css">
+    <script src="/dollar.js" defer></script>
     <script src="http://cdn.wedeploy.com/api/latest/wedeploy.js" defer></script>
     <script src="/app.{version}.{?production}min.{/production}js" defer></script>
   </head>

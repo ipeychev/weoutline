@@ -24,6 +24,7 @@ class Whiteboard {
     this._setupToolbar();
     this._setupData();
     this._setupMap();
+    this._setupRecognizer();
 
     this._attachListeners();
 
@@ -384,6 +385,10 @@ class Whiteboard {
 
     this.addShapes([shape]);
     this.redraw();
+
+    let res = this._recognizer.Recognize(shape.points.map((point) => {return {X: point[0], Y: point[1]};}));
+
+    console.log('SHAPE', res);
   }
 
   _onShapesErasedCallback(shapes) {
@@ -477,6 +482,10 @@ class Whiteboard {
       srcNode: '#map',
       width: this._config.width
     });
+  }
+
+  _setupRecognizer() {
+    this._recognizer = new DollarRecognizer();
   }
 
   _setupToolbar() {
