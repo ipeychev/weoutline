@@ -98,10 +98,11 @@ function Unistroke(name, points) // constructor
 //
 // Result class
 //
-function Result(name, score) // constructor
+function Result(name, score, angle) // constructor
 {
 	this.Name = name;
 	this.Score = score;
+	this.Angle = angle;
 }
 //
 // DollarRecognizer class constants
@@ -154,6 +155,7 @@ function DollarRecognizer() // constructor
 
 		var b = +Infinity;
 		var u = -1;
+		var a = 0.0;
 		for (var i = 0; i < this.Unistrokes.length; i++) // for each unistroke
 		{
 			var d;
@@ -161,12 +163,15 @@ function DollarRecognizer() // constructor
 				d = OptimalCosineDistance(this.Unistrokes[i].Vector, vector);
 			else // Golden Section Search (original $1)
 				d = DistanceAtBestAngle(points, this.Unistrokes[i], -AngleRange, +AngleRange, AnglePrecision);
-			if (d < b) {
-				b = d; // best (least) distance
+			if (d.distance < b) {
+				b = d.distance; // best (least) distance
 				u = i; // unistroke
+				a = d.angle; // angle applied on best solution
 			}
 		}
-		return (u == -1) ? new Result("No match.", 0.0) : new Result(this.Unistrokes[u].Name, useProtractor ? 1.0 / b : 1.0 - b / HalfDiagonal);
+
+		return (u == -1) ? new Result("No match.", 0.0, 0.0) : new Result(this.Unistrokes[u].Name, useProtractor ? 1.0 / b : 1.0 - b / HalfDiagonal, a-radians);
+
 	};
 	this.AddGesture = function(name, points)
 	{
@@ -273,7 +278,7 @@ function OptimalCosineDistance(v1, v2) // for Protractor
                 b += v1[i] * v2[i + 1] - v1[i + 1] * v2[i];
 	}
 	var angle = Math.atan(b / a);
-	return Math.acos(a * Math.cos(angle) + b * Math.sin(angle));
+	return {distance: Math.acos(a * Math.cos(angle) + b * Math.sin(angle)), angle: angle};
 }
 function DistanceAtBestAngle(points, T, a, b, threshold)
 {
@@ -297,7 +302,11 @@ function DistanceAtBestAngle(points, T, a, b, threshold)
 			f2 = DistanceAtAngle(points, T, x2);
 		}
 	}
-	return Math.min(f1, f2);
+	if (f1 < f2) {
+		return {distance: f1, angle: x1};
+	} else {
+		return {distance: f2, angle: x2};
+	}
 }
 function DistanceAtAngle(points, T, radians)
 {
