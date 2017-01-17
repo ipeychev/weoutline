@@ -4,6 +4,7 @@ import Draw from '../draw/draw';
 import DrawLine from '../draw/draw-line';
 import Eraser from '../draw/eraser';
 import Map from '../map/map';
+import ShapesRecognizer from '../draw/shapes-recognizer';
 import Toolbar from '../toolbar/toolbar';
 import Tools from '../draw/tools';
 import Utils from '../utils/utils';
@@ -60,6 +61,7 @@ class Whiteboard {
 
     this._toolbar.destroy();
     this._map.destroy();
+    this._shapesRecognizer.destroy();
 
     this._detachListeners();
   }
@@ -386,9 +388,9 @@ class Whiteboard {
     this.addShapes([shape]);
     this.redraw();
 
-    let res = this._recognizer.Recognize(shape.points.map((point) => {return {X: point[0], Y: point[1]};}));
+    let res = this._shapesRecognizer.recognize(shape.points);
 
-    console.log('SHAPE', res);
+    this._outputElement.innerHTML = 'Name: ' + res.Name + '<br>' + 'Score: ' + res.Score + '<br>' + 'Angle: ' + res.Angle;
   }
 
   _onShapesErasedCallback(shapes) {
@@ -485,7 +487,11 @@ class Whiteboard {
   }
 
   _setupRecognizer() {
-    this._recognizer = new DollarRecognizer();
+    this._shapesRecognizer = new ShapesRecognizer({
+      srcNode: 'shapesContainer'
+    });
+
+    this._outputElement = document.getElementById('output');
   }
 
   _setupToolbar() {

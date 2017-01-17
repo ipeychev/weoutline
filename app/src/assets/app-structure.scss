@@ -25,6 +25,12 @@ html, body {
     }
   }
 
+  .shapes-container {
+    left: 20px;
+    position: fixed;
+    top: 80px;
+  }
+
   .toolbar {
     align-items: center;
     border-radius: 4px;

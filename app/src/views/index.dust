@@ -9,6 +9,17 @@
       <canvas width="150" height="150" id="map" class="map"></canvas>
     </div>
 
+    <div id="shapesContainer" class="shapes-container">
+      <label>Shape:
+        <input id="shapesInput" list="shapesList" name="shapesList">
+      </label>
+      <datalist id="shapesList">
+      </datalist>
+      <button id="add">Add</button>
+      <hr>
+      <div id="output"></div>
+    </div>
+
     <div id="toolbar" class="toolbar hidden">
       <div id="pen" class="toolbar-item">
         <div class="toolbar-item-value active" id="penSize">

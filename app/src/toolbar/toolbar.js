@@ -267,12 +267,12 @@ class Toolbar {
   _setupContainer() {
     this._element = document.getElementById(this._config.srcNode);
 
-    this._clearNode = document.getElementById('clear');
-    this._colorNode = document.getElementById('color');
-    this._eraserNode = document.getElementById('eraser');
-    this._fullScreenNode = document.getElementById('fullscreen');
-    this._penNode = document.getElementById('pen');
-    this._shareNode = document.getElementById('share');
+    this._clearNode = this._element.querySelector('#clear');
+    this._colorNode = this._element.querySelector('#color');
+    this._eraserNode = this._element.querySelector('#eraser');
+    this._fullScreenNode = this._element.querySelector('#fullscreen');
+    this._penNode = this._element.querySelector('#pen');
+    this._shareNode = this._element.querySelector('#share');
   }
 
   _updateToolbarView(rootNode, targetNode, config) {
