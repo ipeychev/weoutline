@@ -35,6 +35,8 @@ class Toolbar {
   }
 
   setValues(config) {
+    this._deactivateValues();
+
     if (config.activeTool === Tools.line) {
       this._penNode.querySelector('.toolbar-item-value').classList.add('active');
     } else if (config.activeTool === Tools.eraser) {
