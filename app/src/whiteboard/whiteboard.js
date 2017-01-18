@@ -41,7 +41,7 @@ class Whiteboard {
     }
 
     if (this._whiteboardId) {
-      this._data.saveShapes(shapes)
+      this._data.saveShapes(this._whiteboardId, shapes)
         .then(() => {
           console.log('Shapes saved successfully on whiteboard', this._whiteboardId);
         })
@@ -154,7 +154,7 @@ class Whiteboard {
   _clearWhiteboard() {
     if (confirm('Are you sure you want to erase the whole whiteboard?')) {
       if (this._whiteboardId) {
-        this._data.deleteShapes(this._shapes)
+        this._data.deleteShapes(this._whiteboardId, this._shapes)
           .then(() => {
             console.log('Shapes deleted successfully on whiteboard', this._whiteboardId);
           })
@@ -394,10 +394,6 @@ class Whiteboard {
 
     shape.id = Date.now().toString() + window.crypto.getRandomValues(new Uint32Array(1))[0];
 
-    if (this._whiteboardId) {
-      shape.board = this._whiteboardId;
-    }
-
     shape.sessionId = this._sessionId;
 
     this.addShapes([shape]);
@@ -406,7 +402,7 @@ class Whiteboard {
 
   _onShapesErasedCallback(shapes) {
     if (this._whiteboardId) {
-      this._data.deleteShapes(shapes)
+      this._data.deleteShapes(this._whiteboardId, shapes)
         .then(() => {
           console.log('Shapes deleted successfully on whiteboard', this._whiteboardId);
         })
@@ -517,18 +513,16 @@ class Whiteboard {
 
       history.pushState(null, null, window.location.origin + '/wb/' + this._whiteboardId);
 
-      for (let i = 0; i < this._shapes.length; i++) {
-        this._shapes[i].board = this._whiteboardId;
+      if (this._shapes.length) {
+        this._data.saveShapes(this._whiteboardId, this._shapes)
+          .then(() => {
+            console.log('Shapes saved successfully on whiteboard', whiteboardId);
+          })
+          .catch((error) => {
+            alert('Creating whiteboard and saving shapes failed!');
+            console.log(error);
+          });
       }
-
-      this._data.saveShapes(this._shapes)
-        .then(() => {
-          console.log('Shapes saved successfully on whiteboard', whiteboardId);
-        })
-        .catch((error) => {
-          alert('Creating whiteboard and saving shapes failed!');
-          console.log(error);
-        });
     }
 
     alert('Copy and share the following URL: ' + window.location.origin + '/wb/' + this._whiteboardId);

@@ -1,6 +1,5 @@
 export class Shape {
   constructor(config) {
-    this.board = config.board;
     this.color = config.color;
     this.id = config.id;
     this.points = config.points;

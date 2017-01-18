@@ -5,11 +5,11 @@ class Data {
     this._data = WeDeploy.data(config.url);
   }
 
-  deleteShapes(shapes) {
+  deleteShapes(whiteboardId, shapes) {
     let deletePromises = [];
 
     for (let i = 0; i < shapes.length; i++) {
-      deletePromises.push(this._data.delete('shapes/' + shapes[i].id));
+      deletePromises.push(this._data.delete(whiteboardId + '/' + shapes[i].id));
     }
 
     return Promise.all(deletePromises);
@@ -25,13 +25,11 @@ class Data {
   }
 
   fetchShapes(whiteboardId) {
-    return this._data
-      .where('board', '=', whiteboardId)
-      .get('shapes')
+    return this._data.get(whiteboardId)
   }
 
-  saveShapes(shapes) {
-    return this._data.create('shapes', shapes);
+  saveShapes(whiteboardId, shapes) {
+    return this._data.create(whiteboardId, shapes);
   }
 
   watch(whiteboardId, sessionId, successCallback, errorCallback) {
