@@ -1,6 +1,22 @@
 [
 	{
-		"path": "/shapes/*",
-		"data": true
+		"data": true,
+		"path": "/",
+		"auth": {
+			"scopes": ["admin"]
+		}
+	},
+	{
+		"data": true,
+		"path": "/boards",
+		"parameters": {
+			"filter": {
+				"value": {"userId":{"operator":"=","value":"$auth.id"}}
+			}
+		}
+	},
+	{
+		"data": true,
+		"path": "/*"
 	}
 ]
