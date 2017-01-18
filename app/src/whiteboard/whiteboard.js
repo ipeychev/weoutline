@@ -87,7 +87,7 @@ class Whiteboard {
             globalCompositeOperation: 'source-over',
             lineCap: 'round',
             lineJoin: 'round',
-            lineWidth: this._shapes[i].lineWidth
+            lineWidth: Utils.getPixelScaledNumber(this._shapes[i].lineWidth)
           });
         }
       }

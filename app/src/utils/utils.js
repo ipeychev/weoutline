@@ -27,6 +27,10 @@ export default class Utils {
     }
   }
 
+  static getPixelScaledNumber(num) {
+    return num / window.devicePixelRatio;
+  }
+
   static isFullScreenSupported() {
     let res = Utils.getFullScreenModeValue();
 

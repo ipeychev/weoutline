@@ -63,7 +63,7 @@ class Map {
           globalCompositeOperation: 'source-over',
           lineCap: 'round',
           lineJoin: 'round',
-          lineWidth: Math.round(shapes[i].lineWidth / 4)
+          lineWidth: Math.round(Utils.getPixelScaledNumber(shapes[i].lineWidth) / 4)
         });
       }
     }
