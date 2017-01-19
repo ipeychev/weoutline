@@ -7,7 +7,8 @@ var logger = require('morgan');
 var manifest = require('../package.json');
 var path = require('path');
 
-var index = require('./routes/index');
+var user = require('./routes/user');
+var whiteboard = require('./routes/whiteboard');
 
 var app = express();
 
@@ -35,9 +36,8 @@ app.use(express.static(path.join(__dirname, '../dist')));
 app.locals.production = app.get('env') === 'production';
 app.locals.version = manifest.version;
 
-app.use('/', index);
-app.use('/wb', index);
-app.use('/wb/:id', index);
+app.use('/', whiteboard);
+app.use('/user', user);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

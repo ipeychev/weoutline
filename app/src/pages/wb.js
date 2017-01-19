@@ -1,5 +1,5 @@
-import Tools from './draw/tools';
-import Whiteboard from './whiteboard/whiteboard';
+import Tools from '../draw/tools';
+import Whiteboard from '../whiteboard/whiteboard';
 
 window.addEventListener('load', () => {
   function createWhiteboard() {

@@ -9,11 +9,14 @@
     <link rel="stylesheet" href="/assets/vendor/normalize.min.css">
     <link rel="stylesheet" href="/assets/vendor/font-awesome.min.css">
 
-    {+appResources}
+    {+cssResources}
       <link rel="stylesheet" href="/assets/app.{version}.{?production}min.{/production}css">
+    {/cssResources}
+
+    {+jsResources}
       <script src="http://cdn.wedeploy.com/api/latest/wedeploy.js" defer></script>
-      <script src="/app.{version}.{?production}min.{/production}js" defer></script>
-    {/appResources}
+      <script src="/whiteboard.{version}.{?production}min.{/production}js" defer></script>
+    {/jsResources}
   </head>
 
   <body>

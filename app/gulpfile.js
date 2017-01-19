@@ -4,6 +4,7 @@ var del = require('del');
 var glob = require('glob');
 var gulp = require('gulp');
 var isparta = require('isparta');
+var gutil = require('gutil');
 var loadPlugins = require('gulp-load-plugins');
 var path = require('path');
 var rename = require('gulp-rename');
@@ -15,6 +16,8 @@ var webpackStream = require('webpack-stream');
 var Instrumenter = isparta.Instrumenter;
 var mochaGlobals = require('./test/setup/.globals');
 var manifest = require('./package.json');
+
+var release = process.env.NODE_ENV === 'production';
 
 // Load all of our Gulp plugins
 var $ = loadPlugins();
@@ -67,34 +70,33 @@ function build(done) {
   );
 }
 
-function buildSrc() {
-  return gulp.src(path.join('src', config.entryFileName))
-    .pipe(webpackStream({
-      output: {
-        filename: `${exportJSFileName}.${manifest.version}.js`,
-        libraryTarget: 'umd',
-        library: config.mainVarName
-      },
-      // Add your own externals here. For instance,
-      // {
-      //   jquery: true
-      // }
-      // would externalize the `jquery` module.
-      externals: {},
-      module: {
-        loaders: [
+function buildSrc(callback) {
+  webpack({
+    entry: {
+      user: './src/pages/user.js',
+      whiteboard: './src/pages/wb.js'
+    },
+    output: {
+      path: path.join(__dirname, 'dist'),
+      filename: `[name].${manifest.version}.js`
+    },
+    module: {
+      context: path.join(__dirname, 'node_modules'),
+      loaders: [
           {test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader'}
         ]
-      },
-      devtool: 'source-map'
-    }).on('error', errorHandler))
-    .pipe(gulp.dest(destinationFolder))
-    .pipe($.filter(['**', '!**/*.js.map', '!**/test', '!**/server.js', '!**/views', '!**/routes']))
-    .pipe($.rename(`${exportJSFileName}.${manifest.version}.min.js`))
-    .pipe($.sourcemaps.init({loadMaps: true}))
-    .pipe($.uglify())
-    .pipe($.sourcemaps.write('./'))
-    .pipe(gulp.dest(destinationFolder));
+    },
+    devtool: release ? '' : 'source-map',
+    plugins: release ? [
+        new webpack.optimize.UglifyJsPlugin({minimize: true})
+    ] : []
+  }, function (err) {
+    if (err) {
+      throw new gutil.PluginError('webpack', err);
+    }
+
+    callback();
+  });
 }
 
 function copyFonts() {
@@ -146,13 +148,6 @@ function cleanDist(done) {
   del([destinationFolder]).then(() => done());
 }
 
-function cleanMap(done) {
-  del([
-    path.join(destinationFolder, '**/*.map')
-  ])
-  .then(() => done());
-}
-
 function concatCSS() {
   return gulp.src(
     path.join(destinationFolder, 'assets/**/*.css'))
@@ -174,14 +169,6 @@ function minCSS() {
       .pipe(cssmin())
       .pipe(rename({suffix: `.min`}))
       .pipe(gulp.dest(path.join(destinationFolder, 'assets')));
-}
-
-function release(done) {
-  runSequence(
-    'build',
-    'clean-map',
-    done
-  );
 }
 
 function _mocha() {
@@ -262,9 +249,6 @@ gulp.task('clean', cleanDist);
 // Remove our temporary files
 gulp.task('clean-tmp', cleanTmp);
 
-// Remove map files
-gulp.task('clean-map', cleanMap);
-
 // Lint our source code
 gulp.task('lint-src', lintSrc);
 
@@ -279,7 +263,6 @@ gulp.task('lint', ['lint-src', 'lint-test', 'lint-gulpfile']);
 
 // Build two versions of the library
 gulp.task('build', build);
-gulp.task('release', release);
 
 // Build the src files
 gulp.task('build-src', buildSrc);
