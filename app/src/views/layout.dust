@@ -15,7 +15,7 @@
 
     {+jsResources}
       <script src="http://cdn.wedeploy.com/api/latest/wedeploy.js" defer></script>
-      <script src="/whiteboard.{version}.js" defer></script>
+      <script src="/whiteboard.{version}.{?production}min.{/production}js" defer></script>
     {/jsResources}
   </head>
 

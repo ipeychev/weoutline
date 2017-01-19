@@ -5,12 +5,16 @@ var dust = require('express-dustjs')
 var express = require('express');
 var logger = require('morgan');
 var manifest = require('../package.json');
+var minifyHTML = require('express-minify-html');
 var path = require('path');
 
 var user = require('./routes/user');
 var whiteboard = require('./routes/whiteboard');
 
+
 var app = express();
+
+var production = app.get('env') === 'production';
 
 // Dustjs settings
 dust._.optimizers.format = function (ctx, node) {
@@ -26,15 +30,30 @@ app.engine('dust', dust.engine({
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'dust');
 
+app.locals.production = production;
+app.locals.version = manifest.version;
+
+if (production) {
+  app.use(minifyHTML({
+    override: true,
+    exception_url: false,
+    htmlMinifier: {
+      collapseBooleanAttributes: true,
+      collapseWhitespace: true,
+      minifyJS: false,
+      removeAttributeQuotes: true,
+      removeComments: true,
+      removeEmptyAttributes: true
+    }
+  }));
+}
+
 app.use(logger('dev'));
 app.use(compression());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../dist')));
-
-app.locals.production = app.get('env') === 'production';
-app.locals.version = manifest.version;
 
 app.use('/', whiteboard);
 app.use('/user', user);

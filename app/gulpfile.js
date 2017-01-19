@@ -7,7 +7,6 @@ var isparta = require('isparta');
 var gutil = require('gutil');
 var loadPlugins = require('gulp-load-plugins');
 var path = require('path');
-var rename = require('gulp-rename');
 var runSequence = require('run-sequence');
 var sass = require('gulp-sass');
 var webpack = require('webpack');
@@ -78,7 +77,7 @@ function buildSrc(callback) {
     },
     output: {
       path: path.join(__dirname, 'dist'),
-      filename: `[name].${manifest.version}.js`
+      filename: `[name].${manifest.version}${release ? '.min': ''}.js`
     },
     module: {
       context: path.join(__dirname, 'node_modules'),
