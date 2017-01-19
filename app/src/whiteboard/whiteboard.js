@@ -170,7 +170,7 @@ class Whiteboard {
   }
 
   _deleteShapesLocally(shapes) {
-    let localShapes = JSON.parse(localStorage.getItem('shapes'));
+    let localShapes = JSON.parse(localStorage.getItem('shapes')) || [];
     localShapes = this._removeShapesFromCollection(localShapes, shapes);
     localStorage.setItem('shapes', JSON.stringify(localShapes));
   }
@@ -502,7 +502,7 @@ class Whiteboard {
   }
 
   _saveShapesLocally(shapes) {
-    let localShapes = JSON.parse(localStorage.getItem('shapes'));
+    let localShapes = JSON.parse(localStorage.getItem('shapes')) || [];
     localShapes = localShapes.concat(shapes);
     localStorage.setItem('shapes', JSON.stringify(localShapes));
   }
