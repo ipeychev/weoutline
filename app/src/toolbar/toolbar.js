@@ -232,14 +232,15 @@ class Toolbar {
   }
 
   _setFullscreen(fullscreen) {
-    let node = this._fullScreenNode.querySelector('.icon');
+    let fullScreenExpandNode = this._fullScreenNode.querySelector('.icon-expand');
+    let fullScreenCompressNode = this._fullScreenNode.querySelector('.icon-compress');
 
     if (fullscreen) {
-      node.classList.remove('icon-expand');
-      node.classList.add('icon-compress');
+      fullScreenExpandNode.classList.add('hidden');
+      fullScreenCompressNode.classList.remove('hidden');
     } else {
-      node.classList.remove('icon-compress');
-      node.classList.add('icon-expand');
+      fullScreenExpandNode.classList.remove('hidden');
+      fullScreenCompressNode.classList.add('hidden');
     }
   }
 
