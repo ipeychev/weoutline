@@ -3,10 +3,12 @@ var cssmin = require('gulp-cssmin');
 var del = require('del');
 var glob = require('glob');
 var gulp = require('gulp');
-var isparta = require('isparta');
+var gulpif = require('gulp-if');
 var gutil = require('gutil');
+var isparta = require('isparta');
 var loadPlugins = require('gulp-load-plugins');
 var path = require('path');
+var rename = require('gulp-rename');
 var runSequence = require('run-sequence');
 var sass = require('gulp-sass');
 var webpack = require('webpack');
@@ -62,7 +64,6 @@ function build(done) {
     'build-src',
     ['lint', 'compile-sass'],
     'concat-css',
-    'min-css',
     'clean-css',
     'copy-static',
     done
@@ -151,6 +152,8 @@ function concatCSS() {
   return gulp.src(
     path.join(destinationFolder, 'assets/**/*.css'))
     .pipe(concatCss(`app.${manifest.version}.css`))
+    .pipe(gulpif(release, cssmin()))
+    .pipe(gulpif(release, rename({suffix: `.min`})))
     .pipe(gulp.dest(path.join(destinationFolder, 'assets')));
 }
 
@@ -161,13 +164,6 @@ function compileSASS() {
   ])
     .pipe(sass().on('error', sass.logError))
     .pipe(gulp.dest(path.join(destinationFolder, 'assets')));
-}
-
-function minCSS() {
-  return gulp.src(path.join(destinationFolder, 'assets/**/*.css'))
-      .pipe(cssmin())
-      .pipe(rename({suffix: `.min`}))
-      .pipe(gulp.dest(path.join(destinationFolder, 'assets')));
 }
 
 function _mocha() {
@@ -271,7 +267,6 @@ gulp.task('copy-fonts', copyFonts);
 gulp.task('compile-sass', compileSASS);
 gulp.task('concat-css', concatCSS);
 gulp.task('copy-static', ['copy-fonts'], copyStatic);
-gulp.task('min-css', minCSS);
 
 // Lint and run our tests
 gulp.task('test', ['lint'], test);
