@@ -183,6 +183,7 @@ html, body {
     #user {
       .toolbar-item-options {
         align-items: center;
+        left: 5px;
         width: 120px;
       }
 
@@ -195,8 +196,10 @@ html, body {
           font-weight: normal;
 
           .icon {
+            height: 18px;
             margin-left: 5px;
             margin-right: 5px;
+            width: 18px;
           }
         }
       }
