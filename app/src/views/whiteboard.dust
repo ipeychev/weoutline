@@ -13,95 +13,95 @@
     <div id="toolbar" class="toolbar hidden">
       <div id="pen" class="toolbar-item">
         <div class="toolbar-item-value active" id="penSize">
-          <i class="fa fa-pencil" aria-hidden="true"></i>
+          <svg class="icon icon-pencil"><use xlink:href="/assets/symbol-defs.svg#icon-pencil"></use></svg>
         </div>
         <ul class="toolbar-item-options hidden">
           <li class="toolbar-item-option small">
-            <i class="fa fa-circle" aria-hidden="true"></i>
+            <svg class="icon icon-circle"><use xlink:href="/assets/symbol-defs.svg#icon-circle"></use></svg>
           </li>
           <li class="toolbar-item-option normal">
-            <i class="fa fa-circle" aria-hidden="true"></i>
+            <svg class="icon icon-circle"><use xlink:href="/assets/symbol-defs.svg#icon-circle"></use></svg>
           </li>
           <li class="toolbar-item-option big active">
-            <i class="fa fa-circle" aria-hidden="true"></i>
+            <svg class="icon icon-circle"><use xlink:href="/assets/symbol-defs.svg#icon-circle"></use></svg>
           </li>
           <li class="toolbar-item-option large">
-            <i class="fa fa-circle" aria-hidden="true"></i>
+            <svg class="icon icon-circle"><use xlink:href="/assets/symbol-defs.svg#icon-circle"></use></svg>
           </li>
           <li class="toolbar-item-option extra">
-            <i class="fa fa-circle" aria-hidden="true"></i>
+            <svg class="icon icon-circle"><use xlink:href="/assets/symbol-defs.svg#icon-circle"></use></svg>
           </li>
           <li class="toolbar-item-option huge">
-            <i class="fa fa-circle" aria-hidden="true"></i>
+            <svg class="icon icon-circle"><use xlink:href="/assets/symbol-defs.svg#icon-circle"></use></svg>
           </li>
           <li class="toolbar-item-option giant">
-            <i class="fa fa-circle" aria-hidden="true"></i>
+            <svg class="icon icon-circle"><use xlink:href="/assets/symbol-defs.svg#icon-circle"></use></svg>
           </li>
         </ul>
       </div>
       <div id="eraser" class="toolbar-item">
         <div class="toolbar-item-value" id="eraserSize">
-          <i class="fa fa-eraser" aria-hidden="true"></i>
+          <svg class="icon icon-eraser"><use xlink:href="/assets/symbol-defs.svg#icon-eraser"></use></svg>
         </div>
       </div>
       <div id="color" class="toolbar-item">
         <div class="toolbar-item-value">
-          <i class="fa fa-paint-brush" aria-hidden="true"></i>
+          <svg class="icon icon-paint-brush"><use xlink:href="/assets/symbol-defs.svg#icon-paint-brush"></use></svg>
         </div>
         <ul class="toolbar-item-options hidden">
           <li class="toolbar-item-option black active">
-            <i class="fa fa-paint-brush" aria-hidden="true"></i>
+            <svg class="icon icon-paint-brush"><use xlink:href="/assets/symbol-defs.svg#icon-paint-brush"></use></svg>
           </li>
           <li class="toolbar-item-option red">
-            <i class="fa fa-paint-brush" aria-hidden="true"></i>
+            <svg class="icon icon-paint-brush"><use xlink:href="/assets/symbol-defs.svg#icon-paint-brush"></use></svg>
           </li>
           <li class="toolbar-item-option green">
-            <i class="fa fa-paint-brush" aria-hidden="true"></i>
+            <svg class="icon icon-paint-brush"><use xlink:href="/assets/symbol-defs.svg#icon-paint-brush"></use></svg>
           </li>
           <li class="toolbar-item-option blue">
-            <i class="fa fa-paint-brush" aria-hidden="true"></i>
+            <svg class="icon icon-paint-brush"><use xlink:href="/assets/symbol-defs.svg#icon-paint-brush"></use></svg>
           </li>
           <li class="toolbar-item-option yellow">
-            <i class="fa fa-paint-brush" aria-hidden="true"></i>
+            <svg class="icon icon-paint-brush"><use xlink:href="/assets/symbol-defs.svg#icon-paint-brush"></use></svg>
           </li>
           <li class="toolbar-item-option orange">
-            <i class="fa fa-paint-brush" aria-hidden="true"></i>
+            <svg class="icon icon-paint-brush"><use xlink:href="/assets/symbol-defs.svg#icon-paint-brush"></use></svg>
           </li>
         </ul>
       </div>
 
       <div id="clear" class="toolbar-item">
         <div class="toolbar-item-value">
-          <i class="fa fa-times" aria-hidden="true"></i>
+          <svg class="icon icon-times"><use xlink:href="/assets/symbol-defs.svg#icon-times"></use></svg>
         </div>
       </div>
 
       <div id="share" class="toolbar-item">
         <div class="toolbar-item-value">
-          <i class="fa fa-share-alt" aria-hidden="true"></i>
+          <svg class="icon icon-share-alt"><use xlink:href="/assets/symbol-defs.svg#icon-share-alt"></use></svg>
         </div>
       </div>
 
       <div id="fullscreen" class="toolbar-item hidden">
         <div class="toolbar-item-value">
-          <i class="fa fa-expand" aria-hidden="true"></i>
+          <svg class="icon icon-expand"><use xlink:href="/assets/symbol-defs.svg#icon-expand"></use></svg>
         </div>
       </div>
 
       <div id="user" class="toolbar-item">
         <div class="toolbar-item-value">
-          <i class="fa fa-user-circle-o" aria-hidden="true"></i>
+          <svg class="icon icon-user-circle-o"><use xlink:href="/assets/symbol-defs.svg#icon-user-circle-o"></use></svg>
         </div>
         <ul class="toolbar-item-options hidden">
           <li class="toolbar-item-option">
             <a href="/user">
-              <i class="fa fa-user" aria-hidden="true"></i>
+              <svg class="icon icon-user-o"><use xlink:href="/assets/symbol-defs.svg#icon-user-o"></use></svg>
               <span>My account<span>
             </a>
           </li>
           <li class="toolbar-item-option">
             <a href="/logout">
-              <i class="fa fa-sign-out" aria-hidden="true"></i>
+              <svg class="icon icon-sign-out"><use xlink:href="/assets/symbol-defs.svg#icon-sign-out"></use></svg>
               <span>Sign out</span>
             </a>
           </li>

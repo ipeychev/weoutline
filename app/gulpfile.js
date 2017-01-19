@@ -108,7 +108,8 @@ function copyStatic() {
   return gulp.src([
       'src/index.html',
       'src/**/assets/vendor/**/*.css',
-      'src/**/*.jpeg'
+      'src/**/*.jpeg',
+      'src/**/*.svg'
     ])
     .pipe(gulp.dest(destinationFolder));
 }

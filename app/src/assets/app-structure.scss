@@ -93,8 +93,9 @@ html, body {
         position: relative;
         width: 100%;
 
-        i {
-          font-size: 22px;
+        .icon {
+          height: 22px;
+          width: 22px;
         }
       }
 
@@ -121,49 +122,57 @@ html, body {
           position: relative;
           width: 38px;
 
+          .icon {
+            height: 22px;
+            width: 22px;
+          }
+
           &.small {
-            i {
-              font-size: 4px;
+            .icon {
+              width: 4px;
             }
           }
 
           &.normal {
-            i {
-              font-size: 6px;
+            .icon {
+              width: 6px;
             }
           }
 
           &.big {
-            i {
-              font-size: 8px;
+            .icon {
+              width: 8px;
             }
           }
 
           &.large {
-            i {
-              font-size: 12px;
+            .icon {
+              width: 12px;
             }
           }
 
           &.extra {
-            i {
-              font-size: 16px;
+            .icon {
+              width: 16px;
             }
           }
 
           &.huge {
-            i {
-              font-size: 18px;
+            .icon {
+              width: 18px;
             }
           }
 
           &.giant {
-            i {
-              font-size: 22px;
+            .icon {
+              height: 22px;
+              width: 22px;
             }
           }
 
           a {
+            align-items: center;
+            display: flex;
             text-decoration: none;
           }
         }
@@ -179,12 +188,16 @@ html, body {
 
       .toolbar-item-option {
         justify-content: flex-start;
-        margin-left: 15px;
         width: 100%;
 
         a {
           color: white;
           font-weight: normal;
+
+          .icon {
+            margin-left: 5px;
+            margin-right: 5px;
+          }
         }
       }
     }

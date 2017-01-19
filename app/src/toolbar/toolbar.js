@@ -103,10 +103,10 @@ class Toolbar {
   }
 
   _getColor() {
-    let node = this._colorNode.querySelector('.toolbar-item-option.active .fa');
+    let node = this._colorNode.querySelector('.toolbar-item-option.active .icon');
     let style = window.getComputedStyle(node);
 
-    return Utils.rgbToHex(style.getPropertyValue('color'));
+    return Utils.rgbToHex(style.getPropertyValue('fill'));
   }
 
   _getPenSize() {
@@ -114,10 +114,10 @@ class Toolbar {
   }
 
   _getToolSize(rootNode) {
-    let node = rootNode.querySelector('.toolbar-item-option.active .fa');
+    let node = rootNode.querySelector('.toolbar-item-option.active .icon');
     let style = window.getComputedStyle(node);
 
-    return parseInt(style.getPropertyValue('font-size'), 10);
+    return parseInt(style.getPropertyValue('width'), 10);
   }
 
   _hideMenu() {
@@ -150,9 +150,9 @@ class Toolbar {
         activateTool: false,
         setCurrentValue: {
           source: 'style',
-          nodeSelector: '.fa',
+          nodeSelector: '.icon',
           transformFn: Utils.rgbToHex,
-          property: 'color'
+          property: 'fill'
         }
       });
     } else if (this._clearNode.contains(targetNode)) {
@@ -199,22 +199,22 @@ class Toolbar {
   _setColor(value) {
     this._deactivateOptions(this._colorNode);
 
-    let nodes = this._colorNode.querySelectorAll('.toolbar-item-option .fa');
+    let nodes = this._colorNode.querySelectorAll('.toolbar-item-option .icon');
 
     for (let i = 0; nodes && i < nodes.length; i++) {
       let optionNode = nodes.item(i);
 
       let style = window.getComputedStyle(optionNode);
 
-      if (Utils.rgbToHex(style.getPropertyValue('color')) === value) {
+      if (Utils.rgbToHex(style.getPropertyValue('fill')) === value) {
         optionNode.parentNode.classList.add('active');
 
         this._setItemValue(optionNode.parentNode, this._colorNode, {
           setCurrentValue: {
             source: 'style',
-            nodeSelector: '.fa',
+            nodeSelector: '.icon',
             transformFn: Utils.rgbToHex,
-            property: 'color'
+            property: 'fill'
           }
         });
       }
@@ -232,14 +232,14 @@ class Toolbar {
   }
 
   _setFullscreen(fullscreen) {
-    let node = this._fullScreenNode.querySelector('.fa');
+    let node = this._fullScreenNode.querySelector('.icon');
 
     if (fullscreen) {
-      node.classList.remove('fa-expand');
-      node.classList.add('fa-compress');
+      node.classList.remove('icon-expand');
+      node.classList.add('icon-compress');
     } else {
-      node.classList.remove('fa-compress');
-      node.classList.add('fa-expand');
+      node.classList.remove('icon-compress');
+      node.classList.add('icon-expand');
     }
   }
 
@@ -257,14 +257,14 @@ class Toolbar {
   _setToolSize(rootNode, value) {
     this._deactivateOptions(rootNode);
 
-    let nodes = rootNode.querySelectorAll('.toolbar-item-option .fa');
+    let nodes = rootNode.querySelectorAll('.toolbar-item-option .icon');
 
     for (let i = 0; nodes && i < nodes.length; i++) {
       let optionNode = nodes.item(i);
 
       let style = window.getComputedStyle(optionNode);
 
-      if (parseInt(style.getPropertyValue('font-size'), 10) === value) {
+      if (parseInt(style.getPropertyValue('width'), 10) === value) {
         optionNode.parentNode.classList.add('active');
       }
     }

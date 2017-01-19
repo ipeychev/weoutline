@@ -6,9 +6,12 @@
   .toolbar {
     background-color: #32a8e6;
     border-color: gray;
-    color: white;
     cursor: move;
     opacity: 0.9;
+
+    .icon {
+        fill: white;
+      }
 
     .toolbar-item {
       border-color: white;
@@ -17,46 +20,43 @@
         background-color: #32a8e6;
 
         .toolbar-item-option {
-          color: white;
-          cursor: pointer;
-
           &.active {
             border-color: white;
           }
 
           &.black {
-            i {
-              color: #000000;
+            .icon {
+              fill: #000000;
             }
           }
 
           &.red {
-            i {
-              color: #ff0000;
+            .icon {
+              fill: #ff0000;
             }
           }
 
           &.green {
-            i {
-              color: #00cc33;
+            .icon {
+              fill: #00cc33;
             }
           }
 
           &.blue {
-            i {
-              color: #0000ff;
+            .icon {
+              fill: #0000ff;
             }
           }
 
           &.yellow {
-            i {
-              color: #ffff00;
+            .icon {
+              fill: #ffff00;
             }
           }
 
           &.orange {
-            i {
-              color: #ff9933;
+            .icon {
+              fill: #ff9933;
             }
           }
         }

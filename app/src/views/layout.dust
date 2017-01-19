@@ -7,7 +7,6 @@
     <title>{title}</title>
 
     <link rel="stylesheet" href="/assets/vendor/normalize.min.css">
-    <link rel="stylesheet" href="/assets/vendor/font-awesome.min.css">
 
     {+cssResources}
       <link rel="stylesheet" href="/assets/app.{version}.{?production}min.{/production}css">

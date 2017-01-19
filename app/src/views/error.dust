@@ -7,7 +7,6 @@
     <title>{message}</title>
 
     <link rel="stylesheet" href="/assets/vendor/normalize.min.css">
-    <link rel="stylesheet" href="/assets/vendor/font-awesome.min.css">
   </head>
 
   <body>
