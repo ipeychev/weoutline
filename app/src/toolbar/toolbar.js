@@ -161,6 +161,10 @@ class Toolbar {
       this._config.shareWhiteboardCallback();
     } else if (this._fullScreenNode.contains(targetNode)) {
       this._config.fullscreenCallback();
+    } else if (this._userNode.contains(targetNode)) {
+      this._updateToolbarView(this._userNode, targetNode, {
+        activateTool: false
+      });
     } else {
       this._hideMenu();
     }
@@ -275,6 +279,7 @@ class Toolbar {
     this._fullScreenNode = document.getElementById('fullscreen');
     this._penNode = document.getElementById('pen');
     this._shareNode = document.getElementById('share');
+    this._userNode = document.getElementById('user');
   }
 
   _updateToolbarView(rootNode, targetNode, config) {

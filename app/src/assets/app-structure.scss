@@ -58,14 +58,21 @@ html, body {
           }
         }
       }
+
+      // Item customizations
+      #user {
+        .toolbar-item-options {
+          flex-direction: column;
+        }
+      }
     }
 
     .toolbar-item {
       display: flex;
       height: 38px;
+      margin-left: 2px;
       position: relative;
       width: 38px;
-      margin-left: 2px;
 
       &.drag {
         position: absolute;
@@ -98,8 +105,8 @@ html, body {
         flex-direction: column;
         justify-content: center;
         left: -4px;
-        padding-bottom: 5px;
-        padding-top: 5px;
+        margin: 0px;
+        padding: 5px 0 5px 0;
         position: absolute;
         top: 44px;
         width: 48px;
@@ -155,6 +162,29 @@ html, body {
               font-size: 22px;
             }
           }
+
+          a {
+            text-decoration: none;
+          }
+        }
+      }
+    }
+
+    // Item customizations
+    #user {
+      .toolbar-item-options {
+        align-items: center;
+        width: 120px;
+      }
+
+      .toolbar-item-option {
+        justify-content: flex-start;
+        margin-left: 15px;
+        width: 100%;
+
+        a {
+          color: white;
+          font-weight: normal;
         }
       }
     }

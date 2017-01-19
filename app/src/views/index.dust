@@ -14,29 +14,29 @@
         <div class="toolbar-item-value active" id="penSize">
           <i class="fa fa-pencil" aria-hidden="true"></i>
         </div>
-        <div class="toolbar-item-options hidden">
-          <div class="toolbar-item-option small">
+        <ul class="toolbar-item-options hidden">
+          <li class="toolbar-item-option small">
             <i class="fa fa-circle" aria-hidden="true"></i>
-          </div>
-          <div class="toolbar-item-option normal">
+          </li>
+          <li class="toolbar-item-option normal">
             <i class="fa fa-circle" aria-hidden="true"></i>
-          </div>
-          <div class="toolbar-item-option big active">
+          </li>
+          <li class="toolbar-item-option big active">
             <i class="fa fa-circle" aria-hidden="true"></i>
-          </div>
-          <div class="toolbar-item-option large">
+          </li>
+          <li class="toolbar-item-option large">
             <i class="fa fa-circle" aria-hidden="true"></i>
-          </div>
-          <div class="toolbar-item-option extra">
+          </li>
+          <li class="toolbar-item-option extra">
             <i class="fa fa-circle" aria-hidden="true"></i>
-          </div>
-          <div class="toolbar-item-option huge">
+          </li>
+          <li class="toolbar-item-option huge">
             <i class="fa fa-circle" aria-hidden="true"></i>
-          </div>
-          <div class="toolbar-item-option giant">
+          </li>
+          <li class="toolbar-item-option giant">
             <i class="fa fa-circle" aria-hidden="true"></i>
-          </div>
-        </div>
+          </li>
+        </ul>
       </div>
       <div id="eraser" class="toolbar-item">
         <div class="toolbar-item-value" id="eraserSize">
@@ -47,44 +47,64 @@
         <div class="toolbar-item-value">
           <i class="fa fa-paint-brush" aria-hidden="true"></i>
         </div>
-        <div class="toolbar-item-options hidden">
-          <div class="toolbar-item-option black active">
+        <ul class="toolbar-item-options hidden">
+          <li class="toolbar-item-option black active">
             <i class="fa fa-paint-brush" aria-hidden="true"></i>
-          </div>
-          <div class="toolbar-item-option red">
+          </li>
+          <li class="toolbar-item-option red">
             <i class="fa fa-paint-brush" aria-hidden="true"></i>
-          </div>
-          <div class="toolbar-item-option green">
+          </li>
+          <li class="toolbar-item-option green">
             <i class="fa fa-paint-brush" aria-hidden="true"></i>
-          </div>
-          <div class="toolbar-item-option blue">
+          </li>
+          <li class="toolbar-item-option blue">
             <i class="fa fa-paint-brush" aria-hidden="true"></i>
-          </div>
-          <div class="toolbar-item-option yellow">
+          </li>
+          <li class="toolbar-item-option yellow">
             <i class="fa fa-paint-brush" aria-hidden="true"></i>
-          </div>
-          <div class="toolbar-item-option orange">
+          </li>
+          <li class="toolbar-item-option orange">
             <i class="fa fa-paint-brush" aria-hidden="true"></i>
-          </div>
-        </div>
+          </li>
+        </ul>
       </div>
 
       <div id="clear" class="toolbar-item">
         <div class="toolbar-item-value">
-          <i class="fa fa-times" id="clear" aria-hidden="true"></i>
+          <i class="fa fa-times" aria-hidden="true"></i>
         </div>
       </div>
 
       <div id="share" class="toolbar-item">
         <div class="toolbar-item-value">
-          <i class="fa fa-share-alt" id="share" aria-hidden="true"></i>
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
         </div>
       </div>
 
       <div id="fullscreen" class="toolbar-item hidden">
         <div class="toolbar-item-value">
-          <i class="fa fa-expand" id="share" aria-hidden="true"></i>
+          <i class="fa fa-expand" aria-hidden="true"></i>
         </div>
+      </div>
+
+      <div id="user" class="toolbar-item">
+        <div class="toolbar-item-value">
+          <i class="fa fa-user-circle-o" aria-hidden="true"></i>
+        </div>
+        <ul class="toolbar-item-options hidden">
+          <li class="toolbar-item-option">
+            <a href="/user">
+              <i class="fa fa-user" aria-hidden="true"></i>
+              <span>My account<span>
+            </a>
+          </li>
+          <li class="toolbar-item-option">
+            <a href="/logout">
+              <i class="fa fa-sign-out" aria-hidden="true"></i>
+              <span>Sign out</span>
+            </a>
+          </li>
+        </ul>
       </div>
     </div>
   </div>
