@@ -521,8 +521,9 @@ class Whiteboard {
         globalCompositeOperation: 'source-over',
         lineCap: 'round',
         lineJoin: 'round',
-        offset: this._offset,
-        lineWidth: this._getLineWidth()
+        lineWidth: this._getLineWidth(),
+        minPointDistance: this._config.minPointDistance,
+        offset: this._offset
       });
     } else if (this._config.activeTool === Tools.eraser) {
       this._drawer = new Eraser({

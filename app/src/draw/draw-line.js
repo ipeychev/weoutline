@@ -50,6 +50,15 @@ class DrawLine {
 
     let curPoint = Utils.getPointFromEvent(event, this._canvasElement);
 
+    if (this._config.minPointDistance > 0) {
+      let distance = Math.sqrt((this._lastPoint[0] - curPoint[0]) * (this._lastPoint[0] - curPoint[0]) +
+        (this._lastPoint[1] - curPoint[1]) * (this._lastPoint[1] - curPoint[1]));
+
+      if (distance < this._config.minPointDistance) {
+        return;
+      }
+    }
+
     let tmpX = this._lastPoint[0] + this._config.offset[0];
     let tmpY = this._lastPoint[1] + this._config.offset[1];
 

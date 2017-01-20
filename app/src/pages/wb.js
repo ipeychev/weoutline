@@ -9,6 +9,7 @@ window.addEventListener('load', () => {
       dataURL: 'http://data.weoutline.wedeploy.io',
       fullscreen: false,
       height: 3000,
+      minPointDistance: 3,
       penSize: 4,
       rulerFontSize: 10,
       whiteboardId: getWhiteboardId(),
