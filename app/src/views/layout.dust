@@ -4,17 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, minimal-ui">
 
-    <title>{title}</title>
+    <title>{+title}WeOutline, a shared whiteboard, designed to work among teams{/title}</title>
 
     <link rel="stylesheet" href="/assets/vendor/normalize.min.css">
 
     {+cssResources}
-      <link rel="stylesheet" href="/assets/app.{version}.{?production}min.{/production}css">
     {/cssResources}
 
     {+jsResources}
-      <script src="http://cdn.wedeploy.com/api/latest/wedeploy.js" defer></script>
-      <script src="/whiteboard.{version}.{?production}min.{/production}js" defer></script>
     {/jsResources}
   </head>
 

@@ -6,23 +6,11 @@ import Utils from '../utils/utils';
 
 class Map {
   constructor(config) {
-    if (typeof config.srcNode === 'string') {
-      this._mapElement = document.querySelector(config.srcNode);
-    } else {
-      this._mapElement = config.srcNode;
-    }
-
-    let container;
-
-    if (typeof config.container === 'string') {
-      container = document.querySelector(config.container);
-    } else {
-      container = config.container;
-    }
+    this._mapElement = document.getElementById(config.srcNode);
 
     this._mapContext = this._mapElement.getContext('2d');
 
-    this._draggable = new Draggable(container);
+    this._draggable = new Draggable(document.getElementById(config.container));
 
     this._attachListeners();
 

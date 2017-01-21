@@ -1,0 +1,32 @@
+.toolbar {
+    background-color: #32a8e6;
+    border-color: gray;
+    cursor: move;
+    opacity: 0.9;
+
+    .icon {
+        fill: white;
+      }
+
+    .toolbar-item {
+      border-color: white;
+
+      .toolbar-item-options {
+        background-color: #32a8e6;
+      }
+
+      &.drag {
+        .toolbar-item-value {
+          cursor: move;
+        }
+      }
+
+      .toolbar-item-value {
+        cursor: pointer;
+
+        &.active {
+          border-color: white;
+        }
+      }
+    }
+  }

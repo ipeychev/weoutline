@@ -11,7 +11,6 @@ var path = require('path');
 var user = require('./routes/user');
 var whiteboard = require('./routes/whiteboard');
 
-
 var app = express();
 
 var production = app.get('env') === 'production';

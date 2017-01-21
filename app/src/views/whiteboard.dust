@@ -1,5 +1,15 @@
 {>"layout"/}
 
+{<cssResources}
+  <link rel="stylesheet" href="/whiteboard.{version}.{?production}min.{/production}css">
+{/cssResources}
+
+{<jsResources}
+  <script src="http://cdn.wedeploy.com/api/latest/wedeploy.js" defer></script>
+  <script src="/commons.{version}.{?production}min.{/production}js" defer></script>
+  <script src="/whiteboard.{version}.{?production}min.{/production}js" defer></script>
+{/jsResources}
+
 {<bodyContent}
   <div id="mainContainer" class="wb">
     <div class="draw-container">
@@ -10,99 +20,104 @@
       <canvas width="150" height="150" id="map" class="map"></canvas>
     </div>
 
-    <div id="toolbar" class="toolbar hidden">
+    <div id="toolbarTools" class="toolbar toolbar-tools hidden">
       <div id="pen" class="toolbar-item">
         <div class="toolbar-item-value active" id="penSize">
-          <svg class="icon icon-pencil"><use xlink:href="/assets/symbol-defs.svg#icon-pencil"></use></svg>
+          <svg class="icon icon-pencil"><use xlink:href="/assets/images/symbol-defs.svg#icon-pencil"></use></svg>
         </div>
         <ul class="toolbar-item-options hidden">
           <li class="toolbar-item-option small">
-            <svg class="icon icon-circle"><use xlink:href="/assets/symbol-defs.svg#icon-circle"></use></svg>
+            <svg class="icon icon-circle"><use xlink:href="/assets/images/symbol-defs.svg#icon-circle"></use></svg>
           </li>
           <li class="toolbar-item-option normal">
-            <svg class="icon icon-circle"><use xlink:href="/assets/symbol-defs.svg#icon-circle"></use></svg>
+            <svg class="icon icon-circle"><use xlink:href="/assets/images/symbol-defs.svg#icon-circle"></use></svg>
           </li>
           <li class="toolbar-item-option big active">
-            <svg class="icon icon-circle"><use xlink:href="/assets/symbol-defs.svg#icon-circle"></use></svg>
+            <svg class="icon icon-circle"><use xlink:href="/assets/images/symbol-defs.svg#icon-circle"></use></svg>
           </li>
           <li class="toolbar-item-option large">
-            <svg class="icon icon-circle"><use xlink:href="/assets/symbol-defs.svg#icon-circle"></use></svg>
+            <svg class="icon icon-circle"><use xlink:href="/assets/images/symbol-defs.svg#icon-circle"></use></svg>
           </li>
           <li class="toolbar-item-option extra">
-            <svg class="icon icon-circle"><use xlink:href="/assets/symbol-defs.svg#icon-circle"></use></svg>
+            <svg class="icon icon-circle"><use xlink:href="/assets/images/symbol-defs.svg#icon-circle"></use></svg>
           </li>
           <li class="toolbar-item-option huge">
-            <svg class="icon icon-circle"><use xlink:href="/assets/symbol-defs.svg#icon-circle"></use></svg>
+            <svg class="icon icon-circle"><use xlink:href="/assets/images/symbol-defs.svg#icon-circle"></use></svg>
           </li>
           <li class="toolbar-item-option giant">
-            <svg class="icon icon-circle"><use xlink:href="/assets/symbol-defs.svg#icon-circle"></use></svg>
+            <svg class="icon icon-circle"><use xlink:href="/assets/images/symbol-defs.svg#icon-circle"></use></svg>
           </li>
         </ul>
       </div>
       <div id="eraser" class="toolbar-item">
         <div class="toolbar-item-value" id="eraserSize">
-          <svg class="icon icon-eraser"><use xlink:href="/assets/symbol-defs.svg#icon-eraser"></use></svg>
+          <svg class="icon icon-eraser"><use xlink:href="/assets/images/symbol-defs.svg#icon-eraser"></use></svg>
         </div>
       </div>
       <div id="color" class="toolbar-item">
         <div class="toolbar-item-value">
-          <svg class="icon icon-paint-brush"><use xlink:href="/assets/symbol-defs.svg#icon-paint-brush"></use></svg>
+          <svg class="icon icon-paint-brush"><use xlink:href="/assets/images/symbol-defs.svg#icon-paint-brush"></use></svg>
         </div>
         <ul class="toolbar-item-options hidden">
           <li class="toolbar-item-option black active">
-            <svg class="icon icon-paint-brush"><use xlink:href="/assets/symbol-defs.svg#icon-paint-brush"></use></svg>
+            <svg class="icon icon-paint-brush"><use xlink:href="/assets/images/symbol-defs.svg#icon-paint-brush"></use></svg>
           </li>
           <li class="toolbar-item-option red">
-            <svg class="icon icon-paint-brush"><use xlink:href="/assets/symbol-defs.svg#icon-paint-brush"></use></svg>
+            <svg class="icon icon-paint-brush"><use xlink:href="/assets/images/symbol-defs.svg#icon-paint-brush"></use></svg>
           </li>
           <li class="toolbar-item-option green">
-            <svg class="icon icon-paint-brush"><use xlink:href="/assets/symbol-defs.svg#icon-paint-brush"></use></svg>
+            <svg class="icon icon-paint-brush"><use xlink:href="/assets/images/symbol-defs.svg#icon-paint-brush"></use></svg>
           </li>
           <li class="toolbar-item-option blue">
-            <svg class="icon icon-paint-brush"><use xlink:href="/assets/symbol-defs.svg#icon-paint-brush"></use></svg>
+            <svg class="icon icon-paint-brush"><use xlink:href="/assets/images/symbol-defs.svg#icon-paint-brush"></use></svg>
           </li>
           <li class="toolbar-item-option yellow">
-            <svg class="icon icon-paint-brush"><use xlink:href="/assets/symbol-defs.svg#icon-paint-brush"></use></svg>
+            <svg class="icon icon-paint-brush"><use xlink:href="/assets/images/symbol-defs.svg#icon-paint-brush"></use></svg>
           </li>
           <li class="toolbar-item-option orange">
-            <svg class="icon icon-paint-brush"><use xlink:href="/assets/symbol-defs.svg#icon-paint-brush"></use></svg>
+            <svg class="icon icon-paint-brush"><use xlink:href="/assets/images/symbol-defs.svg#icon-paint-brush"></use></svg>
           </li>
         </ul>
       </div>
 
       <div id="clear" class="toolbar-item">
         <div class="toolbar-item-value">
-          <svg class="icon icon-times"><use xlink:href="/assets/symbol-defs.svg#icon-times"></use></svg>
+          <svg class="icon icon-times"><use xlink:href="/assets/images/symbol-defs.svg#icon-times"></use></svg>
         </div>
       </div>
 
       <div id="share" class="toolbar-item">
         <div class="toolbar-item-value">
-          <svg class="icon icon-share-alt"><use xlink:href="/assets/symbol-defs.svg#icon-share-alt"></use></svg>
+          <svg class="icon icon-share-alt"><use xlink:href="/assets/images/symbol-defs.svg#icon-share-alt"></use></svg>
         </div>
       </div>
 
       <div id="fullscreen" class="toolbar-item hidden">
         <div class="toolbar-item-value">
-          <svg class="icon icon-expand"><use xlink:href="/assets/symbol-defs.svg#icon-expand"></use></svg>
-          <svg class="icon icon-compress hidden"><use xlink:href="/assets/symbol-defs.svg#icon-compress"></use></svg>
+          <svg class="icon icon-expand"><use xlink:href="/assets/images/symbol-defs.svg#icon-expand"></use></svg>
+          <svg class="icon icon-compress hidden"><use xlink:href="/assets/images/symbol-defs.svg#icon-compress"></use></svg>
         </div>
       </div>
+    </div>
 
+    <div id="toolbarUser" class="toolbar toolbar-user hidden">
       <div id="user" class="toolbar-item">
         <div class="toolbar-item-value">
-          <svg class="icon icon-user-circle-o"><use xlink:href="/assets/symbol-defs.svg#icon-user-circle-o"></use></svg>
+          <img class="icon icon-signed-in hidden" draggable="false">
+          <a id="userSignIn" draggable="false" href="/user/sign-in">
+            <svg class="icon icon-sign-in" id="signIn"><use xlink:href="/assets/images/symbol-defs.svg#icon-sign-in"></use></svg>
+          </a>
         </div>
         <ul class="toolbar-item-options hidden">
           <li class="toolbar-item-option">
-            <a href="/user">
-              <svg class="icon icon-user-o"><use xlink:href="/assets/symbol-defs.svg#icon-user-o"></use></svg>
+            <a id="userProfile" href="/user/profile">
+              <svg class="icon icon-user-o"><use xlink:href="/assets/images/symbol-defs.svg#icon-user-o"></use></svg>
               <span>My account<span>
             </a>
           </li>
           <li class="toolbar-item-option">
-            <a href="/logout">
-              <svg class="icon icon-sign-out"><use xlink:href="/assets/symbol-defs.svg#icon-sign-out"></use></svg>
+            <a id="userSignOut" href="#">
+              <svg class="icon icon-sign-out"><use xlink:href="/assets/images/symbol-defs.svg#icon-sign-out"></use></svg>
               <span>Sign out</span>
             </a>
           </li>

@@ -1,12 +1,13 @@
-import { ShapeType } from '../draw/shape';
 import Data from '../data/data';
 import Draw from '../draw/draw';
 import DrawLine from '../draw/draw-line';
 import Eraser from '../draw/eraser';
 import Map from '../map/map';
-import Toolbar from '../toolbar/toolbar';
+import ToolbarTools from '../toolbar/toolbar-tools';
+import ToolbarUser from '../toolbar/toolbar-user';
 import Tools from '../draw/tools';
 import Utils from '../utils/utils';
+import { ShapeType } from '../draw/shape';
 
 class Whiteboard {
   constructor(config) {
@@ -15,14 +16,15 @@ class Whiteboard {
     this._config = config;
 
     this._shapes = [];
-    this._whiteboardId = config.whiteboardId;
+    this._whiteboardId = this._config.whiteboard.id;
     this._sessionId = window.crypto.getRandomValues(new Uint32Array(1))[0];
 
     this._setupCanvas();
     this._setupContext();
     this._setupData();
     this._setupMap();
-    this._setupToolbar();
+    this._setupToolbarTools();
+    this._setupToolbarUser();
 
     this._attachListeners();
 
@@ -53,7 +55,7 @@ class Whiteboard {
       this._drawer.destroy();
     }
 
-    this._toolbar.destroy();
+    this._toolbarTools.destroy();
     this._map.destroy();
 
     this._detachListeners();
@@ -103,12 +105,6 @@ class Whiteboard {
       width: this._canvasElement.width,
       height: this._canvasElement.height
     });
-  }
-
-  setConfig(config) {
-    Object.assign(this._config, config);
-
-    this._setActiveTool();
   }
 
   _addShapesToCollection(shapesList, shapes) {
@@ -187,7 +183,7 @@ class Whiteboard {
   }
 
   _drawHorizontalRuler() {
-    for (let i = 0; i <= this._config.width; i += 20) {
+    for (let i = 0; i <= this._config.whiteboard.width; i += 20) {
       this._context.beginPath();
       this._context.strokeStyle = '#000000';
       this._context.lineWidth = 1;
@@ -202,16 +198,16 @@ class Whiteboard {
 
       if (i % 500 === 0 && i > 0) {
         this._context.strokeStyle = '#000000';
-        this._context.textAlign = i + 20 < this._config.width ? 'center' : 'end';
+        this._context.textAlign = i + 20 < this._config.whiteboard.width ? 'center' : 'end';
         this._context.textBaseline = 'alphabetic';
-        this._context.font = this._config.rulerFontSize + 'px';
+        this._context.font = this._config.whiteboard.rulerFontSize + 'px';
         this._context.fillText(i, i - this._offset[0], 20);
       }
     }
   }
 
   _drawVerticalRuler() {
-    for (let i = 20; i <= this._config.height; i += 20) {
+    for (let i = 20; i <= this._config.whiteboard.height; i += 20) {
       this._context.beginPath();
       this._context.strokeStyle = '#000000';
       this._context.lineWidth = 1;
@@ -227,8 +223,8 @@ class Whiteboard {
       if (i % 500 === 0) {
         this._context.strokeStyle = '#000000';
         this._context.textAlign = 'start';
-        this._context.textBaseline = i + 20 < this._config.height ? 'middle' : 'bottom';
-        this._context.font = this._config.rulerFontSize + 'px';
+        this._context.textBaseline = i + 20 < this._config.whiteboard.height ? 'middle' : 'bottom';
+        this._context.font = this._config.whiteboard.rulerFontSize + 'px';
         this._context.fillText(i, 12, i - this._offset[1]);
       }
     }
@@ -271,14 +267,14 @@ class Whiteboard {
     let allowedOffset = [];
 
     if ((scrollData[0] < 0 && tmpOffsetWidth < 0) ||
-      (scrollData[0] > 0 && tmpOffsetWidth + this._canvasElement.width > this._config.width)) {
+      (scrollData[0] > 0 && tmpOffsetWidth + this._canvasElement.width > this._config.whiteboard.width)) {
       allowedOffset[0] = 0;
     } else {
       allowedOffset[0] = scrollData[0];
     }
 
     if ((scrollData[1] < 0 && tmpOffsetHeight < 0) ||
-      (scrollData[1] > 0 && tmpOffsetHeight + this._canvasElement.height > this._config.height)) {
+      (scrollData[1] > 0 && tmpOffsetHeight + this._canvasElement.height > this._config.whiteboard.height)) {
       allowedOffset[1] = 0;
     } else {
       allowedOffset[1] = scrollData[1];
@@ -288,7 +284,7 @@ class Whiteboard {
   }
 
   _handleFullscreen() {
-    let mainContainerNode = document.getElementById('mainContainer');
+    let mainContainerNode = document.getElementById(this._config.whiteboard.mainContainer);
 
     let inFullscreen = Utils.getFullScreenModeValue();
 
@@ -302,8 +298,8 @@ class Whiteboard {
   _getLineWidth() {
     let lineWidth;
 
-    if (this._config.activeTool === Tools.line) {
-      lineWidth = this._config.penSize;
+    if (this._config.whiteboard.activeTool === Tools.line) {
+      lineWidth = this._config.whiteboard.penSize;
     }
 
     return lineWidth;
@@ -321,11 +317,11 @@ class Whiteboard {
   }
 
   _onFullscreenChange() {
-    let values = this._toolbar.getValues();
+    let values = this._toolbarTools.getValues();
 
     values.fullscreen = Utils.getFullScreenModeValue();
 
-    this._toolbar.setValues(values);
+    this._toolbarTools.setValues(values);
   }
 
   _onResize() {
@@ -340,8 +336,8 @@ class Whiteboard {
     this._updateOffset({
       canvasHeight: newHeight,
       canvasWidth: newWidth,
-      height: this._config.height,
-      width: this._config.width
+      height: this._config.whiteboard.height,
+      width: this._config.whiteboard.width
     });
 
     this.redraw();
@@ -392,14 +388,14 @@ class Whiteboard {
     let x = point[0] - canvasWidth / 2;
     let y = point[1] - canvasHeight / 2;
 
-    if (x + canvasWidth > this._config.width) {
-      x = this._config.width - canvasWidth;
+    if (x + canvasWidth > this._config.whiteboard.width) {
+      x = this._config.whiteboard.width - canvasWidth;
     } else if (x < 0) {
       x = 0;
     }
 
-    if (y + canvasHeight > this._config.height) {
-      y = this._config.height - canvasHeight;
+    if (y + canvasHeight > this._config.whiteboard.height) {
+      y = this._config.whiteboard.height - canvasHeight;
     } else if (y < 0) {
       y = 0;
     }
@@ -408,6 +404,8 @@ class Whiteboard {
     this._offset[1] = y;
 
     this.redraw();
+
+    this._saveOffset(this._whiteboardId, this._offset);
   }
 
   _onShapeCreatedCallback(shape) {
@@ -443,6 +441,11 @@ class Whiteboard {
     if (event.touches.length > 1) {
       this._lastDragPoint = [event.touches[0].pageX, event.touches[0].pageY];
     }
+  }
+
+  _onUserSignInCallback(href) {
+    href += '?returnUrl=' + encodeURIComponent(location.href);
+    location.href = href;
   }
 
   _removeShapesFromCollection(shapesList, shapes) {
@@ -512,12 +515,12 @@ class Whiteboard {
       this._drawer.destroy();
     }
 
-    if (this._config.activeTool === Tools.line) {
+    if (this._config.whiteboard.activeTool === Tools.line) {
       this._drawer = new DrawLine({
-        boardSize: [this._config.width, this._config.height],
+        boardSize: [this._config.whiteboard.width, this._config.whiteboard.height],
         callback: this._onShapeCreatedCallback.bind(this),
         canvas: this._canvasElement,
-        color: this._config.color,
+        color: this._config.whiteboard.color,
         globalCompositeOperation: 'source-over',
         lineCap: 'round',
         lineJoin: 'round',
@@ -525,9 +528,9 @@ class Whiteboard {
         minPointDistance: this._config.minPointDistance,
         offset: this._offset
       });
-    } else if (this._config.activeTool === Tools.eraser) {
+    } else if (this._config.whiteboard.activeTool === Tools.eraser) {
       this._drawer = new Eraser({
-        boardSize: [this._config.width, this._config.height],
+        boardSize: [this._config.whiteboard.width, this._config.whiteboard.height],
         callback: this._onShapesErasedCallback.bind(this),
         canvas: this._canvasElement,
         offset: this._offset,
@@ -536,8 +539,14 @@ class Whiteboard {
     }
   }
 
+  _setToolValues(toolValues) {
+    Object.assign(this._config.whiteboard, toolValues);
+
+    this._setActiveTool();
+  }
+
   _setupCanvas() {
-    this._canvasElement = document.getElementById('canvas');
+    this._canvasElement = document.getElementById(this._config.whiteboard.srcNode);
   }
 
   _setupContext() {
@@ -546,32 +555,45 @@ class Whiteboard {
 
   _setupData() {
     this._data = new Data({
-      url: this._config.dataURL
+      url: this._config.whiteboard.dataURL
     });
   }
 
   _setupMap() {
     this._map = new Map({
       callback: this._onMapClickCallback.bind(this),
-      color: 'black',
-      container: '#mapContainer',
-      height: this._config.height,
-      lineWidth: 1,
-      srcNode: '#map',
-      width: this._config.width
+      color: this._config.map.color,
+      container: this._config.map.container,
+      height: this._config.map.height,
+      lineWidth: this._config.map.lineWidth,
+      srcNode: this._config.map.srcNode,
+      width: this._config.map.width
     });
   }
 
-  _setupToolbar() {
+  _setupToolbarTools() {
     let config = {
       clearWhiteboardCallback: this._clearWhiteboard.bind(this),
       fullscreenCallback: this._handleFullscreen.bind(this),
       shareWhiteboardCallback: this._shareWhiteboard.bind(this),
-      srcNode: 'toolbar',
-      valuesCallback: this.setConfig.bind(this)
+      valuesCallback: this._setToolValues.bind(this)
     };
 
-    this._toolbar = new Toolbar(Object.assign(config, this._config));
+    Object.assign(config, this._config.toolbarTools);
+
+    this._toolbarTools = new ToolbarTools(config);
+  }
+
+  _setupToolbarUser() {
+    let config = {
+      currentUser: this._config.currentUser,
+      signInCallback: this._onUserSignInCallback.bind(this),
+      signOutCallback: this._config.whiteboard.signOutCallback
+    };
+
+    Object.assign(config, this._config.toolbarUser);
+
+    this._toolbarUser = new ToolbarUser(config);
   }
 
   _shareWhiteboard() {

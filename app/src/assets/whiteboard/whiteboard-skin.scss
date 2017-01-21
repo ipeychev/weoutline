@@ -1,0 +1,10 @@
+@import "../styles-skin.scss";
+@import "../map/map-skin.scss";
+@import "../toolbar/tools-skin.scss";
+@import "../toolbar/user-skin.scss";
+
+.wb {
+  .draw-area {
+    cursor: crosshair;
+  }
+}

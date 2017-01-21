@@ -1,11 +1,12 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('user', {
-    title: 'WeOutline, a shared whiteboard, designed to work among teams'
-  });
+router.get('/sign-in', function(req, res, next) {
+  res.render('user-sign-in');
+});
+
+router.get('/profile', function(req, res, next) {
+  res.render('user-profile');
 });
 
 module.exports = router;

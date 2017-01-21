@@ -1,0 +1,41 @@
+{>"layout"/}
+
+{<cssResources}
+	<link rel="stylesheet" href="/user-sign-in.{version}.{?production}min.{/production}css">
+{/cssResources}
+
+{<jsResources}
+	<script src="http://cdn.wedeploy.com/api/latest/wedeploy.js" defer></script>
+	<script src="/commons.{version}.{?production}min.{/production}js" defer></script>
+  <script src="/user-sign-in.{version}.{?production}min.{/production}js" defer></script>
+{/jsResources}
+
+{<bodyContent}
+	<div class="user">
+		<form id="signIn" name="signIn" class="container">
+			<div class="btn-container">
+				<button class="btn btn-social btn-github" id="signGitHub" type="button">
+					<span class="brand">
+						<span class="icon icon-github"></span>
+					</span>
+					<span class="label">Login with Github</span>
+				</button>
+
+				<button class="btn btn-social btn-google" id="signGoogle" type="button">
+					<span class="brand">
+						<span class="icon icon-google"></span>
+					</span>
+					<span class="label">Login with Google</span>
+				</button>
+			</div>
+
+			<h1>Sign In</h1>
+			<input name="email" type="email" placeholder="Email" required>
+			<input name="password" type="password" placeholder="Password" required>
+
+			<button type="submit">Submit</button>
+			<a href="http://dashboard.wedeploy.com/signup">Create an account</a>
+			<a href="http://dashboard.wedeploy.com/password/reset">Did you forget your password?</a>
+		</form>
+	</div>
+{/bodyContent}

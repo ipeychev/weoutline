@@ -1,0 +1,47 @@
+@import "./toolbar-skin.scss";
+
+.toolbar-tools {
+  .toolbar-item {
+      .toolbar-item-option {
+          &.active {
+            border-color: white;
+          }
+
+          &.black {
+            .icon {
+              fill: #000000;
+            }
+          }
+
+          &.red {
+            .icon {
+              fill: #ff0000;
+            }
+          }
+
+          &.green {
+            .icon {
+              fill: #00cc33;
+            }
+          }
+
+          &.blue {
+            .icon {
+              fill: #0000ff;
+            }
+          }
+
+          &.yellow {
+            .icon {
+              fill: #ffff00;
+            }
+          }
+
+          &.orange {
+            .icon {
+              fill: #ff9933;
+            }
+          }
+      }
+  }
+}

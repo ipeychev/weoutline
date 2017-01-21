@@ -1,16 +1,12 @@
-var concatCss = require('gulp-concat-css');
-var cssmin = require('gulp-cssmin');
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var del = require('del');
 var glob = require('glob');
 var gulp = require('gulp');
-var gulpif = require('gulp-if');
 var gutil = require('gutil');
 var isparta = require('isparta');
 var loadPlugins = require('gulp-load-plugins');
 var path = require('path');
-var rename = require('gulp-rename');
 var runSequence = require('run-sequence');
-var sass = require('gulp-sass');
 var webpack = require('webpack');
 var webpackStream = require('webpack-stream');
 
@@ -23,13 +19,7 @@ var release = process.env.NODE_ENV === 'production';
 // Load all of our Gulp plugins
 var $ = loadPlugins();
 
-var config = {
-  entryFileName: 'app.js',
-  mainVarName: 'app'
-};
-
 var destinationFolder = 'dist';
-var exportJSFileName = path.basename(config.entryFileName, path.extname(config.entryFileName));
 
 function cleanDist(done) {
   del([destinationFolder]).then(() => done());
@@ -62,34 +52,53 @@ function build(done) {
   runSequence(
     'clean',
     'build-src',
-    ['lint', 'compile-sass'],
-    'concat-css',
-    'clean-css',
+    ['lint'],
     'copy-static',
     done
   );
 }
 
 function buildSrc(callback) {
+  let plugins = [
+    new webpack.optimize.CommonsChunkPlugin({
+        name: 'commons',
+        filename: `commons.${manifest.version}${release ? '.min': ''}.js`
+    }),
+    new ExtractTextPlugin(`[name].${manifest.version}${release ? '.min': ''}.css`, {allChunks: true})
+  ];
+
+  if (release) {
+    plugins.push(new webpack.optimize.UglifyJsPlugin({minimize: true}));
+  }
+
   webpack({
     entry: {
-      user: './src/pages/user.js',
-      whiteboard: './src/pages/wb.js'
+      'user-profile': './src/pages/user-profile.js',
+      'user-sign-in': './src/pages/user-sign-in.js',
+      'whiteboard': './src/pages/whiteboard.js'
     },
     output: {
-      path: path.join(__dirname, 'dist'),
-      filename: `[name].${manifest.version}${release ? '.min': ''}.js`
+      chunkFilename: `[id].js`,
+      filename: `[name].${manifest.version}${release ? '.min': ''}.js`,
+      path: destinationFolder
     },
     module: {
       context: path.join(__dirname, 'node_modules'),
       loaders: [
-          {test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader'}
+          {
+            test: /\.js$/,
+            exclude: /node_modules/,
+            loader: 'babel-loader',
+            presets: ['es2015']
+          },
+          {
+            test: /\.scss$/,
+            loader: ExtractTextPlugin.extract('style-loader', 'css-loader!sass-loader')
+          }
         ]
     },
     devtool: release ? '' : 'source-map',
-    plugins: release ? [
-        new webpack.optimize.UglifyJsPlugin({minimize: true})
-    ] : []
+    plugins: plugins
   }, function (err) {
     if (err) {
       throw new gutil.PluginError('webpack', err);
@@ -99,16 +108,11 @@ function buildSrc(callback) {
   });
 }
 
-function copyFonts() {
-  return gulp.src('src/assets/vendor/fonts/*.*')
-    .pipe(gulp.dest(destinationFolder + '/assets/fonts'));
-}
-
 function copyStatic() {
   return gulp.src([
-      'src/index.html',
       'src/**/assets/vendor/**/*.css',
       'src/**/*.jpeg',
+      'src/**/*.png',
       'src/**/*.svg'
     ])
     .pipe(gulp.dest(destinationFolder));
@@ -129,42 +133,8 @@ function coverage(done) {
     });
 }
 
-function errorHandler(error) {
-  console.log(error.toString());
-
-  this.emit('end');
-}
-
-function cleanCSS(done) {
-  del([
-    path.join(destinationFolder, 'assets/**/*.css'),
-    '!' + path.join(destinationFolder, `assets/app.${manifest.version}.css`),
-    '!' + path.join(destinationFolder, `assets/app.${manifest.version}.min.css`),
-    '!' + path.join(destinationFolder, 'assets/vendor')
-  ])
-  .then(() => done());
-}
-
 function cleanDist(done) {
   del([destinationFolder]).then(() => done());
-}
-
-function concatCSS() {
-  return gulp.src(
-    path.join(destinationFolder, 'assets/**/*.css'))
-    .pipe(concatCss(`app.${manifest.version}.css`))
-    .pipe(gulpif(release, cssmin()))
-    .pipe(gulpif(release, rename({suffix: `.min`})))
-    .pipe(gulp.dest(path.join(destinationFolder, 'assets')));
-}
-
-function compileSASS() {
-  return gulp.src([
-    'src/assets/**/*-structure.scss',
-    'src/assets/**/*-skin.scss'
-  ])
-    .pipe(sass().on('error', sass.logError))
-    .pipe(gulp.dest(path.join(destinationFolder, 'assets')));
 }
 
 function _mocha() {
@@ -263,11 +233,7 @@ gulp.task('build', build);
 // Build the src files
 gulp.task('build-src', buildSrc);
 
-gulp.task('clean-css', cleanCSS);
-gulp.task('copy-fonts', copyFonts);
-gulp.task('compile-sass', compileSASS);
-gulp.task('concat-css', concatCSS);
-gulp.task('copy-static', ['copy-fonts'], copyStatic);
+gulp.task('copy-static', copyStatic);
 
 // Lint and run our tests
 gulp.task('test', ['lint'], test);

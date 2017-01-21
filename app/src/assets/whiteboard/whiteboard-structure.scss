@@ -1,0 +1,28 @@
+@import "../styles-structure.scss";
+@import "../map/map-structure.scss";
+@import "../toolbar/tools-structure.scss";
+@import "../toolbar/user-structure.scss";
+
+.wb {
+  height: 100%;
+  left: 0;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  width: 100%;
+
+  .hidden {
+    display: none !important;
+  }
+
+  .draw-container {
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+
+    .draw-area {
+      cursor: crosshair;
+    }
+  }
+}
