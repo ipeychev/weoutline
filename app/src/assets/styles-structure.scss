@@ -1,7 +1,11 @@
-html, body {
-    height: 100%;
-}
+@import './sass-import-once';
 
-@-ms-viewport{
-  width: device-width;
+@include exports('styles-structure') {
+  html, body {
+      height: 100%;
+  }
+
+  @-ms-viewport{
+    width: device-width;
+  }
 }

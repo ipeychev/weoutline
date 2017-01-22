@@ -1,9 +1,13 @@
-@import "../styles-skin.scss";
+@import '../sass-import-once';
 
-.profile {
-  background-color: #0e141a;
+@import '../styles-skin.scss';
 
-  h1 {
-    color: rgba(255, 255, 255, 0.9);
+@include exports('user-profile-skin') {
+  .profile {
+    background-color: #0e141a;
+
+    h1 {
+      color: rgba(255, 255, 255, 0.9);
+    }
   }
 }

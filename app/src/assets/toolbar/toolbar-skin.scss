@@ -1,32 +1,36 @@
-.toolbar {
-    background-color: #32a8e6;
-    border-color: gray;
-    cursor: move;
-    opacity: 0.9;
+@import '../sass-import-once.scss';
 
-    .icon {
+@include exports('toolbar-skin') {
+  .toolbar {
+      background-color: #32a8e6;
+      border-color: gray;
+      cursor: move;
+      opacity: 0.9;
+
+      .icon {
         fill: white;
       }
 
-    .toolbar-item {
-      border-color: white;
+      .toolbar-item {
+        border-color: white;
 
-      .toolbar-item-options {
-        background-color: #32a8e6;
-      }
-
-      &.drag {
-        .toolbar-item-value {
-          cursor: move;
+        .toolbar-item-options {
+          background-color: #32a8e6;
         }
-      }
 
-      .toolbar-item-value {
-        cursor: pointer;
+        &.drag {
+          .toolbar-item-value {
+            cursor: move;
+          }
+        }
 
-        &.active {
-          border-color: white;
+        .toolbar-item-value {
+          cursor: pointer;
+
+          &.active {
+            border-color: white;
+          }
         }
       }
     }
-  }
+}

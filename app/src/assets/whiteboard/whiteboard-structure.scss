@@ -1,28 +1,32 @@
-@import "../styles-structure.scss";
-@import "../map/map-structure.scss";
-@import "../toolbar/tools-structure.scss";
-@import "../toolbar/user-structure.scss";
+@import '../sass-import-once';
 
-.wb {
-  height: 100%;
-  left: 0;
-  overflow: hidden;
-  position: fixed;
-  top: 0;
-  width: 100%;
+@import '../styles-structure.scss';
+@import '../map/map-structure.scss';
+@import '../toolbar/toolbar-tools-structure.scss';
+@import '../toolbar/toolbar-user-structure.scss';
 
-  .hidden {
-    display: none !important;
-  }
-
-  .draw-container {
+@include exports('whiteboard-skin') {
+  .wb {
     height: 100%;
+    left: 0;
     overflow: hidden;
-    position: relative;
+    position: fixed;
+    top: 0;
     width: 100%;
 
-    .draw-area {
-      cursor: crosshair;
+    .hidden {
+      display: none !important;
+    }
+
+    .draw-container {
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+      width: 100%;
+
+      .draw-area {
+        cursor: crosshair;
+      }
     }
   }
 }

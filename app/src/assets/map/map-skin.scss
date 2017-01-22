@@ -1,5 +1,9 @@
-.map {
-  background-color: white;
-  border: 1px solid black;
-  opacity: 0.9;
+@import '../sass-import-once';
+
+@include exports('map-skin') {
+  .map {
+    background-color: white;
+    border: 1px solid black;
+    opacity: 0.9;
+  }
 }

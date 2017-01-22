@@ -1,10 +1,14 @@
-@import "../styles-skin.scss";
-@import "../map/map-skin.scss";
-@import "../toolbar/tools-skin.scss";
-@import "../toolbar/user-skin.scss";
+@import '../sass-import-once';
 
-.wb {
-  .draw-area {
-    cursor: crosshair;
+@import '../styles-skin.scss';
+@import '../map/map-skin.scss';
+@import '../toolbar/toolbar-tools-skin.scss';
+@import '../toolbar/toolbar-user-skin.scss';
+
+@include exports('whiteboard-skin') {
+  .wb {
+    .draw-area {
+      cursor: crosshair;
+    }
   }
 }

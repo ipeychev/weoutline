@@ -1,0 +1,59 @@
+@import '../sass-import-once';
+
+@import './toolbar-structure.scss';
+
+@include exports('toolbar-tools-structure') {
+  .toolbar-tools {
+      left: 20px;
+      top: 20px;
+
+      .toolbar-item {
+        .toolbar-item-options {
+          .toolbar-item-option {
+              &.small {
+                .icon {
+                  width: 4px;
+                }
+              }
+
+              &.normal {
+                .icon {
+                  width: 6px;
+                }
+              }
+
+              &.big {
+                .icon {
+                  width: 8px;
+                }
+              }
+
+              &.large {
+                .icon {
+                  width: 12px;
+                }
+              }
+
+              &.extra {
+                .icon {
+                  width: 16px;
+                }
+              }
+
+              &.huge {
+                .icon {
+                  width: 18px;
+                }
+              }
+
+              &.giant {
+                .icon {
+                  height: 22px;
+                  width: 22px;
+                }
+              }
+          }
+        }
+      }
+    }
+  }

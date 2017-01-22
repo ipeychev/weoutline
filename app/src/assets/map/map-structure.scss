@@ -1,7 +1,11 @@
-.map-container {
-  height: 150px;
-  position: fixed;
-  right: 20px;
-  top: 100px;
-  width: 150px;
+@import '../sass-import-once';
+
+@include exports('map-structure') {
+  .map-container {
+    height: 150px;
+    position: fixed;
+    right: 20px;
+    top: 100px;
+    width: 150px;
+  }
 }
