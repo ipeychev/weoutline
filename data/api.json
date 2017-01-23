@@ -17,6 +17,10 @@
 	},
 	{
 		"data": true,
+		"path": "/users"
+	},
+	{
+		"data": true,
 		"path": "/*"
 	}
 ]
