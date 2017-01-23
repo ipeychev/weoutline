@@ -13,7 +13,7 @@
 {<bodyContent}
 	<div class="user-sign-up">
 		<div class="message-container">
-			<span class="message hidden" id="messageSuccess">Your account has been created successfully<br><a href="/user/sign-in">Sign-in</a></span>
+			<span class="message hidden" id="messageSuccess">Your account has been created successfully<br><a id="signIn" href="/user/sign-in">Sign-in</a></span>
 			<span class="error hidden" id="messageError">There was an error on creating your account</span>
 			<button class="hidden" id="tryAgain">Try again</button>
 		</div>

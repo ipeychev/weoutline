@@ -1,4 +1,5 @@
-import Utils from '../utils/utils';
+import BrowserHelper from '../helpers/browser-helper';
+import DrawHelper from '../helpers/draw-helper';
 
 class Eraser {
   constructor(config) {
@@ -34,13 +35,13 @@ class Eraser {
 
     event.preventDefault();
 
-    let curPoint = Utils.getPointFromEvent(event, this._canvasElement);
+    let curPoint = DrawHelper.getPointFromEvent(event, this._canvasElement);
 
     let tmpX = curPoint[0] + this._config.offset[0];
     let tmpY = curPoint[1] + this._config.offset[1];
 
     if (tmpX > 0 && tmpX < this._config.boardSize[0] && tmpY > 0 && tmpY < this._config.boardSize[1]) {
-      curPoint = Utils.getPointWithoutOffset(curPoint, this._config.offset);
+      curPoint = DrawHelper.getPointWithoutOffset(curPoint, this._config.offset);
 
       let matchingShapes = this._getMatchingShapes(curPoint);
 
@@ -71,13 +72,13 @@ class Eraser {
       width: this._canvasElement.width
     };
 
-    let curPoint = Utils.getPointFromEvent(event, this._canvasElement);
+    let curPoint = DrawHelper.getPointFromEvent(event, this._canvasElement);
 
     let tmpX = curPoint[0] + this._config.offset[0];
     let tmpY = curPoint[1] + this._config.offset[1];
 
     if (tmpX > 0 && tmpX < this._config.boardSize[0] && tmpY > 0 && tmpY < this._config.boardSize[1]) {
-      curPoint = Utils.getPointWithoutOffset(curPoint, this._config.offset);
+      curPoint = DrawHelper.getPointWithoutOffset(curPoint, this._config.offset);
 
       let matchingShapes = this._getMatchingShapes(curPoint);
 
@@ -95,7 +96,7 @@ class Eraser {
     this._finishListener = this.finish.bind(this);
     this._startListener = this.start.bind(this);
 
-    if (Utils.isTouchDevice()) {
+    if (BrowserHelper.isTouchDevice()) {
       this._canvasElement.addEventListener('touchcancel', this._cancelListener, {passive: true});
       this._canvasElement.addEventListener('touchend', this._finishListener, {passive: true});
       this._canvasElement.addEventListener('touchmove', this._eraseListener);
@@ -162,7 +163,7 @@ class Eraser {
     let matchingShapes = [];
 
     for (let i = 0; i < this._config.shapes.length; i++) {
-      if (Utils.checkPointsInViewport(this._config.shapes[i].points, this._config.offset, this._canvasSize)) {
+      if (DrawHelper.checkPointsInViewport(this._config.shapes[i].points, this._config.offset, this._canvasSize)) {
         let matchedShape = this._checkShapeMatching(curPoint, this._config.shapes[i]);
 
         if (matchedShape) {

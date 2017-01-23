@@ -1,4 +1,4 @@
-import Utils from '../utils/utils';
+import BrowserHelper from '../helpers/browser-helper';
 
 class Draggable {
   constructor(target) {
@@ -17,7 +17,7 @@ class Draggable {
     this._touchMoveListener = this._onTouchMove.bind(this);
     this._touchStartListener = this._onTouchStart.bind(this);
 
-    if (Utils.isTouchDevice()) {
+    if (BrowserHelper.isTouchDevice()) {
       this._dragElement.addEventListener('touchend', this._touchEndListener);
       this._dragElement.addEventListener('touchmove', this._touchMoveListener);
       this._dragElement.addEventListener('touchstart', this._touchStartListener, {passive: true});

@@ -1,3 +1,5 @@
+import URLHelper from '../helpers/url-helper';
+
 class UserSignIn {
   constructor(config) {
     this._config = config;
@@ -37,11 +39,11 @@ class UserSignIn {
   }
 
   _navigateAfterSuccess() {
-    let match = /\?returnUrl=([^&]+|.+$)/.exec(window.location.href);
+    let returnURL = URLHelper.getPathAttributeValue('returnURL');
 
-    let url = match ? decodeURIComponent(match[1]) : '/';
+    returnURL = returnURL ? decodeURIComponent(returnURL) : '/';
 
-    window.location.href = url;
+    window.location.href = returnURL;
   }
 
   _onTryAgainClick() {
@@ -53,7 +55,7 @@ class UserSignIn {
   _setupAuth() {
     this._auth = this._config.auth;
 
-    this._auth.onSignIn((user) => {
+    this._auth.onSignIn(() => {
       this._navigateAfterSuccess();
     });
   }
@@ -64,6 +66,16 @@ class UserSignIn {
     this._signGoogleBtn = document.getElementById('signGoogle');
     this._signInForm = document.getElementById('signIn');
     this._tryAgainBtn = document.getElementById('tryAgain');
+
+    let returnURL = URLHelper.getPathAttributeValue('returnURL');
+
+    if (returnURL) {
+      let signUpNode = document.getElementById('signUp');
+      signUpNode.href += '?' + 'returnURL=' + returnURL;
+
+      let resetNode = document.getElementById('reset');
+      resetNode.href += '?returnURL=' + returnURL;
+    }
   }
 
   _signInWithEmailAndPassword() {

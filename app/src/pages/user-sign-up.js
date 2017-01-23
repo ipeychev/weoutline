@@ -6,7 +6,7 @@ import UserSignUp from '../user/sign-up';
 window.addEventListener('load', () => {
   let auth = WeDeploy.auth('auth.weoutline.wedeploy.io');
 
-  let userSignUp = new UserSignUp({
+  new UserSignUp({
     auth: auth
   });
 }, {

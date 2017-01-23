@@ -1,3 +1,5 @@
+import URLHelper from '../helpers/url-helper';
+
 class UserSignUp {
   constructor(config) {
     this._config = config;
@@ -45,6 +47,17 @@ class UserSignUp {
     });
   }
 
+  _onTryAgainClick() {
+    this._signUpForm.classList.remove('hidden');
+    this._messageError.classList.add('hidden');
+    this._messageSuccess.classList.add('hidden');
+    this._tryAgainBtn.classList.add('hidden');
+  }
+
+  _registerUser(user) {
+    return this._config.auth.createUser(user);
+  }
+
   _setupAuth() {
     this._auth = this._config.auth;
   }
@@ -54,17 +67,13 @@ class UserSignUp {
     this._messageSuccess = document.getElementById('messageSuccess');
     this._signUpForm = document.getElementById('signUp');
     this._tryAgainBtn = document.getElementById('tryAgain');
-  }
 
-  _registerUser(user) {
-    return this._config.auth.createUser(user);
-  }
+    let returnURL = URLHelper.getPathAttributeValue('returnURL');
 
-  _onTryAgainClick() {
-    this._signUpForm.classList.remove('hidden');
-    this._messageError.classList.add('hidden');
-    this._messageSuccess.classList.add('hidden');
-    this._tryAgainBtn.classList.add('hidden');
+    if (returnURL) {
+      let signInNode = document.getElementById('signIn');
+      signInNode.href += '?returnURL=' + returnURL;
+    }
   }
 }
 

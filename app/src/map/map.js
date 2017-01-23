@@ -1,8 +1,9 @@
 const simplify = require('simplify-path');
-import { ShapeType } from '../draw/shape';
+import BrowserHelper from '../helpers/browser-helper';
 import Draggable from '../draggable/draggable';
 import Draw from '../draw/draw';
-import Utils from '../utils/utils';
+import DrawHelper from '../helpers/draw-helper';
+import { ShapeType } from '../draw/shape';
 
 class Map {
   constructor(config) {
@@ -51,7 +52,7 @@ class Map {
           globalCompositeOperation: 'source-over',
           lineCap: 'round',
           lineJoin: 'round',
-          lineWidth: Math.round(Utils.getPixelScaledNumber(shapes[i].lineWidth) / 4)
+          lineWidth: Math.round(DrawHelper.getPixelScaledNumber(shapes[i].lineWidth) / 4)
         });
       }
     }
@@ -63,7 +64,7 @@ class Map {
     this._touchMoveListener = this._onTouchMove.bind(this);
     this._touchStartListener = this._onTouchStart.bind(this);
 
-    if (Utils.isTouchDevice()) {
+    if (BrowserHelper.isTouchDevice()) {
       this._mapElement.addEventListener('touchend', this._touchEndListener, { passive: true });
       this._mapElement.addEventListener('touchmove', this._touchMoveListener, { passive: true });
       this._mapElement.addEventListener('touchstart', this._touchStartListener, { passive: true });
@@ -104,7 +105,7 @@ class Map {
     this._dragged = true;
   }
 
-  _onTouchStart(event) {
+  _onTouchStart() {
     this._dragged = false;
   }
 }

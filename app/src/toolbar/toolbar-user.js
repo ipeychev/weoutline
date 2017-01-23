@@ -1,6 +1,6 @@
+import BrowserHelper from '../helpers/browser-helper';
 import Draggable from '../draggable/draggable';
 import Toolbar from './toolbar';
-import Utils from '../utils/utils';
 
 class ToolbarUser extends Toolbar {
   constructor(config) {
@@ -43,7 +43,7 @@ class ToolbarUser extends Toolbar {
     this._documentInteractionListener = this._onDocumentInteraction.bind(this);
     this._touchEndListener = this._onTouchEnd.bind(this);
 
-    if (Utils.isTouchDevice()) {
+    if (BrowserHelper.isTouchDevice()) {
       this._element.addEventListener('touchend', this._touchEndListener, { passive: true });
       document.addEventListener('touchstart', this._documentInteractionListener);
     } else {

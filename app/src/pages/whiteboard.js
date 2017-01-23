@@ -73,7 +73,7 @@ window.addEventListener('load', () => {
 
   let whiteboard;
 
-  window.onpopstate = (event) => {
+  window.onpopstate = () => {
     if (whiteboard) {
       whiteboard.destroy();
     }

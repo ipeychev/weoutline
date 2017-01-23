@@ -1,5 +1,5 @@
 class UserProfile {
-  constructor(config) {
+  constructor() {
   }
 }
 

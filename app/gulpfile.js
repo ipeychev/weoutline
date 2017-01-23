@@ -2,7 +2,7 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var del = require('del');
 var glob = require('glob');
 var gulp = require('gulp');
-var gutil = require('gutil');
+var gutil = require('gulp-util');
 var isparta = require('isparta');
 var loadPlugins = require('gulp-load-plugins');
 var path = require('path');
@@ -100,9 +100,21 @@ function buildSrc(callback) {
     },
     devtool: release ? '' : 'source-map',
     plugins: plugins
-  }, function (err) {
+  }, function (err, stats) {
     if (err) {
-      throw new gutil.PluginError('webpack', err);
+      console.error(new gutil.PluginError('webpack', err));
+    } else if ( stats.hasErrors() ) { // soft error
+      var statsLog = {
+        assets: false,
+        children: false,
+        chunkModules: false,
+        chunks: false,
+        colors: true,
+        hash: false,
+        version: false
+      };
+
+      console.error(stats.toString(statsLog));
     }
 
     callback();
@@ -132,10 +144,6 @@ function coverage(done) {
         .pipe($.istanbul.writeReports())
         .on('end', done);
     });
-}
-
-function cleanDist(done) {
-  del([destinationFolder]).then(() => done());
 }
 
 function _mocha() {

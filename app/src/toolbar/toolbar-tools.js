@@ -1,7 +1,8 @@
+import BrowserHelper from '../helpers/browser-helper';
+import DrawHelper from '../helpers/draw-helper';
 import Draggable from '../draggable/draggable';
 import Toolbar from './toolbar';
 import Tools from '../draw/tools';
-import Utils from '../utils/utils';
 
 class ToolbarTools extends Toolbar {
   constructor(config) {
@@ -59,7 +60,7 @@ class ToolbarTools extends Toolbar {
     this._orientationChangeListener = () => {setTimeout(this._onResize.bind(this), 100)};
     this._touchEndListener = this._onTouchEnd.bind(this);
 
-    if (Utils.isTouchDevice()) {
+    if (BrowserHelper.isTouchDevice()) {
       this._element.addEventListener('touchend', this._touchEndListener, { passive: true });
       document.addEventListener('touchstart', this._documentInteractionListener);
     } else {
@@ -94,7 +95,7 @@ class ToolbarTools extends Toolbar {
     let node = this._colorNode.querySelector('.toolbar-item-option.active .icon');
     let style = window.getComputedStyle(node);
 
-    return Utils.rgbToHex(style.getPropertyValue('fill'));
+    return DrawHelper.rgbToHex(style.getPropertyValue('fill'));
   }
 
   _getPenSize() {
@@ -109,7 +110,7 @@ class ToolbarTools extends Toolbar {
   }
 
   _initItems() {
-    if (Utils.isFullScreenSupported()) {
+    if (BrowserHelper.isFullScreenSupported()) {
       this._fullScreenNode.classList.remove('hidden');
     }
   }
@@ -131,7 +132,7 @@ class ToolbarTools extends Toolbar {
         setCurrentValue: {
           source: 'style',
           nodeSelector: '.icon',
-          transformFn: Utils.rgbToHex,
+          transformFn: DrawHelper.rgbToHex,
           property: 'fill'
         }
       });
@@ -170,14 +171,14 @@ class ToolbarTools extends Toolbar {
 
       let style = window.getComputedStyle(optionNode);
 
-      if (Utils.rgbToHex(style.getPropertyValue('fill')) === value) {
+      if (DrawHelper.rgbToHex(style.getPropertyValue('fill')) === value) {
         optionNode.parentNode.classList.add('active');
 
         this._setItemValue(optionNode.parentNode, this._colorNode, {
           setCurrentValue: {
             source: 'style',
             nodeSelector: '.icon',
-            transformFn: Utils.rgbToHex,
+            transformFn: DrawHelper.rgbToHex,
             property: 'fill'
           }
         });

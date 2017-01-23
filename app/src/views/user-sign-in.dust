@@ -39,8 +39,8 @@
 			<input name="password" type="password" placeholder="Password" required>
 
 			<button type="submit">Submit</button>
-			<a href="/user/sign-up">Create an account</a>
-			<a href="/user/reset">Did you forget your password?</a>
+			<a id="signUp" href="/user/sign-up">Create an account</a>
+			<a id="reset" href="/user/reset">Did you forget your password?</a>
 		</form>
 	</div>
 {/bodyContent}

@@ -4,7 +4,7 @@ require('../assets/user-profile/user-profile-skin.scss');
 import UserProfile from '../user/profile';
 
 window.addEventListener('load', () => {
-
+  new UserProfile();
 }, {
   once: true
 });

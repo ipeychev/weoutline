@@ -3,7 +3,7 @@ var router = express.Router();
 
 /* GET home page. */
 
-function whiteboard(req, res, next) {
+function whiteboard(req, res) {
   res.render('whiteboard');
 }
 

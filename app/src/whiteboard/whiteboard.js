@@ -1,12 +1,14 @@
+import BrowserHelper from '../helpers/browser-helper';
+import CryptHelper from '../helpers/crypt-helper';
 import Data from '../data/data';
 import Draw from '../draw/draw';
+import DrawHelper from '../helpers/draw-helper';
 import DrawLine from '../draw/draw-line';
 import Eraser from '../draw/eraser';
 import Map from '../map/map';
 import ToolbarTools from '../toolbar/toolbar-tools';
 import ToolbarUser from '../toolbar/toolbar-user';
 import Tools from '../draw/tools';
-import Utils from '../utils/utils';
 import { ShapeType } from '../draw/shape';
 
 class Whiteboard {
@@ -77,9 +79,9 @@ class Whiteboard {
 
     for (let i = 0; i < this._shapes.length; i++) {
       if (this._shapes[i].type === ShapeType.LINE) {
-        if (Utils.checkPointsInViewport(this._shapes[i].points, this._offset, canvasSize)) {
+        if (DrawHelper.checkPointsInViewport(this._shapes[i].points, this._offset, canvasSize)) {
           let points = this._shapes[i].points.map((point) => {
-            return Utils.getPointWithOffset(point, this._offset);
+            return DrawHelper.getPointWithOffset(point, this._offset);
           });
 
           Draw.line(points, this._context, {
@@ -87,7 +89,7 @@ class Whiteboard {
             globalCompositeOperation: 'source-over',
             lineCap: 'round',
             lineJoin: 'round',
-            lineWidth: Utils.getPixelScaledNumber(this._shapes[i].lineWidth)
+            lineWidth: DrawHelper.getPixelScaledNumber(this._shapes[i].lineWidth)
           });
         }
       }
@@ -120,7 +122,7 @@ class Whiteboard {
     this._orientationChangeListener = () => {setTimeout(this._onResize.bind(this), 100)};
     this._onFullscreenChangeListener = this._onFullscreenChange.bind(this);
 
-    if (Utils.isTouchDevice()) {
+    if (BrowserHelper.isTouchDevice()) {
       this._canvasElement.addEventListener('touchstart', this._onTouchStartListener, { passive: true });
       this._canvasElement.addEventListener('touchmove', this._onTouchMoveListener);
     } else {
@@ -128,7 +130,7 @@ class Whiteboard {
       this._canvasElement.addEventListener('contextmenu', this._onContextMenuListener);
     }
 
-    document.addEventListener(Utils.getFullscreenChangeEventName(this._canvasElement), this._onFullscreenChangeListener);
+    document.addEventListener(BrowserHelper.getFullscreenChangeEventName(this._canvasElement), this._onFullscreenChangeListener);
 
     window.addEventListener('orientationchange', this._orientationChangeListener);
     window.addEventListener('resize', this._resizeListener);
@@ -148,7 +150,7 @@ class Whiteboard {
   }
 
   _detachListeners() {
-    document.removeEventListener(Utils.getFullscreenChangeEventName(this._canvasElement), this._onFullscreenChangeListener);
+    document.removeEventListener(BrowserHelper.getFullscreenChangeEventName(this._canvasElement), this._onFullscreenChangeListener);
     this._canvasElement.removeEventListener('contextmenu', this._onContextMenuListener);
     this._canvasElement.removeEventListener('touchmove', this._onTouchMoveListener);
     this._canvasElement.removeEventListener('touchstart', this._onTouchStartListener, { passive: true });
@@ -201,6 +203,7 @@ class Whiteboard {
         this._context.textAlign = i + 20 < this._config.whiteboard.width ? 'center' : 'end';
         this._context.textBaseline = 'alphabetic';
         this._context.font = this._config.whiteboard.rulerFontSize + 'px';
+        this._context.fillStyle = '#000000';
         this._context.fillText(i, i - this._offset[0], 20);
       }
     }
@@ -225,6 +228,7 @@ class Whiteboard {
         this._context.textAlign = 'start';
         this._context.textBaseline = i + 20 < this._config.whiteboard.height ? 'middle' : 'bottom';
         this._context.font = this._config.whiteboard.rulerFontSize + 'px';
+        this._context.fillStyle = '#000000';
         this._context.fillText(i, 12, i - this._offset[1]);
       }
     }
@@ -286,12 +290,12 @@ class Whiteboard {
   _handleFullscreen() {
     let mainContainerNode = document.getElementById(this._config.whiteboard.mainContainer);
 
-    let inFullscreen = Utils.getFullScreenModeValue();
+    let inFullscreen = BrowserHelper.getFullScreenModeValue();
 
     if (inFullscreen) {
-      Utils.exitFullscreen(mainContainerNode);
+      DrawHelper.exitFullscreen(mainContainerNode);
     } else {
-      Utils.requestFullscreen(mainContainerNode);
+      DrawHelper.requestFullscreen(mainContainerNode);
     }
   }
 
@@ -308,7 +312,7 @@ class Whiteboard {
   _onFullscreenChange() {
     let values = this._toolbarTools.getValues();
 
-    values.fullscreen = Utils.getFullScreenModeValue();
+    values.fullscreen = BrowserHelper.getFullScreenModeValue();
 
     this._toolbarTools.setValues(values);
   }
@@ -400,10 +404,10 @@ class Whiteboard {
   _onShapeCreatedCallback(shape) {
     // change points coordinates according to 0,0
     shape.points = shape.points.map((point) => {
-      return Utils.getPointWithoutOffset(point, this._offset);
+      return DrawHelper.getPointWithoutOffset(point, this._offset);
     });
 
-    shape.id = Date.now().toString() + window.crypto.getRandomValues(new Uint32Array(1))[0];
+    shape.id = CryptHelper.getId();
 
     shape.sessionId = this._sessionId;
 
@@ -433,7 +437,7 @@ class Whiteboard {
   }
 
   _onUserSignInCallback(href) {
-    href += '?returnUrl=' + encodeURIComponent(location.href);
+    href += '?returnURL=' + encodeURIComponent(location.href);
     location.href = href;
   }
 
@@ -514,7 +518,7 @@ class Whiteboard {
         lineCap: 'round',
         lineJoin: 'round',
         lineWidth: this._getLineWidth(),
-        minPointDistance: this._config.minPointDistance,
+        minPointDistance: this._config.whiteboard.minPointDistance,
         offset: this._offset
       });
     } else if (this._config.whiteboard.activeTool === Tools.eraser) {
@@ -587,7 +591,7 @@ class Whiteboard {
 
   _shareWhiteboard() {
     if (!this._whiteboardId) {
-      let whiteboardId = Utils.getRandomBase64(12);
+      let whiteboardId = DrawHelper.getRandomBase64(12);
 
       this._whiteboardId = whiteboardId;
 

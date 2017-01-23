@@ -1,6 +1,7 @@
+import BrowserHelper from '../helpers/browser-helper';
 import Draw from './draw';
+import DrawHelper from '../helpers/draw-helper';
 import { Shape, ShapeType }  from './shape';
-import Utils from '../utils/utils';
 
 class DrawLine {
   constructor(config) {
@@ -48,7 +49,7 @@ class DrawLine {
 
     event.preventDefault();
 
-    let curPoint = Utils.getPointFromEvent(event, this._canvasElement);
+    let curPoint = DrawHelper.getPointFromEvent(event, this._canvasElement);
 
     if (this._config.minPointDistance > 0) {
       let distance = Math.sqrt((this._lastPoint[0] - curPoint[0]) * (this._lastPoint[0] - curPoint[0]) +
@@ -68,7 +69,7 @@ class DrawLine {
         globalCompositeOperation: this._config.globalCompositeOperation,
         lineCap: this._config.lineCap,
         lineJoin: this._config.lineJoin,
-        lineWidth: Utils.getPixelScaledNumber(this._config.lineWidth)
+        lineWidth: DrawHelper.getPixelScaledNumber(this._config.lineWidth)
       });
 
       this._points.push(curPoint);
@@ -95,6 +96,12 @@ class DrawLine {
         type: ShapeType.LINE
       });
 
+      let p = this._points.slice(0);
+
+      if (p.length === 2) {
+        console.log(p);
+      }
+
       this._config.callback(shape);
 
       this._points.length = 0;
@@ -106,13 +113,13 @@ class DrawLine {
   }
 
   start(event) {
-    this._lastPoint = Utils.getPointFromEvent(event, this._canvasElement);
+    this._lastPoint = DrawHelper.getPointFromEvent(event, this._canvasElement);
 
     let tmpX = this._lastPoint[0] + this._config.offset[0];
     let tmpY = this._lastPoint[1] + this._config.offset[1];
 
     if (tmpX > 0 && tmpX < this._config.boardSize[0] && tmpY > 0 && tmpY < this._config.boardSize[1]) {
-      this._context.lineWidth = Utils.getPixelScaledNumber(this._config.lineWidth);
+      this._context.lineWidth = DrawHelper.getPixelScaledNumber(this._config.lineWidth);
       this._context.strokeStyle = this._config.color;
 
       this._points.push(this._lastPoint);
@@ -127,7 +134,7 @@ class DrawLine {
     this._drawListener = this.draw.bind(this);
     this._finishListener = this.finish.bind(this);
 
-    if (Utils.isTouchDevice()) {
+    if (BrowserHelper.isTouchDevice()) {
       this._canvasElement.addEventListener('touchcancel', this._cancelListener, {passive: true});
       this._canvasElement.addEventListener('touchend', this._finishListener, {passive: true});
       this._canvasElement.addEventListener('touchmove', this._drawListener);
