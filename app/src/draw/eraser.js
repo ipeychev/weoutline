@@ -66,6 +66,11 @@ class Eraser {
   }
 
   start(event) {
+    this._canvasSize = {
+      height: this._canvasElement.height,
+      width: this._canvasElement.width
+    };
+
     let curPoint = Utils.getPointFromEvent(event, this._canvasElement);
 
     let tmpX = curPoint[0] + this._config.offset[0];
@@ -157,10 +162,12 @@ class Eraser {
     let matchingShapes = [];
 
     for (let i = 0; i < this._config.shapes.length; i++) {
-      let matchedShape = this._checkShapeMatching(curPoint, this._config.shapes[i]);
+      if (Utils.checkPointsInViewport(this._config.shapes[i].points, this._config.offset, this._canvasSize)) {
+        let matchedShape = this._checkShapeMatching(curPoint, this._config.shapes[i]);
 
-      if (matchedShape) {
-        matchingShapes.push(this._config.shapes[i]);
+        if (matchedShape) {
+          matchingShapes.push(this._config.shapes[i]);
+        }
       }
     }
 

@@ -77,7 +77,7 @@ class Whiteboard {
 
     for (let i = 0; i < this._shapes.length; i++) {
       if (this._shapes[i].type === ShapeType.LINE) {
-        if (this._isShapeInViewport(this._shapes[i].points, this._offset, canvasSize)) {
+        if (Utils.checkPointsInViewport(this._shapes[i].points, this._offset, canvasSize)) {
           let points = this._shapes[i].points.map((point) => {
             return Utils.getPointWithOffset(point, this._offset);
           });
@@ -303,17 +303,6 @@ class Whiteboard {
     }
 
     return lineWidth;
-  }
-
-  _isShapeInViewport(points, offset, canvasSize) {
-    for (let i = 0; i < points.length; i++) {
-      if (points[i][0] >= offset[0] && points[i][0] <= offset[0] + canvasSize.width &&
-        points[i][1] >= offset[1] && points[i][1] <= offset[1] + canvasSize.height) {
-          return true;
-      }
-    }
-
-    return false;
   }
 
   _onFullscreenChange() {

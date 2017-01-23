@@ -100,6 +100,17 @@ export default class Utils {
     return str;
   }
 
+  static checkPointsInViewport(points, offset, canvasSize) {
+    for (let i = 0; i < points.length; i++) {
+      if (points[i][0] >= offset[0] && points[i][0] <= offset[0] + canvasSize.width &&
+        points[i][1] >= offset[1] && points[i][1] <= offset[1] + canvasSize.height) {
+          return true;
+      }
+    }
+
+    return false;
+  }
+
   static isTouchDevice() {
     return 'ontouchstart' in window || navigator.maxTouchPoints;
   }
