@@ -1,0 +1,57 @@
+@import '../sass-import-once';
+
+@import '../styles-skin.scss';
+
+@include exports('user-sign-up-skin') {
+  .user-sign-up {
+    background-color: #0e141a;
+
+    .container {
+      max-width: 360px;
+    }
+
+    h1 {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .title {
+      color: #00d46a;
+    }
+
+    .message {
+      color: white;
+    }
+
+    .error {
+      color: red;
+    }
+
+    .subtitle {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    label {
+      color: white;
+    }
+
+    input {
+      background-color: rgba(255, 255, 255, .2);
+      border-radius: 4px;
+      color: white;
+    }
+
+    button {
+      background-color: #00d46a;
+      color: white;
+    }
+
+    a {
+      color: #00d46a;
+      text-decoration: none;
+    }
+
+    .list {
+      color: rgba(255, 255, 255, .7);
+    }
+  }
+}

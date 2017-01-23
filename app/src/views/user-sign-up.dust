@@ -1,0 +1,29 @@
+{>"layout"/}
+
+{<cssResources}
+	<link rel="stylesheet" href="/user-sign-up.{version}.{?production}min.{/production}css">
+{/cssResources}
+
+{<jsResources}
+	<script src="http://cdn.wedeploy.com/api/latest/wedeploy.js" defer></script>
+	<script src="/commons.{version}.{?production}min.{/production}js" defer></script>
+  <script src="/user-sign-up.{version}.{?production}min.{/production}js" defer></script>
+{/jsResources}
+
+{<bodyContent}
+	<div class="user-sign-up">
+		<div class="container">
+			<span class="message hidden" id="messageSuccess">Your account has been created successfully!<br><a href="/user/sign-in">Sign-in</a></span>
+			<span class="error hidden" id="messageError">There was an error on creating your account.</span>
+			<button class="hidden" id="tryAgain">Try again</button>
+		</div>
+
+		<form id="signUp" name="signUp" class="container">
+			<h1>Sign Up</h1>
+			<input name="email" type="email" placeholder="Email" required>
+			<input name="password" type="password" placeholder="Password" required>
+
+			<button type="submit">Submit</button>
+		</form>
+	</div>
+{/bodyContent}

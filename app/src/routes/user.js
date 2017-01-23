@@ -9,4 +9,8 @@ router.get('/profile', function(req, res, next) {
   res.render('user-profile');
 });
 
+router.get('/sign-up', function(req, res, next) {
+  res.render('user-sign-up');
+});
+
 module.exports = router;

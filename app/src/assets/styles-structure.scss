@@ -5,7 +5,7 @@
       height: 100%;
   }
 
-  @-ms-viewport{
-    width: device-width;
+  .hidden {
+    display: none !important;
   }
 }

@@ -3,8 +3,12 @@
 @import '../styles-skin.scss';
 
 @include exports('user-sign-in-skin') {
-  .user {
+  .user-sign-in {
     background-color: #0e141a;
+
+    .container {
+      max-width: 360px;
+    }
 
     h1 {
       color: rgba(255, 255, 255, 0.9);
