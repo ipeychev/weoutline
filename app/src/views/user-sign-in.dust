@@ -12,6 +12,11 @@
 
 {<bodyContent}
 	<div class="user-sign-in">
+		<div class="message-container">
+			<span class="error hidden" id="messageError">Error signing-in</span>
+			<button class="hidden" id="tryAgain">Try again</button>
+		</div>
+
 		<form id="signIn" name="signIn" class="container">
 			<div class="btn-container">
 				<button class="btn btn-social btn-github" id="signGitHub" type="button">

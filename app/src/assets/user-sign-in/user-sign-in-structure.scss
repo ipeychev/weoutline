@@ -16,9 +16,19 @@
       max-width: 360px;
     }
 
+    .message-container {
+      max-width: 500px;
+    }
+
     h1 {
       font-weight: 300;
       margin: 0 0 20px;
+    }
+
+    .error {
+      font-size: 3em;
+      font-weight: 600;
+      margin: 0;
     }
 
     .title {
@@ -68,7 +78,6 @@
       margin: 15px 0 0;
       outline: none;
       padding: 0 48px;
-      width: 100%;
     }
 
     a {

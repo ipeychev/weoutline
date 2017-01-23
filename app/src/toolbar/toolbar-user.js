@@ -60,32 +60,39 @@ class ToolbarUser extends Toolbar {
   }
 
   _initItems() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       if (this._config.currentUser) {
         let signedInNode = this._element.querySelector('.icon-signed-in');
 
-        signedInNode.src = this._config.currentUser.photoUrl;
+        if (this._config.currentUser.photoUrl) {
+          signedInNode.src = this._config.currentUser.photoUrl;
 
-        let loadImgListener = () => {
+          let loadImgListener = () => {
+            signedInNode.classList.remove('hidden');
+            this._userSignInNode.classList.add('hidden');
+
+            removeEventListeners();
+            resolve();
+          };
+
+          let errorImgListener = () => {
+            removeEventListeners();
+            resolve();
+          };
+
+          let removeEventListeners = () => {
+            signedInNode.removeEventListener('load', loadImgListener);
+            signedInNode.removeEventListener('error', errorImgListener);
+          };
+
+          signedInNode.addEventListener('load', loadImgListener);
+          signedInNode.addEventListener('error', errorImgListener);
+        } else {
           signedInNode.classList.remove('hidden');
           this._userSignInNode.classList.add('hidden');
 
-          removeEventListeners();
           resolve();
-        };
-
-        let errorImgListener = () => {
-          removeEventListeners();
-          resolve();
-        };
-
-        let removeEventListeners = () => {
-          signedInNode.removeEventListener('load', loadImgListener);
-          signedInNode.removeEventListener('error', errorImgListener);
-        };
-
-        signedInNode.addEventListener('load', loadImgListener);
-        signedInNode.addEventListener('error', errorImgListener);
+        }
       } else {
         resolve();
       }

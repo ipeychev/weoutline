@@ -30,6 +30,18 @@ class UserSignUp {
     this._registerUser({
       email: this._signUpForm.email.value,
       password: this._signUpForm.password.value
+    })
+    .then(() => {
+      this._messageError.classList.add('hidden');
+      this._messageSuccess.classList.remove('hidden');
+      this._signUpForm.classList.add('hidden');
+      this._tryAgainBtn.classList.add('hidden');
+    })
+    .catch(() => {
+      this._messageError.classList.remove('hidden');
+      this._messageSuccess.classList.add('hidden');
+      this._signUpForm.classList.add('hidden');
+      this._tryAgainBtn.classList.remove('hidden');
     });
   }
 
@@ -45,19 +57,7 @@ class UserSignUp {
   }
 
   _registerUser(user) {
-    this._config.auth.createUser(user)
-    .then(() => {
-      this._signUpForm.classList.add('hidden');
-      this._messageError.classList.add('hidden');
-      this._messageSuccess.classList.remove('hidden');
-      this._tryAgainBtn.classList.add('hidden');
-    })
-    .catch(() => {
-      this._signUpForm.classList.add('hidden');
-      this._messageError.classList.remove('hidden');
-      this._messageSuccess.classList.add('hidden');
-      this._tryAgainBtn.classList.remove('hidden');
-    });
+    return this._config.auth.createUser(user);
   }
 
   _onTryAgainClick() {

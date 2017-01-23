@@ -15,16 +15,19 @@ class UserSignIn {
     this._signGitHubListener = this._signInWithGithub.bind(this);
     this._signGoogleListener = this._signInWithGoogle.bind(this);
     this._submitListener = this._onFormSubmit.bind(this);
+    this._tryAgainClickListener = this._onTryAgainClick.bind(this);
 
-    this._signInForm.addEventListener('submit', this._submitListener);
     this._signGitHubBtn.addEventListener('click', this._signGitHubListener);
     this._signGoogleBtn.addEventListener('click', this._signGoogleListener);
+    this._signInForm.addEventListener('submit', this._submitListener);
+    this._tryAgainBtn.addEventListener('click', this._tryAgainClickListener);
   }
 
   _detachListeners() {
-    this._signInForm.removeEventListener('submit', this._submitListener);
     this._signGitHubBtn.removeEventListener('click', this._signGitHubListener);
     this._signGoogleBtn.removeEventListener('click', this._signGoogleListener);
+    this._signInForm.removeEventListener('submit', this._submitListener);
+    this._tryAgainBtn.removeEventListener('click', this._tryAgainClickListener);
   }
 
   _onFormSubmit(event) {
@@ -33,34 +36,46 @@ class UserSignIn {
     this._signInWithEmailAndPassword();
   }
 
+  _navigateAfterSuccess() {
+    let match = /\?returnUrl=([^&]+|.+$)/.exec(window.location.href);
+
+    let url = match ? decodeURIComponent(match[1]) : '/';
+
+    window.location.href = url;
+  }
+
+  _onTryAgainClick() {
+    this._signInForm.classList.remove('hidden');
+    this._messageError.classList.add('hidden');
+    this._tryAgainBtn.classList.add('hidden');
+  }
+
   _setupAuth() {
     this._auth = this._config.auth;
 
-    this._auth.onSignIn(function(user) {
-      let match = /\?returnUrl=([^&]+|.+$)/.exec(window.location.href);
-
-      if (match) {
-        window.location.href = decodeURIComponent(match[1]) || '/';
-      }
+    this._auth.onSignIn((user) => {
+      this._navigateAfterSuccess();
     });
   }
 
   _setupContainer() {
-    this._signInForm = document.getElementById('signIn');
+    this._messageError = document.getElementById('messageError');
     this._signGitHubBtn = document.getElementById('signGitHub');
     this._signGoogleBtn = document.getElementById('signGoogle');
+    this._signInForm = document.getElementById('signIn');
+    this._tryAgainBtn = document.getElementById('tryAgain');
   }
 
   _signInWithEmailAndPassword() {
     this._auth.signInWithEmailAndPassword(this._signInForm.email.value, this._signInForm.password.value)
-      .then(function() {
-        alert('Sign-in successfully.');
-        this._signInForm.reset();
-      })
-      .catch(function() {
-        alert('Sign-in failed.');
-        this._signInForm.reset();
-      });
+    .then(() => {
+      this._navigateAfterSuccess();
+    })
+    .catch(() => {
+      this._messageError.classList.remove('hidden');
+      this._signInForm.classList.add('hidden');
+      this._tryAgainBtn.classList.remove('hidden');
+    });
   }
 
   _signInWithGithub() {

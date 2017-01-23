@@ -103,7 +103,7 @@
     <div id="toolbarUser" class="toolbar toolbar-user hidden">
       <div id="user" class="toolbar-item">
         <div class="toolbar-item-value">
-          <img class="icon icon-signed-in hidden" draggable="false">
+          <img class="icon icon-signed-in hidden" draggable="false" src="/assets/images/user-unknown.png">
           <a id="userSignIn" draggable="false" href="/user/sign-in">
             <svg class="icon icon-sign-in" id="signIn"><use xlink:href="/assets/images/symbol-defs.svg#icon-sign-in"></use></svg>
           </a>
