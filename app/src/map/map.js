@@ -135,6 +135,7 @@ class Map {
 
   _onMouseDown(event) {
     this._pointerDown = true;
+    this._pointerMove = false;
     this._rectHit = false;
 
     let mapViewportRect = this._getMapViewportRect();
@@ -151,9 +152,7 @@ class Map {
   }
 
   _onMouseMove(event) {
-    if (this._pointerDown) {
-      this._pointerMove = true;
-    }
+    this._pointerMove = true;
 
     if (this._rectHit) {
       let mapRect = this._mapElement.getBoundingClientRect();
@@ -163,17 +162,20 @@ class Map {
   }
 
   _onMouseUp(event) {
-    let mapRect = this._mapElement.getBoundingClientRect();
+    if (!this._pointerMove) {
+      let mapRect = this._mapElement.getBoundingClientRect();
 
-    this._setPoint([event.offsetX, event.offsetY], mapRect, {width: this._config.width, height: this._config.height});
+      this._setPoint([event.offsetX, event.offsetY], mapRect, {width: this._config.width, height: this._config.height});
+    }
 
     this._pointerDown = false;
+    this._pointerMove = false;
     this._rectHit = false;
   }
 
   _onTouchEnd(event) {
     if (event.changedTouches.length === 1) {
-      if (this._rectHit) {
+      if (this._rectHit || !this._pointerMove) {
         let touch = event.changedTouches[0];
 
         let mapRect = this._mapElement.getBoundingClientRect();
@@ -184,6 +186,8 @@ class Map {
   }
 
   _onTouchMove() {
+    this._pointerMove = true;
+
     if (this._rectHit) {
       if (event.changedTouches.length === 1) {
         let touch = event.changedTouches[0];
@@ -201,6 +205,7 @@ class Map {
   _onTouchStart(event) {
     this._pointerDown = true;
     this._rectHit = false;
+    this._pointerMove = false;
 
     if (event.changedTouches.length === 1) {
       let touch = event.changedTouches[0];
