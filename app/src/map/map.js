@@ -11,9 +11,9 @@ class Map {
 
     this._mapContext = this._mapElement.getContext('2d');
 
-    this._draggable = new Draggable(document.getElementById(config.container));
-
     this._attachListeners();
+
+    this._draggable = new Draggable(document.getElementById(config.container));
 
     this._config = config;
   }
@@ -24,19 +24,29 @@ class Map {
     this._draggable.destroy();
   }
 
-  draw(shapes, offset, srcCanvasSize) {
+  draw(shapes) {
     this._mapContext.clearRect(0, 0, this._mapContext.canvas.width, this._mapContext.canvas.height);
 
-    let ratioX = this._config.width / this._mapElement.width;
-    let ratioY = this._config.height / this._mapElement.height;
+    let mapRect = this._mapElement.getBoundingClientRect();
+    let srcCanvasRect = this._config.srcCanvas.getBoundingClientRect();
+
+    let srcRectSize = {
+      height: srcCanvasRect.height,
+      width: srcCanvasRect.width
+    };
+
+    let ratioX = this._config.width / mapRect.width;
+    let ratioY = this._config.height / mapRect.height;
+
+    let mapViewportRect = this._getMapViewportRect(srcRectSize, [ratioX, ratioY], this._config.offset);
 
     this._mapContext.strokeStyle = this._config.color;
     this._mapContext.lineWidth = this._config.lineWidth;
     this._mapContext.strokeRect(
-      offset[0] / ratioX,
-      offset[1] / ratioY,
-      srcCanvasSize.width / ratioX,
-      srcCanvasSize.height / ratioY
+      mapViewportRect.x,
+      mapViewportRect.y,
+      mapViewportRect.width,
+      mapViewportRect.height
     );
 
     for (let i = 0; i < shapes.length; i++) {
@@ -58,55 +68,167 @@ class Map {
     }
   }
 
+  setConfig(config) {
+    this._config = Object.assign(this._config, config);
+  }
+
   _attachListeners() {
-    this._clickListener = this._onClick.bind(this);
+    this._mouseDownListener = this._onMouseDown.bind(this);
+    this._mouseMoveListener = this._onMouseMove.bind(this);
+    this._mouseUpListener = this._onMouseUp.bind(this);
     this._touchEndListener = this._onTouchEnd.bind(this);
     this._touchMoveListener = this._onTouchMove.bind(this);
     this._touchStartListener = this._onTouchStart.bind(this);
 
     if (BrowserHelper.isTouchDevice()) {
       this._mapElement.addEventListener('touchend', this._touchEndListener, { passive: true });
-      this._mapElement.addEventListener('touchmove', this._touchMoveListener, { passive: true });
-      this._mapElement.addEventListener('touchstart', this._touchStartListener, { passive: true });
+      this._mapElement.addEventListener('touchmove', this._touchMoveListener);
+      this._mapElement.addEventListener('touchstart', this._touchStartListener);
     } else {
-      this._mapElement.addEventListener('click', this._clickListener);
+      this._mapElement.addEventListener('mousedown', this._mouseDownListener);
+      this._mapElement.addEventListener('mousemove', this._mouseMoveListener);
+      this._mapElement.addEventListener('mouseup', this._mouseUpListener);
     }
   }
 
   _detachListeners() {
-    this._mapElement.removeEventListener('click', this._clickListener);
-    this._mapElement.removeEventListener('touchend', this._touchEndListener, { passive: true });
-    this._mapElement.removeEventListener('touchmove', this._touchMoveListener, { passive: true });
-    this._mapElement.removeEventListener('touchstart', this._touchStartListener, { passive: true });
+    this._mapElement.addEventListener('mousedown', this._mouseDownListener);
+    this._mapElement.addEventListener('mousemove', this._mouseMoveListener);
+    this._mapElement.addEventListener('mouseup', this._mouseUpListener);
+    this._mapElement.addEventListener('touchend', this._touchEndListener, { passive: true });
+    this._mapElement.addEventListener('touchmove', this._touchMoveListener);
+    this._mapElement.addEventListener('touchstart', this._touchStartListener);
   }
 
-  _onClick(event) {
-    this._setPoint(event.offsetX, event.offsetY);
+  _getMapViewportRect() {
+    let srcCanvasRect = this._config.srcCanvas.getBoundingClientRect();
+
+    let srcCanvasSize = {
+      height: srcCanvasRect.height,
+      width: srcCanvasRect.width
+    };
+
+    let mapRect = this._mapElement.getBoundingClientRect();
+    let whiteboardSize = {width: this._config.width, height: this._config.height};
+
+    let ratioX = whiteboardSize.width / mapRect.width;
+    let ratioY = whiteboardSize.height / mapRect.height;
+
+    return {
+      height: srcCanvasSize.height / ratioY,
+      width: srcCanvasSize.width / ratioX,
+      x: this._config.offset[0] / ratioX,
+      y: this._config.offset[1] / ratioY
+    };
   }
 
-  _setPoint(pointX, pointY) {
-    let ratioX = this._config.width / this._mapElement.width;
-    let ratioY = this._config.height / this._mapElement.height;
+  _isPointInMapViewport(point, mapViewportRect) {
+    mapViewportRect = mapViewportRect || this._getMapViewportRect();
 
-    this._config.callback([pointX * ratioX, pointY * ratioY]);
+    if (point[0] > mapViewportRect.x && point[0] < mapViewportRect.x + mapViewportRect.width &&
+      point[1] > mapViewportRect.y && point[1] < mapViewportRect.y + mapViewportRect.height) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  _onMouseDown(event) {
+    this._pointerDown = true;
+    this._rectHit = false;
+
+    let mapViewportRect = this._getMapViewportRect();
+
+    if (this._isPointInMapViewport([event.offsetX, event.offsetY], mapViewportRect)) {
+      this._rectHit = true;
+
+      this._dragOffsetX = event.offsetX - (mapViewportRect.x + (mapViewportRect.width/2));
+      this._dragOffsetY = event.offsetY - (mapViewportRect.y + (mapViewportRect.height/2));
+
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }
+
+  _onMouseMove(event) {
+    if (this._pointerDown) {
+      this._pointerMove = true;
+    }
+
+    if (this._rectHit) {
+      let mapRect = this._mapElement.getBoundingClientRect();
+
+      this._setPoint([event.offsetX, event.offsetY], mapRect, {width: this._config.width, height: this._config.height});
+    }
+  }
+
+  _onMouseUp(event) {
+    let mapRect = this._mapElement.getBoundingClientRect();
+
+    this._setPoint([event.offsetX, event.offsetY], mapRect, {width: this._config.width, height: this._config.height});
+
+    this._pointerDown = false;
+    this._rectHit = false;
   }
 
   _onTouchEnd(event) {
-    if (event.changedTouches.length === 1 && !this._dragged) {
-      let touch = event.changedTouches[0];
+    if (event.changedTouches.length === 1) {
+      if (this._rectHit) {
+        let touch = event.changedTouches[0];
 
-      let mapRect = this._mapElement.getBoundingClientRect();
+        let mapRect = this._mapElement.getBoundingClientRect();
 
-      this._setPoint(touch.pageX - mapRect.left, touch.pageY -  mapRect.top);
+        this._setPoint([touch.pageX - mapRect.left, touch.pageY - mapRect.top], mapRect, {width: this._config.width, height: this._config.height});
+      }
     }
   }
 
   _onTouchMove() {
-    this._dragged = true;
+    if (this._rectHit) {
+      if (event.changedTouches.length === 1) {
+        let touch = event.changedTouches[0];
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        let mapRect = this._mapElement.getBoundingClientRect();
+
+        this._setPoint([touch.pageX - mapRect.left, touch.pageY - mapRect.top], mapRect, {width: this._config.width, height: this._config.height});
+      }
+    }
   }
 
-  _onTouchStart() {
-    this._dragged = false;
+  _onTouchStart(event) {
+    this._pointerDown = true;
+    this._rectHit = false;
+
+    if (event.changedTouches.length === 1) {
+      let touch = event.changedTouches[0];
+
+      let mapRect = this._mapElement.getBoundingClientRect();
+
+      let pointX = touch.pageX - mapRect.left;
+      let pointY = touch.pageY - mapRect.top;
+
+      let mapViewportRect = this._getMapViewportRect();
+
+      if (this._isPointInMapViewport([pointX, pointY], mapViewportRect)) {
+        this._rectHit = true;
+
+        this._dragOffsetX = pointX - (mapViewportRect.x + (mapViewportRect.width/2));
+        this._dragOffsetY = pointY - (mapViewportRect.y + (mapViewportRect.height/2));
+
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    }
+  }
+
+  _setPoint(point, mapRect, whiteboardSize) {
+    let ratioX = whiteboardSize.width / mapRect.width;
+    let ratioY = whiteboardSize.height / mapRect.height;
+
+    this._config.setOffsetCallback([(point[0] - (this._dragOffsetX || 0)) * ratioX, (point[1] - (this._dragOffsetY || 0)) * ratioY]);
   }
 }
 

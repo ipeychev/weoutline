@@ -21,6 +21,8 @@ class Whiteboard {
     this._whiteboardId = this._config.whiteboard.id;
     this._sessionId = window.crypto.getRandomValues(new Uint32Array(1))[0];
 
+    this._fetchOffset();
+
     this._setupCanvas();
     this._setupContext();
     this._setupData();
@@ -30,14 +32,15 @@ class Whiteboard {
 
     this._attachListeners();
 
-    this._fetchOffset();
-    this._fetchShapes();
-
     this._resizeCanvas();
 
     this._setActiveTool();
 
-    this.redraw();
+    this._fetchShapes()
+      .then((shapes) => {
+        this._shapes = shapes || [];
+        this.redraw();
+      });
   }
 
   addShapes(shapes) {
@@ -103,10 +106,7 @@ class Whiteboard {
 
     this.drawShapes();
 
-    this._map.draw(this._shapes, this._offset, {
-      width: this._canvasElement.width,
-      height: this._canvasElement.height
-    });
+    this._map.draw(this._shapes);
   }
 
   _addShapesToCollection(shapesList, shapes) {
@@ -248,19 +248,13 @@ class Whiteboard {
 
   _fetchShapes() {
     if (this._whiteboardId) {
-      this._data.fetchShapes(this._whiteboardId)
-        .then((shapes) => {
-          this._shapes = shapes;
-          this.redraw();
-        });
+      return this._data.fetchShapes(this._whiteboardId);
     } else {
-      let localShapes = JSON.parse(localStorage.getItem('shapes'));
+      return new Promise((resolve) => {
+        let localShapes = JSON.parse(localStorage.getItem('shapes'));
 
-      if (localShapes) {
-        this._shapes = localShapes;
-      }
-
-      this.redraw();
+        resolve(localShapes);
+      });
     }
   }
 
@@ -293,9 +287,9 @@ class Whiteboard {
     let inFullscreen = BrowserHelper.getFullScreenModeValue();
 
     if (inFullscreen) {
-      DrawHelper.exitFullscreen(mainContainerNode);
+      BrowserHelper.exitFullscreen(mainContainerNode);
     } else {
-      DrawHelper.requestFullscreen(mainContainerNode);
+      BrowserHelper.requestFullscreen(mainContainerNode);
     }
   }
 
@@ -371,10 +365,14 @@ class Whiteboard {
       offset: this._offset
     });
 
+    this._map.setConfig({
+      offset: this._offset
+    });
+
     this._saveOffsetWithTimeout(this._whiteboardId, this._offset);
   }
 
-  _onMapClickCallback(point) {
+  _onMapSetOffsetCallback(point) {
     let canvasHeight = this._canvasElement.height;
     let canvasWidth = this._canvasElement.width;
 
@@ -554,13 +552,15 @@ class Whiteboard {
 
   _setupMap() {
     this._map = new Map({
-      callback: this._onMapClickCallback.bind(this),
       color: this._config.map.color,
       container: this._config.map.container,
       height: this._config.map.height,
       lineWidth: this._config.map.lineWidth,
+      offset: this._offset,
+      setOffsetCallback: this._onMapSetOffsetCallback.bind(this),
+      srcCanvas: this._canvasElement,
       srcNode: this._config.map.srcNode,
-      width: this._config.map.width
+      width: this._config.map.width,
     });
   }
 

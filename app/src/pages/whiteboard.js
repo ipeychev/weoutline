@@ -5,6 +5,10 @@ import Tools from '../draw/tools';
 import Whiteboard from '../whiteboard/whiteboard';
 
 window.addEventListener('load', () => {
+  let auth = WeDeploy.auth('auth.weoutline.wedeploy.io');
+
+  let whiteboard;
+
   function createWhiteboard() {
     let whiteboardSize = {
       height: 3000,
@@ -68,10 +72,6 @@ window.addEventListener('load', () => {
         location.reload();
       });
   }
-
-  let auth = WeDeploy.auth('auth.weoutline.wedeploy.io');
-
-  let whiteboard;
 
   window.onpopstate = () => {
     if (whiteboard) {

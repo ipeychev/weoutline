@@ -15,13 +15,14 @@
         "sourceType": "module"
     },
     "rules": {
+        "constructor-super": "warn",
         "no-const-assign": "warn",
+        "no-redeclare": "error",
         "no-this-before-super": "warn",
         "no-undef": "error",
         "no-unreachable": "warn",
         "no-unused-vars": "warn",
-        "constructor-super": "warn",
-        "valid-typeof": "warn",
-        "no-redeclare": "error"
+        "no-use-before-define": [2, { "functions": false }],
+        "valid-typeof": "warn"
     }
 }

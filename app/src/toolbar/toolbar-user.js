@@ -67,6 +67,8 @@ class ToolbarUser extends Toolbar {
         if (this._config.currentUser.photoUrl) {
           signedInNode.src = this._config.currentUser.photoUrl;
 
+          let removeEventListeners;
+
           let loadImgListener = () => {
             signedInNode.classList.remove('hidden');
             this._userSignInNode.classList.add('hidden');
@@ -80,7 +82,7 @@ class ToolbarUser extends Toolbar {
             resolve();
           };
 
-          let removeEventListeners = () => {
+          removeEventListeners = () => {
             signedInNode.removeEventListener('load', loadImgListener);
             signedInNode.removeEventListener('error', errorImgListener);
           };
