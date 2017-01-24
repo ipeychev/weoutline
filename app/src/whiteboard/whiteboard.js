@@ -591,7 +591,7 @@ class Whiteboard {
 
   _shareWhiteboard() {
     if (!this._whiteboardId) {
-      let whiteboardId = DrawHelper.getRandomBase64(12);
+      let whiteboardId = CryptHelper.getRandomBase64(12);
 
       this._whiteboardId = whiteboardId;
 
