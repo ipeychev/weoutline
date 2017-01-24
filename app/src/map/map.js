@@ -143,8 +143,8 @@ class Map {
     if (this._isPointInMapViewport([event.offsetX, event.offsetY], mapViewportRect)) {
       this._rectHit = true;
 
-      this._dragOffsetX = event.offsetX - (mapViewportRect.x + (mapViewportRect.width/2));
-      this._dragOffsetY = event.offsetY - (mapViewportRect.y + (mapViewportRect.height/2));
+      this._startOffsetX = event.offsetX - (mapViewportRect.x + (mapViewportRect.width/2));
+      this._startOffsetY = event.offsetY - (mapViewportRect.y + (mapViewportRect.height/2));
 
       event.preventDefault();
       event.stopPropagation();
@@ -220,8 +220,8 @@ class Map {
       if (this._isPointInMapViewport([pointX, pointY], mapViewportRect)) {
         this._rectHit = true;
 
-        this._dragOffsetX = pointX - (mapViewportRect.x + (mapViewportRect.width/2));
-        this._dragOffsetY = pointY - (mapViewportRect.y + (mapViewportRect.height/2));
+        this._startOffsetX = pointX - (mapViewportRect.x + (mapViewportRect.width/2));
+        this._startOffsetY = pointY - (mapViewportRect.y + (mapViewportRect.height/2));
 
         event.preventDefault();
         event.stopPropagation();
@@ -233,7 +233,7 @@ class Map {
     let ratioX = whiteboardSize.width / mapRect.width;
     let ratioY = whiteboardSize.height / mapRect.height;
 
-    this._config.setOffsetCallback([(point[0] - (this._dragOffsetX || 0)) * ratioX, (point[1] - (this._dragOffsetY || 0)) * ratioY]);
+    this._config.setOffsetCallback([(point[0] - (this._startOffsetX || 0)) * ratioX, (point[1] - (this._startOffsetY || 0)) * ratioY]);
   }
 }
 

@@ -106,7 +106,7 @@ class Draggable {
     if (event.targetTouches.length === 1) {
       let touch = event.targetTouches[0];
 
-      let targetRect = event.target.getBoundingClientRect();
+      let targetRect = this._dragElement.getBoundingClientRect();
 
       this._elementHeight = targetRect.height;
       this._elementWidth = targetRect.width;
