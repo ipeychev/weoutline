@@ -1,0 +1,34 @@
+{>"layout"/}
+
+{<cssResources}
+	<link rel="stylesheet" href="/user-profile.{version}.{?production}min.{/production}css">
+{/cssResources}
+
+{<jsResources}
+	<script src="http://cdn.wedeploy.com/api/latest/wedeploy.js" defer></script>
+	<script src="/commons.{version}.{?production}min.{/production}js" defer></script>
+  <script src="/user-profile.{version}.{?production}min.{/production}js" defer></script>
+{/jsResources}
+
+{<bodyContent}
+	<div class="user-profile">
+		<div class"container">
+			<span id="loading" class="label">Retrieving data...</span>
+		</div>
+
+		<div class="message-container">
+			<span class="error hidden" id="messageError">Error retrieving user data</span>
+		</div>
+
+		<form id="userProfile" name="userProfile" class="container hidden">
+			<h1>My account</h1>
+			<label>Name
+				<input name="name" type="text" placeholder="Name" required readonly autofocus>
+			</label>
+
+			<label>Email
+				<input name="email" type="email" placeholder="Email" readonly required>
+			</label>
+		</form>
+	</div>
+{/bodyContent}

@@ -31,6 +31,7 @@ class UserSignUp {
 
     this._registerUser({
       email: this._signUpForm.email.value,
+      name: this._signUpForm.name.value,
       password: this._signUpForm.password.value
     })
     .then(() => {

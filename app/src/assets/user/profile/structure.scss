@@ -1,0 +1,58 @@
+@import '../../sass-import-once';
+
+@import '../../styles-structure.scss';
+
+@include exports('user-profile-structure') {
+  .user-profile {
+    align-items: center;
+    display: flex;
+    font-family: 'Open Sans', sans-serif;
+    height: 100%;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+
+    .container {
+      max-width: 360px;
+    }
+
+    .message-container {
+      max-width: 500px;
+    }
+
+    .error {
+      font-size: 22px;
+    }
+
+    h1 {
+      font-weight: 300;
+      margin: 0 0 20px;
+    }
+
+    label, .label {
+      display: block;
+      margin: 0 0 15px;
+      text-align: left;
+    }
+
+    .label {
+      font-size: 22px;
+    }
+
+    input {
+      border: 0;
+      display: inline-block;
+      font-size: 16px;
+      line-height: 58px;
+      margin: 0 0 10px;
+      outline: none;
+      padding: 0 20px;
+      width: calc(100% - 40px);
+    }
+
+    a {
+      display: block;
+      margin: 15px 0 0;
+    }
+  }
+}

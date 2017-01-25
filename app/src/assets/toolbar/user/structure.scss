@@ -1,6 +1,6 @@
-@import '../sass-import-once';
+@import '../../sass-import-once';
 
-@import './toolbar-structure.scss';
+@import '../structure.scss';
 
 @include exports('toolbar-user-structure') {
   .toolbar-user {

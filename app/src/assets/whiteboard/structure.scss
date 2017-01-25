@@ -1,11 +1,11 @@
 @import '../sass-import-once';
 
 @import '../styles-structure.scss';
-@import '../map/map-structure.scss';
-@import '../toolbar/toolbar-tools-structure.scss';
-@import '../toolbar/toolbar-user-structure.scss';
+@import '../map/structure.scss';
+@import '../toolbar/tools/structure.scss';
+@import '../toolbar/user/structure.scss';
 
-@include exports('whiteboard-skin') {
+@include exports('whiteboard-structure') {
   .wb {
     height: 100%;
     left: 0;

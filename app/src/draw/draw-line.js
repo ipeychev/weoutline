@@ -96,12 +96,6 @@ class DrawLine {
         type: ShapeType.LINE
       });
 
-      let p = this._points.slice(0);
-
-      if (p.length === 2) {
-        console.log(p);
-      }
-
       this._config.callback(shape);
 
       this._points.length = 0;

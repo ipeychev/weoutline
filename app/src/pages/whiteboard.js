@@ -1,5 +1,5 @@
-require('../assets/whiteboard/whiteboard-structure.scss');
-require('../assets/whiteboard/whiteboard-skin.scss');
+require('../assets/whiteboard/structure.scss');
+require('../assets/whiteboard/skin.scss');
 
 import Tools from '../draw/tools';
 import Whiteboard from '../whiteboard/whiteboard';

@@ -1,6 +1,6 @@
-@import '../sass-import-once';
+@import '../../sass-import-once';
 
-@import '../styles-structure.scss';
+@import '../../styles-structure.scss';
 
 @include exports('user-sign-up-structure') {
   .user-sign-up {
@@ -52,7 +52,7 @@
 
     label {
       display: block;
-      margin: 0 0 5px;
+      margin: 0 0 15px 0;;
       text-align: left;
     }
 

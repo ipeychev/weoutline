@@ -1,0 +1,87 @@
+@import '../../sass-import-once';
+
+@import '../../styles-skin.scss';
+
+@include exports('user-profile-skin') {
+  .user-profile {
+      background-color: #0e141a;
+
+      h1 {
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .title {
+        color: #00d46a;
+      }
+
+      .subtitle {
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .error {
+        color: red;
+      }
+
+      label, .label {
+        color: white;
+      }
+
+      input {
+        background-color: rgba(255, 255, 255, .2);
+        border-radius: 4px;
+        color: white;
+      }
+
+      button {
+        background-color: #00d46a;
+        color: white;
+      }
+
+      a {
+        color: #00d46a;
+        text-decoration: none;
+      }
+
+      .list {
+        color: rgba(255, 255, 255, .7);
+      }
+
+      .btn-container .btn {
+        border-color: #fff;
+
+        .label {
+          color: #fff;
+        }
+
+        .brand {
+          background-color: rgba(255, 255, 255, 0.1);
+        }
+      }
+
+      .btn-container .btn .brand .icon-github {
+        background-image: url("/assets/images/icon-github-white.png");
+        background-repeat: no-repeat;
+      }
+
+      .btn-container .btn .brand .icon-google {
+        background-image: url("/assets/images/icon-google-white.png");
+        background-repeat: no-repeat;
+      }
+
+      .btn-container .btn.btn-google {
+        background-color: #4285f4;
+      }
+
+      .btn-container .btn.btn-google:hover {
+        background-color: rgba(66,133,244, 0.8);
+      }
+
+      .btn-container .btn.btn-github {
+        background-color: rgba(255,255,255, 0.4);
+      }
+
+      .btn-container .btn.btn-github:hover {
+        background-color: rgba(255,255,255, 0.2);
+      }
+    }
+  }

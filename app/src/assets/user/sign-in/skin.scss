@@ -1,6 +1,6 @@
-@import '../sass-import-once';
+@import '../../sass-import-once';
 
-@import '../styles-skin.scss';
+@import '../../styles-skin.scss';
 
 @include exports('user-sign-in-skin') {
   .user-sign-in {

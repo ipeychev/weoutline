@@ -20,6 +20,7 @@
 
 		<form id="signUp" name="signUp" class="container">
 			<h1>Sign Up</h1>
+			<input name="name" type="text" placeholder="Name" required autofocus>
 			<input name="email" type="email" placeholder="Email" required>
 			<input name="password" type="password" placeholder="Password" required>
 

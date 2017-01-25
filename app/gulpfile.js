@@ -73,9 +73,9 @@ function buildSrc(callback) {
 
   webpack({
     entry: {
-      'user-profile': './src/pages/user-profile.js',
-      'user-sign-in': './src/pages/user-sign-in.js',
-      'user-sign-up': './src/pages/user-sign-up.js',
+      'user-profile': './src/pages/user/profile.js',
+      'user-sign-in': './src/pages/user/sign-in.js',
+      'user-sign-up': './src/pages/user/sign-up.js',
       'whiteboard': './src/pages/whiteboard.js'
     },
     output: {
