@@ -25,7 +25,9 @@ class Data {
   }
 
   fetchShapes(whiteboardId) {
-    return this._data.get(whiteboardId)
+    return this._data
+      .limit(10000)
+      .get(whiteboardId);
   }
 
   saveShapes(whiteboardId, shapes) {
