@@ -57,7 +57,7 @@ class ToolbarTools extends Toolbar {
     this._clickListener = this._onClick.bind(this);
     this._documentInteractionListener = this._onDocumentInteraction.bind(this);
     this._resizeListener = this._onResize.bind(this);
-    this._orientationChangeListener = () => {setTimeout(this._onResize.bind(this), 100)};
+    this._orientationChangeListener = () => {setTimeout(this._onResize.bind(this), 100);};
     this._touchEndListener = this._onTouchEnd.bind(this);
 
     if (BrowserHelper.isTouchDevice()) {

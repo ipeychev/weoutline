@@ -1,0 +1,17 @@
+@import '../sass-import-once';
+
+@include exports('spinner-structure') {
+  .spinner {
+    font-size: 10px;
+    height: 40px;
+    margin: 100px auto;
+    text-align: center;
+    width: 50px;
+
+    div {
+      display: inline-block;
+      height: 100%;
+      width: 6px;
+    }
+  }
+}

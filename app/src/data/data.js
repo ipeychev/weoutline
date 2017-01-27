@@ -5,6 +5,22 @@ class Data {
     this._data = WeDeploy.data(config.url);
   }
 
+  createOrUpdateWhiteboardBookmark(params) {
+    if (params.id) {
+      this.updateWhiteboardBookmark(params);
+    } else {
+      this.createWhiteboardBookmark(params);
+    }
+  }
+
+  createWhiteboardBookmark(params) {
+    this._data.create('user2whiteboard', {
+      userId: params.userId,
+      whiteboardId: params.whiteboardId,
+      whiteboardName: params.whiteboardName
+    });
+  }
+
   deleteShapes(whiteboardId, shapes) {
     let deletePromises = [];
 
@@ -15,13 +31,20 @@ class Data {
     return Promise.all(deletePromises);
   }
 
+  getWhiteboardBookmark(userId, whiteboardId) {
+    return this._data
+      .where('userId', '=', userId)
+      .where('whiteboardId', '=', whiteboardId)
+      .get('user2whiteboard');
+  }
+
   fetchAllWhiteboards() {
     this._data
-    .aggregate('whiteboards', 'board', 'terms')
-    .get('shapes')
-    .then(function(whiteboards) {
-      console.log(whiteboards);
-    });
+      .aggregate('whiteboards', 'board', 'terms')
+      .get('shapes')
+      .then(function(whiteboards) {
+        console.log(whiteboards);
+      });
   }
 
   fetchShapes(whiteboardId) {
@@ -32,6 +55,14 @@ class Data {
 
   saveShapes(whiteboardId, shapes) {
     return this._data.create(whiteboardId, shapes);
+  }
+
+  updateWhiteboardBookmark(params) {
+    this._data.update('user2whiteboard/' + params.id, {
+      userId: params.userId,
+      whiteboardId: params.whiteboardId,
+      whiteboardName: params.whiteboardName
+    });
   }
 
   watch(whiteboardId, sessionId, successCallback, errorCallback) {

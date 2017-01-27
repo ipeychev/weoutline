@@ -1,7 +1,7 @@
 var bodyParser = require('body-parser');
 var compression = require('compression');
 var cookieParser = require('cookie-parser');
-var dust = require('express-dustjs')
+var dust = require('express-dustjs');
 var express = require('express');
 var logger = require('morgan');
 var manifest = require('../package.json');
@@ -17,8 +17,8 @@ var production = app.get('env') === 'production';
 
 // Dustjs settings
 dust._.optimizers.format = function (ctx, node) {
-  return node
-}
+  return node;
+};
 
 // view engine setup
 app.engine('dust', dust.engine({

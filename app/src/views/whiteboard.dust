@@ -124,5 +124,29 @@
         </ul>
       </div>
     </div>
+
+    <div class="modal hidden" id="shareWhiteboard">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span id="shareWhiteboardHide" class="hide">x</span>
+          <h2 id="shareWhiteboardTitle">Loading...</h2>
+        </div>
+        <div class="modal-body">
+          <div class="spinner" id="shareDashboardSpinner">
+            <div class="rect1"></div>
+            <div class="rect2"></div>
+            <div class="rect3"></div>
+            <div class="rect4"></div>
+            <div class="rect5"></div>
+          </div>
+          <form id="shareWhiteboardForm" name="shareWhiteboardForm" class="container share-whiteboard">
+          </form>
+        </div>
+        <div class="modal-footer">
+          <div class="btn-container" id="shareWhiteboardFooterBtnContainer">
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 {/bodyContent}

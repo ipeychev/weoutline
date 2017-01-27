@@ -1,0 +1,85 @@
+@import '../sass-import-once';
+
+@include exports('modal-structure') {
+  .modal {
+    display: block;
+    height: 100%;
+    left: 0;
+    overflow: auto;
+    padding-top: 100px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1;
+
+    button {
+      border-radius: 4px;
+      border: 0;
+      cursor: pointer;
+      display: inline-block;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 58px;
+      margin: 15px 0 0;
+      outline: none;
+      padding: 0 48px;
+    }
+
+    .modal-content {
+      border: 1px solid transparent;
+      margin: auto;
+      padding: 0;
+      position: relative;
+      width: 80%;
+
+      .hide {
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+
+      .modal-footer {
+        padding: 2px 16px;
+
+        .btn-container {
+          display: flex;
+          justify-content: flex-end;
+          margin: auto;
+          width: 100%;
+
+          .btn {
+            width: 100px;
+          }
+        }
+      }
+
+      .modal-header {
+        padding: 2px 16px;
+      }
+
+      .modal-body {
+        padding: 2px 16px;
+      }
+    }
+
+    @-webkit-keyframes animatetop {
+      from {top:-300px; opacity:0};
+      to {top:0; opacity:1}
+    }
+
+    @keyframes animatetop {
+      from {top:-300px; opacity:0}
+      to {top:0; opacity:1}
+    }
+
+
+    h2, h3 {
+      margin: 10px;
+
+      .modal-body {
+        padding: 2px 16px;
+      }
+    }
+
+  }
+}

@@ -1,0 +1,54 @@
+@import '../sass-import-once';
+
+@include exports('modal-skin') {
+  .modal {
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+
+    button {
+      background-color: #32a8e6;
+      color: white;
+    }
+
+    .modal-content {
+      -webkit-animation-duration: 0.4s;
+      -webkit-animation-name: animatetop;
+      animation-duration: 0.4s;
+      animation-name: animatetop;
+      background-color: #fefefe;
+      border-color: #888;
+      box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    }
+
+    @-webkit-keyframes animatetop {
+      from {top:-300px; opacity:0} 
+      to {top:0; opacity:1}
+    }
+
+    @keyframes animatetop {
+      from {top:-300px; opacity:0}
+      to {top:0; opacity:1}
+    }
+
+    .hide {
+      color: white;
+    }
+
+    .hide:hover,
+    .hide:focus {
+      color: #000000;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .modal-header {
+      background-color: #32a8e6;
+      color: white;
+    }
+
+    .modal-footer {
+      background-color: white;
+      color: black;
+    }
+  }
+}

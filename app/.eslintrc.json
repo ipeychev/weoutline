@@ -23,6 +23,7 @@
         "no-unreachable": "warn",
         "no-unused-vars": "warn",
         "no-use-before-define": [2, { "functions": false }],
+        "semi": "error",
         "valid-typeof": "warn"
     }
 }

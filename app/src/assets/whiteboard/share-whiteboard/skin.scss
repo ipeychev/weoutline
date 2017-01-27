@@ -1,0 +1,17 @@
+@import '../../sass-import-once';
+
+@import '../../copy/skin.scss';
+
+@include exports('share-whiteboard-skin') {
+  .share-whiteboard {
+    margin: 10px;
+
+    .share-whiteboard-url-container {
+      .share-whiteboard-url-btn {
+        border-color: #0E141A;
+        background-color: #eee;
+        background-image: linear-gradient(#fcfcfc, #eee);
+      }
+    }
+  }
+}

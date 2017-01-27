@@ -1,0 +1,16 @@
+{>"layout"/}
+
+{<cssResources}
+	<link rel="stylesheet" href="/user-reset.{version}.{?production}min.{/production}css">
+{/cssResources}
+
+{<jsResources}
+	<script src="http://cdn.wedeploy.com/api/latest/wedeploy.js" defer></script>
+	<script src="/commons.{version}.{?production}min.{/production}js" defer></script>
+{/jsResources}
+
+{<bodyContent}
+	<div class="user-reset">
+		<h1>This section is not yet ready</h1>
+	</div>
+{/bodyContent}

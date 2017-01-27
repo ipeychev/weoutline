@@ -4,7 +4,7 @@ $imported-modules: () !default;
 /// This mixin helps making sure a module is imported once and only once.
 /// @access public
 /// @param {String} $name - Name of exported module
-/// @param {Bool} $debug [true] - Warn when module has been already imported
+/// @param {Bool} $warn [true] - Warn when module has been already imported
 /// @require $imported-modules
 @mixin exports($name, $warn: false) {
   @if (index($imported-modules, $name) == null) {
