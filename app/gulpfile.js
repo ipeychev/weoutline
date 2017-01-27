@@ -74,6 +74,7 @@ function buildSrc(callback) {
   webpack({
     entry: {
       'user-profile': './src/pages/user/profile.js',
+      'user-reset': './src/pages/user/reset.js',
       'user-sign-in': './src/pages/user/sign-in.js',
       'user-sign-up': './src/pages/user/sign-up.js',
       'whiteboard': './src/pages/whiteboard.js'
@@ -123,12 +124,12 @@ function buildSrc(callback) {
 
 function copyStatic() {
   return gulp.src([
-      'src/**/assets/vendor/**/*.css',
-      'src/**/*.jpeg',
-      'src/**/*.png',
-      'src/**/*.svg'
-    ])
-    .pipe(gulp.dest(destinationFolder));
+    'src/**/*.jpeg',
+    'src/**/*.png',
+    'src/**/*.svg',
+    'src/**/assets/vendor/**/*.css'
+  ])
+  .pipe(gulp.dest(destinationFolder));
 }
 
 function coverage(done) {
@@ -164,7 +165,7 @@ function test() {
   return _mocha();
 }
 
-var watchFiles = ['src/**/*', 'test/**/*', 'package.json', '**/.eslintrc', '!**/server.js', '!**/views/*', '!**/routes/*'];
+var watchFiles = ['gulpfile.js', 'src/**/*', 'test/**/*', 'package.json', '**/.eslintrc', '!**/server.js', '!**/views/*', '!**/routes/*'];
 
 // Run the headless unit tests as you make changes.
 function watch() {

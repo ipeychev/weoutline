@@ -13,4 +13,8 @@ router.get('/sign-up', function(req, res) {
   res.render('user/sign-up');
 });
 
+router.get('/reset', function(req, res) {
+  res.render('user/reset');
+});
+
 module.exports = router;

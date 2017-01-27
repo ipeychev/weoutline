@@ -4,6 +4,8 @@
 @import '../map/structure.scss';
 @import '../toolbar/tools/structure.scss';
 @import '../toolbar/user/structure.scss';
+@import '../modal/structure.scss';
+@import '../spinner/structure.scss';
 
 @include exports('whiteboard-structure') {
   .wb {
@@ -19,9 +21,41 @@
       overflow: hidden;
       position: relative;
       width: 100%;
+    }
 
-      .draw-area {
-        cursor: crosshair;
+    .modal-content {
+      width: 500px;
+
+      input {
+        border: 1px solid transparent;
+      }
+
+      .close {
+        margin-right: 10px;
+      }
+
+      .container {
+        max-width: inherit;
+      }
+
+      .btn-container {
+        max-width: inherit;
+
+        .btn {
+          &:last-child {
+            margin: 0 10px 0 4px;
+          }
+        }
+      }
+
+      .add-name-container {
+        label {
+          display: inline;
+        }
+
+        input {
+          width: 22px;
+        }
       }
     }
   }

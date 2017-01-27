@@ -6,6 +6,7 @@ import DrawHelper from '../helpers/draw-helper';
 import DrawLine from '../draw/draw-line';
 import Eraser from '../draw/eraser';
 import Map from '../map/map';
+import ShareWhiteboardModal from './share-modal';
 import ToolbarTools from '../toolbar/toolbar-tools';
 import ToolbarUser from '../toolbar/toolbar-user';
 import Tools from '../draw/tools';
@@ -19,7 +20,7 @@ class Whiteboard {
 
     this._shapes = [];
     this._whiteboardId = this._config.whiteboard.id;
-    this._sessionId = window.crypto.getRandomValues(new Uint32Array(1))[0];
+    this._sessionId = this._generateSessionId();
 
     this._fetchOffset();
 
@@ -119,7 +120,7 @@ class Whiteboard {
     this._onWheelListener = this._onScroll.bind(this);
     this._onContextMenuListener = function(e) { e.preventDefault(); };
     this._resizeListener = this._onResize.bind(this);
-    this._orientationChangeListener = () => {setTimeout(this._onResize.bind(this), 100)};
+    this._orientationChangeListener = () => {setTimeout(this._onResize.bind(this), 100);};
     this._onFullscreenChangeListener = this._onFullscreenChange.bind(this);
 
     if (BrowserHelper.isTouchDevice()) {
@@ -258,6 +259,14 @@ class Whiteboard {
     }
   }
 
+  _generateSessionId() {
+    window.crypto.getRandomValues(new Uint32Array(1))[0];
+  }
+
+  _generateWhiteboardId() {
+    return CryptHelper.getRandomBase64(12);
+  }
+
   _getAllowedOffset(scrollData) {
     let tmpOffsetWidth = this._offset[0] + scrollData[0];
     let tmpOffsetHeight = this._offset[1] + scrollData[1];
@@ -281,6 +290,80 @@ class Whiteboard {
     return allowedOffset;
   }
 
+  _getLineWidth() {
+    let lineWidth;
+
+    if (this._config.whiteboard.activeTool === Tools.line) {
+      lineWidth = this._config.whiteboard.penSize;
+    }
+
+    return lineWidth;
+  }
+
+  _getShareWhiteboardData() {
+    let data;
+    let whiteboardBookmark;
+    let whiteboardId = this._whiteboardId || this._generateWhiteboardId();
+
+    let url = window.location.origin + '/wb/' + whiteboardId;
+
+    if (this._config.whiteboard.currentUser && this._whiteboardId) {
+      return this._data.getWhiteboardBookmark(this._config.whiteboard.currentUser.id, this._whiteboardId)
+        .then((data) => {
+          whiteboardBookmark = data ? data[0] : null;
+
+          if (whiteboardBookmark) {
+            data = {
+              action: 'logged user + existing bookmark',
+              url: url,
+              whiteboardBookmark: whiteboardBookmark,
+              whiteboardId: whiteboardId
+            };
+          } else {
+            data = {
+              action: 'logged user + new bookmark',
+              url: url,
+              whiteboardId: whiteboardId
+            };
+          }
+
+          return data;
+        });
+    } else {
+      if (this._config.whiteboard.currentUser) {
+        data = {
+          action: 'logged user + new bookmark',
+          url: url,
+          whiteboardId: whiteboardId
+        };
+      } else if (this._whiteboardId) {
+        data = {
+          action: 'anonymous user + existing whiteboard',
+          url: url,
+          whiteboardId: whiteboardId
+        };
+      } else {
+        data = {
+          action: 'anonymous user + new whiteboard',
+          url: url,
+          whiteboardId: whiteboardId
+        };
+      }
+
+      return Promise.resolve(data);
+    }
+  }
+
+  _getShareWhiteboardModal() {
+    if (!this._shareWhiteboardModal) {
+      this._shareWhiteboardModal = new ShareWhiteboardModal({
+        srcNode: 'shareWhiteboard'
+      });
+    }
+
+    return this._shareWhiteboardModal;
+  }
+
   _handleFullscreen() {
     let mainContainerNode = document.getElementById(this._config.whiteboard.mainContainer);
 
@@ -291,16 +374,6 @@ class Whiteboard {
     } else {
       BrowserHelper.requestFullscreen(mainContainerNode);
     }
-  }
-
-  _getLineWidth() {
-    let lineWidth;
-
-    if (this._config.whiteboard.activeTool === Tools.line) {
-      lineWidth = this._config.whiteboard.penSize;
-    }
-
-    return lineWidth;
   }
 
   _onFullscreenChange() {
@@ -568,7 +641,7 @@ class Whiteboard {
     let config = {
       clearWhiteboardCallback: this._clearWhiteboard.bind(this),
       fullscreenCallback: this._handleFullscreen.bind(this),
-      shareWhiteboardCallback: this._shareWhiteboard.bind(this),
+      shareWhiteboardCallback: this._onShareWhiteboardCallback.bind(this),
       valuesCallback: this._setToolValues.bind(this)
     };
 
@@ -579,7 +652,7 @@ class Whiteboard {
 
   _setupToolbarUser() {
     let config = {
-      currentUser: this._config.currentUser,
+      currentUser: this._config.whiteboard.currentUser,
       signInCallback: this._onUserSignInCallback.bind(this),
       signOutCallback: this._config.whiteboard.signOutCallback
     };
@@ -589,19 +662,45 @@ class Whiteboard {
     this._toolbarUser = new ToolbarUser(config);
   }
 
-  _shareWhiteboard() {
-    if (!this._whiteboardId) {
-      let whiteboardId = CryptHelper.getRandomBase64(12);
+  _onShareWhiteboardCallback() {
+    let shareWhiteboardModal = this._getShareWhiteboardModal();
+    shareWhiteboardModal.show();
 
-      this._whiteboardId = whiteboardId;
+    this._getShareWhiteboardData()
+      .then((data) => {
+        shareWhiteboardModal.setConfig({
+          shareWhiteBoardCallback: (payload) => {
+            this._shareWhiteboard({
+              createWhiteboardBookmark: this._config.whiteboard.currentUser && this._whiteboardId && payload.createBookmark,
+              id: data.whiteboardBookmark ? data.whiteboardBookmark.id : null,
+              saveShapes: !this._whiteboardId,
+              whiteboardId: payload.whiteboardId,
+              whiteboardName: payload.whiteboardName
+            });
 
-      history.pushState(null, null, window.location.origin + '/wb/' + this._whiteboardId);
+            if (!this._whiteboardId) {
+              this._whiteboardId = payload.whiteboardId;
+            }
+          }
+        });
+
+        shareWhiteboardModal.setData(data);
+      })
+      .catch((error) => {
+        alert('Error retrieving whiteboard bookmark');
+        console.log(error);
+        shareWhiteboardModal.hide();
+      });
+  }
+
+  _shareWhiteboard(params) {
+    if (params.saveShapes) {
+      history.pushState(null, null, window.location.origin + '/wb/' + params.whiteboardId);
 
       if (this._shapes.length) {
-        // There is a whiteboard Id already, save the shapes to the remote storage
-        this._data.saveShapes(this._whiteboardId, this._shapes)
+        this._data.saveShapes(params.whiteboardId, this._shapes)
           .then(() => {
-            console.log('Shapes saved successfully on whiteboard', whiteboardId);
+            console.log('Shapes saved successfully on whiteboard', params.whiteboardId);
           })
           .catch((error) => {
             alert('Creating whiteboard and saving shapes failed!');
@@ -612,7 +711,14 @@ class Whiteboard {
       this._saveOffset(this._whiteboardId, this._offset);
     }
 
-    alert('Copy and share the following URL: ' + window.location.origin + '/wb/' + this._whiteboardId);
+    if (params.createWhiteboardBookmark) {
+      this._data.createOrUpdateWhiteboardBookmark({
+        id: params.id,
+        userId: this._config.whiteboard.currentUser.id,
+        whiteboardName: params.whiteboardName,
+        whiteboardId: params.whiteboardId
+      });
+    }
   }
 
   _updateOffset(params) {

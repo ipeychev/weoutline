@@ -2,8 +2,8 @@
 
 @import '../../styles-skin.scss';
 
-@include exports('user-sign-up-skin') {
-  .user-sign-up {
+@include exports('user-reset-skin') {
+  .user-reset {
     background-color: #0e141a;
   }
 }

@@ -23,16 +23,6 @@ class ToolbarUser extends Toolbar {
       });
   }
 
-  static getConfigProps() {
-    return {
-      currentUser: 1,
-      signInCallback: 1,
-      signOutCallback: 1,
-      srcNode: 1,
-      userProfileCallback: 1
-    };
-  }
-
   destroy() {
     this._detachListeners();
     this._draggable.destroy();

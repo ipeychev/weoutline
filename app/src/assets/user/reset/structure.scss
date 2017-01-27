@@ -2,8 +2,8 @@
 
 @import '../../styles-structure.scss';
 
-@include exports('user-sign-up-structure') {
-  .user-sign-up {
+@include exports('user-reset-structure') {
+  .user-reset {
     align-items: center;
     display: flex;
     font-family: 'Open Sans', sans-serif;

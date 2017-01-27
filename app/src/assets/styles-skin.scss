@@ -1,4 +1,55 @@
 @import './sass-import-once';
 
 @include exports('styles-skin') {
+  h1 {
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .title {
+    color: #00d46a;
+  }
+
+  .subtitle {
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .error {
+    color: red;
+  }
+
+  label {
+    color: white;
+  }
+
+  input {
+    background-color: rgba(255, 255, 255, .2);
+    border-radius: 4px;
+    color: white;
+  }
+
+  button {
+    background-color: #00d46a;
+    color: white;
+  }
+
+  a {
+    color: #00d46a;
+    text-decoration: none;
+  }
+
+  .list {
+    color: rgba(255, 255, 255, .7);
+  }
+
+  .separator {
+    color: white;
+  }
+
+  .btn-container .btn {
+    border-color: #fff;
+
+    .label {
+      color: #fff;
+    }
+  }
 }

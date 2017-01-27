@@ -4,11 +4,30 @@
 @import '../map/skin.scss';
 @import '../toolbar/tools/skin.scss';
 @import '../toolbar/user/skin.scss';
+@import '../modal/skin.scss';
+@import '../spinner/skin.scss';
 
 @include exports('whiteboard-skin') {
   .wb {
     .draw-area {
       cursor: crosshair;
+    }
+
+    .modal-content {
+      label {
+        color:#0e141a;
+      }
+
+      input {
+        background-color: white;
+        border-color: #0E141A;
+        border-radius: 4px;
+        color: #0e141a;
+      }
+
+      .share-whiteboard {
+        margin: 10px;
+      }
     }
   }
 }
