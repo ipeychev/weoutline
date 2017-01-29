@@ -119,7 +119,7 @@ class ShareWhiteboardModal {
               <label for="shareWhiteboardAddName">Save bookmark on my dashboard</label>
             </div>
 
-            <label for="name">Name:</label>
+            <label for="name">Name</label>
             <input id="shareWhiteboardName" class="share-whiteboard-name" name="name" type="text" placeholder="Name" value="${whiteboardName}" required autofocus>
           </div>`,
         footer: `<button id="shareWhiteboardButton" class="btn">Share</button>`
@@ -128,13 +128,13 @@ class ShareWhiteboardModal {
       return {
         title: 'Update bookmark',
         form:
-          `<div id="shareWhiteboardMessage">This whiteboard is already bookmarked. Change the name and click on the "Update" button to save the changes.
+          `<div id="shareWhiteboardMessage" class="share-whiteboard-message">This whiteboard is already bookmarked. Change the name and click on "Update" button to save the changes.
           </div>
 
           <div class="separator"></div>
 
           <div id="shareWhiteboardNameContainer">
-            <label for="name">URL:</label>
+            <label for="name">URL</label>
             <div class="share-whiteboard-url-container">
               <input id="shareWhiteboardURL" class="share-whiteboard-url-input" name="url" type="text" placeholder="URL" value="${payload.url}" required readonly>
               <button id="shareWhiteboardCopyURL" class="btn share-whiteboard-url-btn copy">
@@ -145,7 +145,7 @@ class ShareWhiteboardModal {
 
           <div class="separator"></div>
 
-          <label for="name">Name:</label>
+          <label for="name">Name</label>
           <input id="shareWhiteboardName" class="share-whiteboard-name" name="name" type="text" placeholder="Name" value="${payload.whiteboardBookmark.whiteboardName}" required autofocus>`,
         footer: `<button id="shareWhiteboardButton" class="btn">Update</button>`
       };
