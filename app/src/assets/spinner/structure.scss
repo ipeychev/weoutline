@@ -4,7 +4,8 @@
   .spinner {
     font-size: 10px;
     height: 40px;
-    margin: 100px auto;
+    left: calc(50% - 20px);
+    position: absolute;
     text-align: center;
     width: 50px;
 

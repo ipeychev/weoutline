@@ -32,10 +32,12 @@
     }
 
     .profile-container {
+      position: relative;
       width: 30%;
     }
 
     .bookmarks-container {
+      position: relative;
       width: 70%;
 
       .bookmarks-list-container {

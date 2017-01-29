@@ -20,6 +20,14 @@
       <canvas width="150" height="150" id="map" class="map"></canvas>
     </div>
 
+    <div class="spinner loading" id="loadSpinner">
+      <div class="rect1"></div>
+      <div class="rect2"></div>
+      <div class="rect3"></div>
+      <div class="rect4"></div>
+      <div class="rect5"></div>
+    </div>
+
     <div id="toolbarTools" class="toolbar toolbar-tools hidden">
       <div id="pen" class="toolbar-item">
         <div class="toolbar-item-value active" id="penSize">

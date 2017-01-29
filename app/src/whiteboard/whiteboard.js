@@ -20,6 +20,7 @@ class Whiteboard {
     this._config = config;
 
     this._shapes = [];
+    this._loadSpinner = document.getElementById(this._config.whiteboard.loadSpinnerId);
     this._whiteboardId = this._config.whiteboard.id;
     this._sessionId = this._generateSessionId();
 
@@ -42,6 +43,7 @@ class Whiteboard {
       .then((shapes) => {
         this._shapes = shapes || [];
         this.redraw();
+        this._loadSpinner.classList.add('hidden');
       });
   }
 

@@ -46,6 +46,7 @@ window.addEventListener('load', () => {
         dataURL: 'data.weoutline.wedeploy.io',
         height: whiteboardSize.height,
         id: getWhiteboardId(),
+        loadSpinnerId: 'loadSpinner',
         mainContainer: 'mainContainer',
         minPointDistance: 3,
         penSize: penSize,
