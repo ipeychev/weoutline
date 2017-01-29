@@ -5,7 +5,6 @@ class ShareWhiteboardModal {
     this._config = config;
 
     this._setupContainer();
-    this._attachListeners();
   }
 
   destroy() {
@@ -13,6 +12,7 @@ class ShareWhiteboardModal {
   }
 
   hide() {
+    this._detachListeners();
     this._element.classList.add('hidden');
 
     this._resetDialog();
@@ -33,16 +33,20 @@ class ShareWhiteboardModal {
   }
 
   show() {
+    this._attachListeners();
     this._element.classList.remove('hidden');
   }
 
   _attachListeners() {
     this._hideClickListener = this.hide.bind(this);
+    this._onKeyDownListener = this._onKeyDown.bind(this);
 
+    document.addEventListener('keydown', this._onKeyDownListener);
     this._hideBtn.addEventListener('click', this._hideClickListener);
   }
 
   _detachListeners() {
+    document.removeEventListener('keydown', this._onKeyDownListener);
     this._hideBtn.removeEventListener('click', this._hideClickListener);
   }
 
@@ -149,6 +153,14 @@ class ShareWhiteboardModal {
     }
 
     throw new Error('Invalid state');
+  }
+
+  _onKeyDown(event) {
+    if (event.keyCode === 13) {
+      this._shareWhiteboard();
+    } else if (event.keyCode === 27) {
+      this.hide();
+    }
   }
 
   _resetDialog() {
