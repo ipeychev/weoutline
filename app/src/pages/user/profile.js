@@ -5,7 +5,6 @@ import UserProfile from '../../user/profile';
 
 window.addEventListener('load', () => {
   let auth = WeDeploy.auth('auth.weoutline.wedeploy.io');
-  let data = WeDeploy.data('data.weoutline.wedeploy.io');
 
   new UserProfile({
     auth: auth,
