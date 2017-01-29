@@ -97,9 +97,6 @@ class ShareWhiteboardModal {
         footer: ``
       };
     } else if (payload.action === 'logged user + new bookmark') {
-      let date = new Date();
-      let whiteboardName = date.toDateString() + ' ' + date.toTimeString();
-
       return {
         title: `Share whiteboard`,
         form:
@@ -120,7 +117,7 @@ class ShareWhiteboardModal {
             </div>
 
             <label for="name">Name</label>
-            <input id="shareWhiteboardName" class="share-whiteboard-name" name="name" type="text" placeholder="Name" value="${whiteboardName}" required autofocus>
+            <input id="shareWhiteboardName" class="share-whiteboard-name" name="name" type="text" placeholder="Name" value="New whiteboard" required autofocus>
           </div>`,
         footer: `<button id="shareWhiteboardButton" class="btn">Share</button>`
       };

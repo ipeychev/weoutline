@@ -1,27 +1,57 @@
 @import '../../sass-import-once';
 
 @import '../../styles-structure.scss';
+@import '../../spinner/structure.scss';
 
 @include exports('user-profile-structure') {
   .user-profile {
-    align-items: center;
+    align-content: stretch;
+    align-items: stretch;
     display: flex;
     font-family: 'Open Sans', sans-serif;
     height: 100%;
-    justify-content: center;
     text-align: center;
     width: 100%;
 
-    .container {
-      max-width: 360px;
+    .user-profile-container {
+      label, input {
+        margin-bottom: 1em;
+      }
+    }
+
+    .error {
+      font-size: 22px;
     }
 
     .message-container {
       max-width: 500px;
     }
 
-    .error {
-      font-size: 22px;
+    .profile-container, .bookmarks-container {
+      padding: 1em;
+    }
+
+    .profile-container {
+      width: 30%;
+    }
+
+    .bookmarks-container {
+      width: 70%;
+
+      .bookmarks-list-container {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+      }
+
+      .bookmark-item {
+        display: flex;
+        margin-bottom: 1em;
+
+        a {
+          color: white;
+        }
+      }
     }
 
     h1 {

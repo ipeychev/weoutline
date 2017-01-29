@@ -38,19 +38,17 @@ class Data {
       .get('user2whiteboard');
   }
 
-  fetchAllWhiteboards() {
-    this._data
-      .aggregate('whiteboards', 'board', 'terms')
-      .get('shapes')
-      .then(function(whiteboards) {
-        console.log(whiteboards);
-      });
-  }
-
   fetchShapes(whiteboardId) {
     return this._data
       .limit(10000)
       .get(whiteboardId);
+  }
+
+  fetchWhiteboardBookmarks(userId) {
+    return this._data
+      .limit(10000)
+      .where('userId', '=', userId)
+      .get('user2whiteboard');
   }
 
   saveShapes(whiteboardId, shapes) {

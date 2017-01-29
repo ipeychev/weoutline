@@ -1,6 +1,7 @@
 @import '../../sass-import-once';
 
 @import '../../styles-skin.scss';
+@import '../../spinner/skin.scss';
 
 @include exports('user-profile-skin') {
   .user-profile {

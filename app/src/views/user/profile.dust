@@ -12,23 +12,47 @@
 
 {<bodyContent}
 	<div class="user-profile">
-		<div class="container">
-			<span id="loading" class="label">Retrieving data...</span>
-		</div>
-
 		<div class="message-container">
-			<span class="error hidden" id="messageError">Error retrieving user data</span>
+			<span class="error hidden" id="profileMessageError">Error retrieving user data</span>
 		</div>
 
-		<form id="userProfile" name="userProfile" class="container hidden">
-			<h1>My account</h1>
-			<label>Name
-				<input name="name" type="text" placeholder="Name" required readonly autofocus>
-			</label>
+		<div class="container profile-container">
+			<div class="spinner" id="loadingProfile">
+				<div class="rect1"></div>
+				<div class="rect2"></div>
+				<div class="rect3"></div>
+				<div class="rect4"></div>
+				<div class="rect5"></div>
+			</div>
 
-			<label>Email
+			<form id="userProfile" name="userProfile" class="container user-profile-container hidden">
+				<h1>My account</h1>
+
+				<label for="name">Name</label>
+				<input name="name" type="text" placeholder="Name" required readonly autofocus>
+
+				<label for="email">Email</label>
 				<input name="email" type="email" placeholder="Email" readonly required>
-			</label>
-		</form>
+			</form>
+		</div>
+		<div class="bookmarks-container">
+			<div class="message-container">
+				<span class="error hidden" id="bookmarksMessageError">Error retrieving whiteboard bookmarks</span>
+			</div>
+
+			<div class="spinner" id="loadingBookmarks">
+				<div class="rect1"></div>
+				<div class="rect2"></div>
+				<div class="rect3"></div>
+				<div class="rect4"></div>
+				<div class="rect5"></div>
+			</div>
+
+			<div class="bookmarks-list-container hidden" id="bookmarksListContainer">
+				<h1>My bookmarks</h1>
+				<ul class="bookmarks-list" id="bookmarksList">
+				</ul>
+			</div>
+		</div>
 	</div>
 {/bodyContent}
