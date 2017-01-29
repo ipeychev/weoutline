@@ -6,6 +6,7 @@
 @import '../toolbar/user/skin.scss';
 @import '../modal/skin.scss';
 @import '../spinner/skin.scss';
+@import './erase-whiteboard/skin.scss';
 @import './share-whiteboard/skin.scss';
 
 @include exports('whiteboard-skin') {

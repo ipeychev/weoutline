@@ -125,6 +125,23 @@
       </div>
     </div>
 
+    <div class="modal hidden" id="eraseWhiteboard">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span id="eraseWhiteboardHide" class="hide">x</span>
+          <h2>Erase whiteboard</h2>
+        </div>
+        <div class="modal-body">
+          <h1>Erase the whole whiteboard?</h1>
+        </div>
+        <div class="modal-footer">
+          <div class="btn-container erase-whiteboard-footer">
+            <button id="eraseWhiteboardButton" class="btn">Erase</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="modal hidden" id="shareWhiteboard">
       <div class="modal-content">
         <div class="modal-header">

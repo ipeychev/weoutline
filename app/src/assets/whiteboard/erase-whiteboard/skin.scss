@@ -1,0 +1,9 @@
+@import '../../sass-import-once';
+
+@include exports('erase-whiteboard-skin') {
+  .modal-body {
+    h1 {
+      color: black;
+    }
+  }
+}

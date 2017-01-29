@@ -4,6 +4,7 @@ import Data from '../data/data';
 import Draw from '../draw/draw';
 import DrawHelper from '../helpers/draw-helper';
 import DrawLine from '../draw/draw-line';
+import EraseWhiteboardModal from './erase-whiteboard';
 import Eraser from '../draw/eraser';
 import Map from '../map/map';
 import ShareWhiteboardModal from './share-whiteboard';
@@ -138,16 +139,23 @@ class Whiteboard {
   }
 
   _clearWhiteboard() {
-    if (confirm('Are you sure you want to erase the whole whiteboard?')) {
-      this.deleteShapes(this._shapes);
+    if (!this._eraseWhiteboardModal) {
+      this._eraseWhiteboardModal = new EraseWhiteboardModal({
+        srcNode: 'eraseWhiteboard',
+        eraseWhiteBoardCallback: () => {
+          this.deleteShapes(this._shapes);
 
-      this._offset[0] = 0;
-      this._offset[1] = 0;
+          this._offset[0] = 0;
+          this._offset[1] = 0;
 
-      this._saveOffset(this._whiteboardId, this._offset);
+          this._saveOffset(this._whiteboardId, this._offset);
 
-      this.redraw();
+          this.redraw();
+        }
+      });
     }
+
+    this._eraseWhiteboardModal.show();
   }
 
   _detachListeners() {

@@ -1,0 +1,17 @@
+@import '../../sass-import-once';
+
+@include exports('erase-whiteboard-structure') {
+  .modal {
+    .modal-content {
+      .modal-body h1 {
+        font-size: 22px;
+        margin: 10px;
+      }
+
+      .modal-footer .erase-whiteboard-footer .btn {
+        height: 50px;
+        width: 80px
+      }
+    }
+  }
+}
