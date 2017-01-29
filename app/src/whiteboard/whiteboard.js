@@ -6,7 +6,7 @@ import DrawHelper from '../helpers/draw-helper';
 import DrawLine from '../draw/draw-line';
 import Eraser from '../draw/eraser';
 import Map from '../map/map';
-import ShareWhiteboardModal from './share-modal';
+import ShareWhiteboardModal from './share-whiteboard';
 import ToolbarTools from '../toolbar/toolbar-tools';
 import ToolbarUser from '../toolbar/toolbar-user';
 import Tools from '../draw/tools';
@@ -671,7 +671,7 @@ class Whiteboard {
         shareWhiteboardModal.setConfig({
           shareWhiteBoardCallback: (payload) => {
             this._shareWhiteboard({
-              createWhiteboardBookmark: this._config.whiteboard.currentUser && this._whiteboardId && payload.createBookmark,
+              createWhiteboardBookmark: payload.createBookmark,
               id: data.whiteboardBookmark ? data.whiteboardBookmark.id : null,
               saveShapes: !this._whiteboardId,
               whiteboardId: payload.whiteboardId,

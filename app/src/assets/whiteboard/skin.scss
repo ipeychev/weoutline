@@ -6,6 +6,7 @@
 @import '../toolbar/user/skin.scss';
 @import '../modal/skin.scss';
 @import '../spinner/skin.scss';
+@import './share-whiteboard/skin.scss';
 
 @include exports('whiteboard-skin') {
   .wb {
@@ -23,10 +24,6 @@
         border-color: #0E141A;
         border-radius: 4px;
         color: #0e141a;
-      }
-
-      .share-whiteboard {
-        margin: 10px;
       }
     }
   }

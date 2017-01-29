@@ -1,0 +1,22 @@
+@import '../sass-import-once';
+
+@include exports('copy-structure') {
+  .copy.copied {
+    &:before {
+      content: '';
+      left: calc(35%);
+      position: absolute;
+      top: calc(100%);
+    }
+
+    &:after {
+      content: attr(aria-label);
+      font-size: 12px;
+      left: calc(-30%);
+      padding: 5px;
+      position: absolute;
+      top: 100%;
+      top: calc(100% + 5px);
+    }
+  }
+}

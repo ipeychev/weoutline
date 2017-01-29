@@ -1,3 +1,5 @@
+import Copy from '../copy/copy';
+
 class ShareWhiteboardModal {
   constructor(config) {
     this._config = config;
@@ -21,15 +23,7 @@ class ShareWhiteboardModal {
 
     let content = this._renderContent(data);
 
-    this._shareWhiteboardTitle.innerHTML = content.title;
-    this._shareWhiteboardForm.innerHTML = content.form;
-    this._shareWhiteboardFooterBtnContainer.innerHTML = content.footer;
-
-    let shareWhiteboardButton = this._shareWhiteboardFooterBtnContainer.querySelector('#shareWhiteboardButton');
-
-    if (shareWhiteboardButton) {
-      shareWhiteboardButton.addEventListener('click', this._shareWhiteboard.bind(this));
-    }
+    this._initContent(content);
 
     this._shareDashboardSpinner.classList.add('hidden');
   }
@@ -52,13 +46,39 @@ class ShareWhiteboardModal {
     this._hideBtn.removeEventListener('click', this._hideClickListener);
   }
 
+  _initContent(content) {
+    this._shareWhiteboardTitle.innerHTML = content.title;
+    this._shareWhiteboardForm.innerHTML = content.form;
+    this._shareWhiteboardFooterBtnContainer.innerHTML = content.footer;
+
+    let shareWhiteboardButton = this._shareWhiteboardFooterBtnContainer.querySelector('#shareWhiteboardButton');
+
+    if (shareWhiteboardButton) {
+      shareWhiteboardButton.addEventListener('click', this._shareWhiteboard.bind(this));
+    }
+
+    if (this._copy) {
+      this._copy.destroy();
+    }
+
+    this._copy = new Copy({
+      srcNode: '#shareWhiteboardCopyURL',
+      targetEl: '#shareWhiteboardURL'
+    });
+  }
+
   _renderContent(payload) {
     if (payload.action === 'anonymous user + new whiteboard') {
       return {
         title: 'Share whiteboard',
         form:
           `<label for="url">URL</label>
-          <input id="shareWhiteboardURL" name="url" type="text" placeholder="URL" value="${payload.url}" required readonly>
+          <div class="share-whiteboard-url-container">
+            <input id="shareWhiteboardURL" class="share-whiteboard-url-input" name="url" type="text" placeholder="URL" value="${payload.url}" required readonly>
+            <button id="shareWhiteboardCopyURL" class="btn share-whiteboard-url-btn copy">
+              <svg class="icon" id="signIn"><use xlink:href="/assets/images/symbol-defs.svg#icon-clipboard"></use></svg>
+            </button>
+          </div>
           </div>`,
         footer: `<button id="shareWhiteboardButton" class="btn">Share</button>`
       };
@@ -67,7 +87,12 @@ class ShareWhiteboardModal {
         title: 'Share whiteboard',
         form:
           `<label for="url">URL</label>
-          <input id="shareWhiteboardURL" name="url" type="text" placeholder="URL" value="${payload.url}" required readonly>
+          <div class="share-whiteboard-url-container">
+            <input id="shareWhiteboardURL" class="share-whiteboard-url-input" name="url" type="text" placeholder="URL" value="${payload.url}" required readonly>
+            <button id="shareWhiteboardCopyURL" class="btn share-whiteboard-url-btn copy">
+              <svg class="icon" id="signIn"><use xlink:href="/assets/images/symbol-defs.svg#icon-clipboard"></use></svg>
+            </button>
+          </div>
           </div>`,
         footer: ``
       };
@@ -79,18 +104,23 @@ class ShareWhiteboardModal {
         title: `Share whiteboard`,
         form:
           `<label for="url">URL</label>
-          <input id="shareWhiteboardURL" name="url" type="text" placeholder="URL" value="${payload.url}" required readonly>
+          <div class="share-whiteboard-url-container">
+            <input id="shareWhiteboardURL" class="share-whiteboard-url-input" name="url" type="text" placeholder="URL" value="${payload.url}" required readonly>
+            <button id="shareWhiteboardCopyURL" class="btn share-whiteboard-url-btn copy">
+              <svg class="icon" id="signIn"><use xlink:href="/assets/images/symbol-defs.svg#icon-clipboard"></use></svg>
+            </button>
+          </div>
 
           <div class="separator"></div>
 
           <div id="shareWhiteboardNameContainer">
             <div class="add-name-container">
               <input id="shareWhiteboardAddName" type="checkbox" checked>
-              <label for="shareWhiteboardAddName" class="">Save bookmark on my dashboard</label>
+              <label for="shareWhiteboardAddName">Save bookmark on my dashboard</label>
             </div>
 
             <label for="name">Whiteboard name:</label>
-            <input id="shareWhiteboardName" name="name" type="text" placeholder="Name" value="${whiteboardName}" required autofocus>
+            <input id="shareWhiteboardName" class="share-whiteboard-name" name="name" type="text" placeholder="Name" value="${whiteboardName}" required autofocus>
           </div>`,
         footer: `<button id="shareWhiteboardButton" class="btn">Share</button>`
       };
@@ -105,13 +135,18 @@ class ShareWhiteboardModal {
 
           <div id="shareWhiteboardNameContainer">
             <label for="name">Whiteboard name:</label>
-            <input id="shareWhiteboardName" name="name" type="text" placeholder="Name" value="${payload.whiteboardBookmark.whiteboardName}" required autofocus>
+            <div class="share-whiteboard-url-container">
+              <input id="shareWhiteboardURL" class="share-whiteboard-url-input" name="url" type="text" placeholder="URL" value="${payload.url}" required readonly>
+              <button id="shareWhiteboardCopyURL" class="btn share-whiteboard-url-btn copy">
+                <svg class="icon" id="signIn"><use xlink:href="/assets/images/symbol-defs.svg#icon-clipboard"></use></svg>
+              </button>
+            </div>
           </div>
 
           <div class="separator"></div>
 
-          <label for="url">URL</label>
-          <input id="shareWhiteboardURL" name="url" type="text" placeholder="URL" value="${payload.url}" required readonly>`,
+          <label for="name">Whiteboard name:</label>
+          <input id="shareWhiteboardName" class="share-whiteboard-name" name="name" type="text" placeholder="Name" value="${payload.whiteboardBookmark.whiteboardName}" required autofocus>`,
         footer: `<button id="shareWhiteboardButton" class="btn">Update</button>`
       };
     }

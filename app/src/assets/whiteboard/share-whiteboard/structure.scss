@@ -1,0 +1,66 @@
+@import '../../sass-import-once';
+
+@import '../../copy/structure.scss';
+
+@include exports('share-whiteboard-structure') {
+  .share-whiteboard {
+    input {
+      flex: 1;
+      line-height: 1.6em;
+      margin: 0px;
+      padding: 5px;
+    }
+
+    .add-name-container {
+      margin-bottom: 10px;
+
+      label {
+        display: inline;
+      }
+
+      input {
+        width: 22px;
+      }
+    }
+
+    .btn {
+      line-height: 1.6em;
+      margin: 0;
+      padding: 0px;
+    }
+
+    .share-whiteboard-url-container {
+      position: relative;
+
+      .share-whiteboard-url-input {
+        border-bottom-right-radius: 0;
+        border-right: 0px;
+        border-top-right-radius: 0;
+        height: 25px;
+        width: calc(100% - 50px);
+      }
+
+      .share-whiteboard-url-btn {
+        border-bottom-left-radius: 0;
+        border-left: 0px;
+        border-top-left-radius: 0;
+        border: 1px solid transparent;
+        display: flex;
+        height: 37px;
+        position: absolute;
+        right: 0px;
+        top: 0px;
+        width: 40px;
+
+        .icon {
+          height: 22px;
+          width: 38px;
+        }
+      }
+    }
+
+    .share-whiteboard-name {
+      width: calc(100% - 10px);
+    }
+  }
+}

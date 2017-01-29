@@ -1,0 +1,20 @@
+@import '../sass-import-once';
+
+@include exports('copy-skin') {
+  .copy.copied {
+    &:before {
+      border-bottom-color: #383838;
+      border-bottom: 5px solid black;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      color: black;
+    }
+
+    &:after {
+      background-color: black;
+      border-radius: 5px;
+      border: 1px solid black;
+      color: white;
+    }
+  }
+}

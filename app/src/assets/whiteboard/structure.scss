@@ -6,6 +6,7 @@
 @import '../toolbar/user/structure.scss';
 @import '../modal/structure.scss';
 @import '../spinner/structure.scss';
+@import './share-whiteboard/structure.scss';
 
 @include exports('whiteboard-structure') {
   .wb {
@@ -42,19 +43,12 @@
         max-width: inherit;
 
         .btn {
+          height: 50px;
+          width: 80px;
+
           &:last-child {
             margin: 0 10px 0 4px;
           }
-        }
-      }
-
-      .add-name-container {
-        label {
-          display: inline;
-        }
-
-        input {
-          width: 22px;
         }
       }
     }
