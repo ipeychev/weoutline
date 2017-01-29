@@ -29,6 +29,7 @@ class Copy {
 
     window.setTimeout(() => {
       this._element.classList.remove('copied');
+      this._element.removeAttribute('aria-label', 'Copied!');
     }, 3000);
   }
 

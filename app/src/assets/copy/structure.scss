@@ -12,10 +12,9 @@
     &:after {
       content: attr(aria-label);
       font-size: 12px;
-      left: calc(-30%);
-      padding: 5px;
+      left: -8px;
+      padding: 3px;
       position: absolute;
-      top: 100%;
       top: calc(100% + 5px);
     }
   }

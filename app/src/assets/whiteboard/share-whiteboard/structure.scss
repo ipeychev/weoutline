@@ -3,7 +3,7 @@
 @import '../../copy/structure.scss';
 
 @include exports('share-whiteboard-structure') {
-  .share-whiteboard {
+  .share-whiteboard-form {
     input {
       flex: 1;
       line-height: 1.6em;

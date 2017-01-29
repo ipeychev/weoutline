@@ -3,7 +3,7 @@
 @import '../../copy/skin.scss';
 
 @include exports('share-whiteboard-skin') {
-  .share-whiteboard {
+  .share-whiteboard-form {
     margin: 10px;
 
     .share-whiteboard-url-container {

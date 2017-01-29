@@ -139,11 +139,11 @@
             <div class="rect4"></div>
             <div class="rect5"></div>
           </div>
-          <form id="shareWhiteboardForm" name="shareWhiteboardForm" class="container share-whiteboard">
+          <form id="shareWhiteboardForm" name="shareWhiteboardForm" class="container share-whiteboard-form">
           </form>
         </div>
         <div class="modal-footer">
-          <div class="btn-container" id="shareWhiteboardFooterBtnContainer">
+          <div class="btn-container share-whiteboard-footer" id="shareWhiteboardFooterBtnContainer">
           </div>
         </div>
       </div>
