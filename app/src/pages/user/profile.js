@@ -8,7 +8,7 @@ window.addEventListener('load', () => {
 
   new UserProfile({
     auth: auth,
-    dataURL: 'data.weoutline.wedeploy.io'
+    dataURL: 'http://data.weoutline.wedeploy.io'
   });
 }, {
   once: true

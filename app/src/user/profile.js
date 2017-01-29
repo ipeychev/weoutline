@@ -6,7 +6,9 @@ class UserProfile {
 
     if (this._config.auth.currentUser) {
       this._auth = this._config.auth;
-      this._data = new Data(this._config.dataURL);
+      this._data = new Data({
+        url: this._config.dataURL
+      });
 
       this._fetchUserData();
       this._fetchWhiteboardBookmarks();
