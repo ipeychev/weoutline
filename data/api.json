@@ -8,7 +8,7 @@
 	},
 	{
 		"data": true,
-		"path": "/boards",
+		"path": "/user2whiteboard",
 		"parameters": {
 			"filter": {
 				"value": {"userId":{"operator":"=","value":"$auth.id"}}
