@@ -111,20 +111,20 @@
     <div id="toolbarUser" class="toolbar toolbar-user hidden">
       <div id="user" class="toolbar-item">
         <div class="toolbar-item-value">
-          <img class="icon icon-signed-in hidden" draggable="false" src="/assets/images/user-unknown.png">
+          <img id="userSignedIn" class="icon icon-signed-in hidden" draggable="false" src="/assets/images/user-unknown.png">
           <a id="userSignIn" draggable="false" href="/user/sign-in">
-            <svg class="icon icon-sign-in" id="signIn"><use xlink:href="/assets/images/symbol-defs.svg#icon-sign-in"></use></svg>
+            <svg class="icon icon-sign-in"><use xlink:href="/assets/images/symbol-defs.svg#icon-sign-in"></use></svg>
           </a>
         </div>
         <ul class="toolbar-item-options hidden">
           <li class="toolbar-item-option">
-            <a id="userProfile" href="/user/profile">
+            <a id="userProfile" draggable="false" href="/user/profile">
               <svg class="icon icon-user-o"><use xlink:href="/assets/images/symbol-defs.svg#icon-user-o"></use></svg>
-              <span>My account<span>
+              <span>My account</span>
             </a>
           </li>
           <li class="toolbar-item-option">
-            <a id="userSignOut" href="#">
+            <a id="userSignOut" draggable="false">
               <svg class="icon icon-sign-out"><use xlink:href="/assets/images/symbol-defs.svg#icon-sign-out"></use></svg>
               <span>Sign out</span>
             </a>
