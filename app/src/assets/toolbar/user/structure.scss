@@ -8,8 +8,18 @@
       top: 20px;
 
       &.vertical {
-        .toolbar-item-options {
-          flex-direction: column;
+        .toolbar-item {
+          .toolbar-item-options {
+            flex-direction: column;
+            top: 44px;
+            padding: 4px;
+            left: calc(-90px);
+            width: 120px;
+
+            .toolbar-item-option {
+              width: 100%;
+            }
+          }
         }
       }
 

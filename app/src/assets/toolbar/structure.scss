@@ -12,12 +12,17 @@
       &.vertical {
         flex-direction: column;
         height: auto;
-        padding: 2px 2px 30px 2px;
+        padding: 2px;
         width: 42px;
 
         .toolbar-item {
-          margin-left: 0px;
+          margin-bottom: 2px;
+          margin-left: 0;
           margin-top: 2px;
+
+          &:last-child {
+            margin-right: 0;
+          }
 
           .toolbar-item-options {
             flex-direction: row;
