@@ -3,7 +3,7 @@
 @include exports('map-structure') {
   .map-container {
     height: 150px;
-    position: fixed;
+    position: absolute;
     right: 20px;
     top: 100px;
     width: 150px;
