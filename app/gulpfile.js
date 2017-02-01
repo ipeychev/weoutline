@@ -5,7 +5,6 @@ var gulp = require('gulp');
 var gutil = require('gulp-util');
 var isparta = require('isparta');
 var loadPlugins = require('gulp-load-plugins');
-var path = require('path');
 var runSequence = require('run-sequence');
 var webpack = require('webpack');
 var webpackStream = require('webpack-stream');
@@ -64,7 +63,10 @@ function buildSrc(callback) {
         name: 'commons',
         filename: `commons.${manifest.version}${release ? '.min': ''}.js`
     }),
-    new ExtractTextPlugin(`[name].${manifest.version}${release ? '.min': ''}.css`, {allChunks: true})
+    new ExtractTextPlugin({
+      filename: `[name].${manifest.version}${release ? '.min': ''}.css`,
+      allChunks: true
+    })
   ];
 
   if (release) {
@@ -85,17 +87,25 @@ function buildSrc(callback) {
       path: destinationFolder
     },
     module: {
-      context: path.join(__dirname, 'node_modules'),
-      loaders: [
+      rules: [
           {
             test: /\.js$/,
             exclude: /node_modules/,
-            loader: 'babel-loader',
-            presets: ['es2015']
+            use: [
+              {
+                loader: 'babel-loader',
+                options: {
+                  presets: ['es2015']
+                }
+              }
+            ],
           },
           {
             test: /\.scss$/,
-            loader: ExtractTextPlugin.extract('style-loader', 'css-loader!sass-loader')
+            loader: ExtractTextPlugin.extract({
+              fallbackLoader: 'css-loader',
+              loader: 'css-loader!sass-loader'
+            })
           }
         ]
     },
@@ -196,9 +206,7 @@ function testBrowser() {
       module: {
         loaders: [
           // This is what allows us to author in future JavaScript
-          {test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader'},
-          // This allows the test setup scripts to load `package.json`
-          {test: /\.json$/, exclude: /node_modules/, loader: 'json-loader'}
+          {test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader'}
         ]
       },
       plugins: [
