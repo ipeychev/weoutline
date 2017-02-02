@@ -1,3 +1,5 @@
+import BrowserHelper from '../helpers/browser-helper';
+
 class Toolbar {
   _deactivateOptions(rootNode) {
     var nodes = rootNode.querySelectorAll('.toolbar-item-option');
@@ -89,7 +91,9 @@ class Toolbar {
 
         this._deactivateOptions(rootNode);
 
-        while (!targetNode.matches('.toolbar-item-option')) {
+        let matches = BrowserHelper.getNodeMatches(targetNode);
+
+        while (!matches.call(targetNode, '.toolbar-item-option')) {
           targetNode = targetNode.parentNode;
         }
 

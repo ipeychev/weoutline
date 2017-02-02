@@ -21,6 +21,10 @@ class BrowserHelper {
     }
   }
 
+  static getNodeMatches(node) {
+    return node.matches || node.msMatchesSelector;
+  }
+
   static isFullScreenSupported() {
     let res = BrowserHelper.getFullScreenModeValue();
 

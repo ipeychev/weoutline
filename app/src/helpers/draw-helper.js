@@ -57,6 +57,14 @@ class DrawHelper {
     return false;
   }
 
+  static colorToHex(value) {
+    if (value.charAt(0) === '#') {
+      return value;
+    } else {
+      return DrawHelper.rgbToHex(value);
+    }
+  }
+
   static rgbToHex(value) {
     let result = /rgb\s*\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)/.exec(value);
     let r = parseInt(result[1], 10);
