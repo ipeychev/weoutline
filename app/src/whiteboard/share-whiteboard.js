@@ -80,7 +80,7 @@ class ShareWhiteboardModal {
           <div class="share-whiteboard-url-container">
             <input id="shareWhiteboardURL" class="share-whiteboard-url-input" name="url" type="text" placeholder="URL" value="${payload.url}" required readonly>
             <button id="shareWhiteboardCopyURL" class="btn share-whiteboard-url-btn copy">
-              <svg class="icon" id="signIn"><use xlink:href="/assets/images/symbol-defs.svg#icon-clipboard"></use></svg>
+              <span class="icon icon-clipboard"></span>
             </button>
           </div>
           </div>`,
@@ -94,7 +94,7 @@ class ShareWhiteboardModal {
           <div class="share-whiteboard-url-container">
             <input id="shareWhiteboardURL" class="share-whiteboard-url-input" name="url" type="text" placeholder="URL" value="${payload.url}" required readonly>
             <button id="shareWhiteboardCopyURL" class="btn share-whiteboard-url-btn copy">
-              <svg class="icon" id="signIn"><use xlink:href="/assets/images/symbol-defs.svg#icon-clipboard"></use></svg>
+              <span class="icon icon-clipboard"></span>
             </button>
           </div>
           </div>`,
@@ -108,7 +108,7 @@ class ShareWhiteboardModal {
           <div class="share-whiteboard-url-container">
             <input id="shareWhiteboardURL" class="share-whiteboard-url-input" name="url" type="text" placeholder="URL" value="${payload.url}" required readonly>
             <button id="shareWhiteboardCopyURL" class="btn share-whiteboard-url-btn copy">
-              <svg class="icon" id="signIn"><use xlink:href="/assets/images/symbol-defs.svg#icon-clipboard"></use></svg>
+              <span class="icon icon-clipboard"></span>
             </button>
           </div>
 
@@ -139,7 +139,7 @@ class ShareWhiteboardModal {
             <div class="share-whiteboard-url-container">
               <input id="shareWhiteboardURL" class="share-whiteboard-url-input" name="url" type="text" placeholder="URL" value="${payload.url}" required readonly>
               <button id="shareWhiteboardCopyURL" class="btn share-whiteboard-url-btn copy">
-                <svg class="icon" id="signIn"><use xlink:href="/assets/images/symbol-defs.svg#icon-clipboard"></use></svg>
+                <span class="icon icon-clipboard"></span>
               </button>
             </div>
           </div>

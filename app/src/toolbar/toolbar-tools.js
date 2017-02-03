@@ -138,10 +138,6 @@ class ToolbarTools extends Toolbar {
       });
     } else if (this._clearNode.contains(targetNode)) {
       this._config.clearWhiteboardCallback();
-    } else if (this._selectNode.contains(targetNode)) {
-      this._updateToolbarView(this._selectNode, targetNode, {
-        activateValue: true
-      });
     } else if (this._shareNode.contains(targetNode)) {
       this._config.shareWhiteboardCallback();
     } else if (this._fullScreenNode.contains(targetNode)) {
