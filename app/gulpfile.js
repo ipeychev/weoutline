@@ -136,7 +136,7 @@ function copyStatic() {
   return gulp.src([
     'src/**/*.jpeg',
     'src/**/*.png',
-    'src/**/*.svg',
+    'src/**/assets/fonts/**/*.*',
     'src/**/assets/vendor/**/*.css'
   ])
   .pipe(gulp.dest(destinationFolder));

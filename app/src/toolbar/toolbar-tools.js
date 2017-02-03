@@ -95,7 +95,7 @@ class ToolbarTools extends Toolbar {
     let node = this._colorNode.querySelector('.toolbar-item-option.active .icon');
     let style = window.getComputedStyle(node);
 
-    return DrawHelper.colorToHex(style.getPropertyValue('fill'));
+    return DrawHelper.colorToHex(style.getPropertyValue('color'));
   }
 
   _getPenSize() {
@@ -106,7 +106,7 @@ class ToolbarTools extends Toolbar {
     let node = rootNode.querySelector('.toolbar-item-option.active .icon');
     let style = window.getComputedStyle(node);
 
-    return parseInt(style.getPropertyValue('width'), 10);
+    return parseInt(style.getPropertyValue('font-size'), 10);
   }
 
   _initItems() {
@@ -133,7 +133,7 @@ class ToolbarTools extends Toolbar {
           source: 'style',
           nodeSelector: '.icon',
           transformFn: DrawHelper.colorToHex,
-          property: 'fill'
+          property: 'color'
         }
       });
     } else if (this._clearNode.contains(targetNode)) {
@@ -175,7 +175,7 @@ class ToolbarTools extends Toolbar {
 
       let style = window.getComputedStyle(optionNode);
 
-      if (DrawHelper.colorToHex(style.getPropertyValue('fill')) === value) {
+      if (DrawHelper.colorToHex(style.getPropertyValue('color')) === value) {
         optionNode.parentNode.classList.add('active');
 
         this._setItemValue(optionNode.parentNode, this._colorNode, {
@@ -183,7 +183,7 @@ class ToolbarTools extends Toolbar {
             source: 'style',
             nodeSelector: '.icon',
             transformFn: DrawHelper.colorToHex,
-            property: 'fill'
+            property: 'color'
           }
         });
       }
@@ -213,8 +213,9 @@ class ToolbarTools extends Toolbar {
 
       let style = window.getComputedStyle(optionNode);
 
-      if (parseInt(style.getPropertyValue('width'), 10) === value) {
+      if (parseInt(style.getPropertyValue('font-size'), 10) === value) {
         optionNode.parentNode.classList.add('active');
+        break;
       }
     }
   }

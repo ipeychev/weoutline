@@ -10,46 +10,49 @@
       .toolbar-item {
         .toolbar-item-options {
           .toolbar-item-option {
+              .icon {
+                font-size: 22px;
+              }
+
               &.small {
                 .icon {
-                  width: 4px;
+                  font-size: 4px;
                 }
               }
 
               &.normal {
                 .icon {
-                  width: 6px;
+                  font-size: 6px;
                 }
               }
 
               &.big {
                 .icon {
-                  width: 8px;
+                  font-size: 8px;
                 }
               }
 
               &.large {
                 .icon {
-                  width: 12px;
+                  font-size: 12px;
                 }
               }
 
               &.extra {
                 .icon {
-                  width: 16px;
+                  font-size: 16px;
                 }
               }
 
               &.huge {
                 .icon {
-                  width: 18px;
+                  font-size: 18px;
                 }
               }
 
               &.giant {
                 .icon {
-                  height: 22px;
-                  width: 22px;
+                  font-size: 22px;
                 }
               }
           }
