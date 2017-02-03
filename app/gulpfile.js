@@ -1,24 +1,26 @@
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
-var del = require('del');
-var glob = require('glob');
-var gulp = require('gulp');
-var gutil = require('gulp-util');
-var isparta = require('isparta');
-var loadPlugins = require('gulp-load-plugins');
-var runSequence = require('run-sequence');
-var webpack = require('webpack');
-var webpackStream = require('webpack-stream');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const del = require('del');
+const glob = require('glob');
+const gulp = require('gulp');
+const gutil = require('gulp-util');
+const isparta = require('isparta');
+const loadPlugins = require('gulp-load-plugins');
+const runSequence = require('run-sequence');
+const webpack = require('webpack');
+const webpackStream = require('webpack-stream');
 
-var Instrumenter = isparta.Instrumenter;
-var mochaGlobals = require('./test/setup/.globals');
-var manifest = require('./package.json');
+const mochaGlobals = require('./test/setup/.globals');
+const manifest = require('./package.json');
 
-var release = process.env.NODE_ENV === 'production';
+let Instrumenter = isparta.Instrumenter;
+
+let release = process.env.NODE_ENV === 'production';
 
 // Load all of our Gulp plugins
-var $ = loadPlugins();
+let $ = loadPlugins();
 
-var destinationFolder = 'dist';
+let destinationFolder = 'dist';
 
 function cleanDist(done) {
   del([destinationFolder]).then(() => done());
@@ -70,7 +72,15 @@ function buildSrc(callback) {
   ];
 
   if (release) {
-    plugins.push(new webpack.optimize.UglifyJsPlugin({minimize: true}));
+    plugins.push(
+      new webpack.optimize.UglifyJsPlugin({minimize: true}),
+      new OptimizeCssAssetsPlugin({
+        assetNameRegExp: /\.css$/,
+        canPrint: false,
+        cssProcessor: require('cssnano'),
+        cssProcessorOptions: { discardComments: {removeAll: true } }
+      })
+    );
   }
 
   webpack({
@@ -115,7 +125,7 @@ function buildSrc(callback) {
     if (err) {
       console.error(new gutil.PluginError('webpack', err));
     } else if ( stats.hasErrors() ) { // soft error
-      var statsLog = {
+      let statsLog = {
         assets: false,
         children: false,
         chunkModules: false,
@@ -136,7 +146,9 @@ function copyStatic() {
   return gulp.src([
     'src/**/*.jpeg',
     'src/**/*.png',
-    'src/**/assets/fonts/**/*.*',
+    'src/**/assets/fonts/**/*.svg',
+    'src/**/assets/fonts/**/*.ttf',
+    'src/**/assets/fonts/**/*.woff',
     'src/**/assets/vendor/**/*.css'
   ])
   .pipe(gulp.dest(destinationFolder));
@@ -175,7 +187,7 @@ function test() {
   return _mocha();
 }
 
-var watchFiles = ['gulpfile.js', 'src/**/*', 'test/**/*', 'package.json', '**/.eslintrc', '!**/server.js', '!**/views/*', '!**/routes/*'];
+let watchFiles = ['gulpfile.js', 'src/**/*', 'test/**/*', 'package.json', '**/.eslintrc', '!**/server.js', '!**/views/*', '!**/routes/*'];
 
 // Run the headless unit tests as you make changes.
 function watch() {
@@ -186,11 +198,11 @@ function testBrowser() {
   // Our testing bundle is made up of our unit tests, which
   // should individually load up pieces of our application.
   // We also include the browser setup file.
-  var testFiles = glob.sync('./test/unit/**/*.js');
-  var allFiles = ['./test/setup/browser.js'].concat(testFiles);
+  let testFiles = glob.sync('./test/unit/**/*.js');
+  let allFiles = ['./test/setup/browser.js'].concat(testFiles);
 
-  // vars us differentiate between the first build and subsequent builds
-  var firstBuild = true;
+  // lets us differentiate between the first build and subsequent builds
+  let firstBuild = true;
 
   // This empty stream might seem like a hack, but we need to specify all of our files through
   // the `entry` option of webpack. Otherwise, it ignores whatever file(s) are placed in here.
