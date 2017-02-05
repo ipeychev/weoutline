@@ -26,6 +26,8 @@ class ToolbarUser extends Toolbar {
   destroy() {
     this._detachListeners();
     this._draggable.destroy();
+
+    window.clearTimeout(this._hideMenuTimeout);
   }
 
   _attachListeners() {
@@ -95,6 +97,8 @@ class ToolbarUser extends Toolbar {
     let targetNode = event.target;
 
     if (this._config.currentUser) {
+      window.clearTimeout(this._hideMenuTimeout);
+
       if (this._userSignOutNode.contains(targetNode)) {
         event.preventDefault();
         this._config.signOutCallback();
@@ -103,6 +107,8 @@ class ToolbarUser extends Toolbar {
           activateValue: false
         });
       }
+
+      this._hideMenuTimeout = window.setTimeout(this._hideMenu.bind(this), 5000);
     } else {
       event.preventDefault();
       this._config.signInCallback(this._userSignInNode.getAttribute('href'));

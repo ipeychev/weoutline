@@ -27,6 +27,8 @@ class ToolbarTools extends Toolbar {
   destroy() {
     this._detachListeners();
     this._draggable.destroy();
+
+    window.clearTimeout(this._hideMenuTimeout);
   }
 
   getValues() {
@@ -57,7 +59,7 @@ class ToolbarTools extends Toolbar {
     this._clickListener = this._onClick.bind(this);
     this._documentInteractionListener = this._onDocumentInteraction.bind(this);
     this._resizeListener = this._onResize.bind(this);
-    this._orientationChangeListener = () => {setTimeout(this._onResize.bind(this), 100);};
+    this._orientationChangeListener = () => {window.setTimeout(this._onResize.bind(this), 100);};
     this._touchEndListener = this._onTouchEnd.bind(this);
 
     if (BrowserHelper.isTouchDevice()) {
@@ -118,6 +120,8 @@ class ToolbarTools extends Toolbar {
   _onClick(event) {
     let targetNode = event.target;
 
+    window.clearTimeout(this._hideMenuTimeout);
+
     if (this._penNode.contains(targetNode)) {
       this._updateToolbarView(this._penNode, targetNode, {
         activateValue: true
@@ -149,6 +153,8 @@ class ToolbarTools extends Toolbar {
     let values = this.getValues();
 
     this._config.valuesCallback(values);
+
+    this._hideMenuTimeout = window.setTimeout(this._hideMenu.bind(this), 5000);
   }
 
   _onColorChange() {
