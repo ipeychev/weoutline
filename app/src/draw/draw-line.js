@@ -50,6 +50,9 @@ class DrawLine {
     event.preventDefault();
 
     let curPoint = DrawHelper.getPointFromEvent(event, this._canvasElement);
+    // set the point to the unscaled X and Y
+    curPoint[0] = curPoint[0] / this._config.scale + this._config.originX;
+    curPoint[1] = curPoint[1] / this._config.scale + this._config.originY;
 
     if (this._config.minPointDistance > 0) {
       let distance = Math.sqrt((this._lastPoint[0] - curPoint[0]) * (this._lastPoint[0] - curPoint[0]) +
@@ -108,6 +111,10 @@ class DrawLine {
 
   start(event) {
     this._lastPoint = DrawHelper.getPointFromEvent(event, this._canvasElement);
+
+    // set the point to the unscaled X and Y
+    this._lastPoint[0] = this._lastPoint[0] / this._config.scale + this._config.originX;
+    this._lastPoint[1] = this._lastPoint[1] / this._config.scale + this._config.originY;
 
     let tmpX = this._lastPoint[0] + this._config.offset[0];
     let tmpY = this._lastPoint[1] + this._config.offset[1];

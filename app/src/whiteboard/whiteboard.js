@@ -20,6 +20,11 @@ class Whiteboard {
     this._config = config;
 
     this._shapes = [];
+
+    this._scale = 1;
+    this._originX = 0;
+    this._originY = 0;
+
     this._loadSpinner = document.getElementById(this._config.whiteboard.loadSpinnerId);
     this._whiteboardId = this._config.whiteboard.id;
     this._sessionId = this._generateSessionId();
@@ -104,7 +109,7 @@ class Whiteboard {
   }
 
   redraw() {
-    this._context.clearRect(0, 0, this._context.canvas.width, this._context.canvas.height);
+    this._context.clearRect(this._originX, this._originY, this._context.canvas.width/this._scale, this._context.canvas.height/this._scale);
 
     this.drawRulers();
 
@@ -419,40 +424,109 @@ class Whiteboard {
     if (event.deltaMode === 0) {
       event.preventDefault();
 
-      allowedOffset = this._getAllowedOffset([event.deltaX, event.deltaY]);
+      var mouseX = event.offsetX;
+      var mouseY = event.offsetY;
 
-      this._offset[0] += allowedOffset[0];
-      this._offset[1] += allowedOffset[1];
+      var wheel = event.wheelDelta / 120;
+
+      var zoom = 1 - wheel/2;
+
+      this._context.translate(this._originX, this._originY);
+      this._context.scale(zoom, zoom);
+
+      this._originX = ((mouseX / this._scale) + this._originX) - (mouseX / ( this._scale * zoom ));
+      this._originY = ((mouseY / this._scale) + this._originY) - (mouseY / ( this._scale * zoom ));
+
+      this._context.translate(-this._originX, -this._originY);
+
+      this._scale *= zoom;
+
+      this._drawer.setConfig({
+        offset: this._offset,
+        scale: this._scale,
+        originX: this._originX,
+        originY: this._originY
+      });
 
       this.redraw();
     } else if (event.touches.length > 1) {
       event.preventDefault();
 
-      let curPoint = [event.touches[0].pageX, event.touches[0].pageY];
+      if (!this._dragModeSet) {
+        let curPoint0 = [event.touches[0].pageX, event.touches[0].pageY];
+        let curPoint1 = [event.touches[1].pageX, event.touches[1].pageY];
 
-      allowedOffset = this._getAllowedOffset([
-        (curPoint[0] - this._lastDragPoint[0]) * -1,
-        (curPoint[1] - this._lastDragPoint[1]) * -1
-      ]);
+        if (Math.abs(curPoint0[0] - this._lastPoint0[0]) >= 20 || Math.abs(curPoint0[1] - this._lastPoint0[1]) >= 20 ||
+          Math.abs(curPoint1[0] - this._lastPoint1[0]) >= 20 || Math.abs(curPoint1[1] - this._lastPoint1[1]) >= 20) {
 
-      this._offset[0] += allowedOffset[0];
-      this._offset[1] += allowedOffset[1];
+          this._dragModeSet = true;
 
-      this._lastDragPoint[0] = curPoint[0];
-      this._lastDragPoint[1] = curPoint[1];
+          if ((curPoint0[0] < this._lastPoint0[0] && curPoint1[0] < this._lastPoint1[0]) ||
+              (curPoint0[0] > this._lastPoint0[0] && curPoint1[0] > this._lastPoint1[0]) ||
+            (curPoint0[1] < this._lastPoint0[1] && curPoint1[1] < this._lastPoint1[1]) ||
+            (curPoint0[1] > this._lastPoint0[1] && curPoint1[1] > this._lastPoint1[1])) {
+              this._dragMode = 'pan';
+            } else {
+              this._dragMode = 'zoom';
+            }
+          }
+      } else if (this._dragMode === 'pan') {
+        let curPoint = [event.touches[0].pageX, event.touches[0].pageY];
 
-      this.redraw();
+        allowedOffset = this._getAllowedOffset([
+          (curPoint[0] - this._lastPoint0[0]) * -1,
+          (curPoint[1] - this._lastPoint0[1]) * -1
+        ]);
+
+        this._offset[0] += allowedOffset[0];
+        this._offset[1] += allowedOffset[1];
+
+        this.redraw();
+
+        this._drawer.setConfig({
+          offset: this._offset
+        });
+
+        this._map.setConfig({
+          offset: this._offset
+        });
+
+        this._saveOffsetWithTimeout(this._whiteboardId, this._offset);
+
+        this._lastPoint0[0] = curPoint[0];
+        this._lastPoint0[1] = curPoint[1];
+      } else {
+        let curPoint0 = [event.touches[0].pageX, event.touches[0].pageY];
+        let curPoint1 = [event.touches[1].pageX, event.touches[1].pageY];
+
+        if (Math.abs(curPoint0[0] - this._lastPoint0[0]) >= 10 || Math.abs(curPoint0[1] - this._lastPoint0[1]) >= 10 ||
+          Math.abs(curPoint1[0] - this._lastPoint1[0]) >= 10 || Math.abs(curPoint1[1] - this._lastPoint1[1]) >= 10) {
+
+          let x1 = curPoint0[0];
+          let x2 = this._lastPoint0[0];
+          let y1 = curPoint0[1];
+          let y2 = this._lastPoint0[1];
+
+          let x3 = curPoint1[0];
+          let x4 = this._lastPoint1[0];
+          let y3 = curPoint1[1];
+          let y4 = this._lastPoint1[1];
+
+          let distance1 = Math.abs(Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2)));
+
+          let distance2 = Math.abs(Math.sqrt((x3-x4)*(x3-x4) + (y3-y4)*(y3-y4)));
+
+          if (distance2 > distance1) {
+            
+          } else {
+            
+          }
+
+          this._lastPoint0 = curPoint0;
+          this._lastPoint1 = curPoint1;
+        }
+      }
     }
-
-    this._drawer.setConfig({
-      offset: this._offset
-    });
-
-    this._map.setConfig({
-      offset: this._offset
-    });
-
-    this._saveOffsetWithTimeout(this._whiteboardId, this._offset);
   }
 
   _onMapSetOffsetCallback(point) {
@@ -513,7 +587,10 @@ class Whiteboard {
 
   _onTouchStart(event) {
     if (event.touches.length > 1) {
-      this._lastDragPoint = [event.touches[0].pageX, event.touches[0].pageY];
+      this._dragModeSet = false;
+
+      this._lastPoint0 = [event.touches[0].pageX, event.touches[0].pageY];
+      this._lastPoint1 = [event.touches[1].pageX, event.touches[1].pageY];
     }
   }
 
@@ -600,7 +677,10 @@ class Whiteboard {
         lineJoin: 'round',
         lineWidth: this._getLineWidth(),
         minPointDistance: this._config.whiteboard.minPointDistance,
-        offset: this._offset
+        offset: this._offset,
+        scale: this._scale,
+        originX: this._originX,
+        originY: this._originY
       });
     } else if (this._config.whiteboard.activeTool === Tools.eraser) {
       this._drawer = new Eraser({
