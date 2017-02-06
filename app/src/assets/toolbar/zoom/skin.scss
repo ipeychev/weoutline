@@ -1,0 +1,6 @@
+@import '../../sass-import-once';
+
+@import '../skin.scss';
+
+@include exports('toolbar-zoom-skin') {
+}

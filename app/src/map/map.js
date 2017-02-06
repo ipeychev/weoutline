@@ -104,8 +104,8 @@ class Map {
     let srcCanvasRect = this._config.srcCanvas.getBoundingClientRect();
 
     let srcCanvasSize = {
-      height: srcCanvasRect.height,
-      width: srcCanvasRect.width
+      height: srcCanvasRect.height / this._config.scale,
+      width: srcCanvasRect.width / this._config.scale
     };
 
     let mapRect = this._mapElement.getBoundingClientRect();

@@ -1,3 +1,5 @@
+import DrawHelper from '../helpers/draw-helper';
+
 export default class Draw {
   static line(points, context, config) {
     let p1 = points[0];
@@ -21,7 +23,7 @@ export default class Draw {
       context.moveTo(p1[0], p1[1]);
 
       for (let i = 1, len = points.length; i < len; i++) {
-        let midPoint = Draw.getMidPoint(p1, p2);
+        let midPoint = DrawHelper.getMidPoint(p1, p2);
         context.quadraticCurveTo(p1[0], p1[1], midPoint[0], midPoint[1]);
         p1 = points[i];
         p2 = points[i + 1];
@@ -43,18 +45,11 @@ export default class Draw {
     context.beginPath();
     context.moveTo(p1[0], p1[1]);
 
-    let midPoint = Draw.getMidPoint(p1, p2);
+    let midPoint = DrawHelper.getMidPoint(p1, p2);
     context.quadraticCurveTo(p1[0], p1[1], midPoint[0], midPoint[1]);
 
     context.stroke();
 
     return midPoint;
-  }
-
-  static getMidPoint(p1, p2) {
-    return [
-      p1[0] + (p2[0] - p1[0]) / 2,
-      p1[1] + (p2[1] - p1[1]) / 2
-    ];
   }
 }

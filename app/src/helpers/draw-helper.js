@@ -46,10 +46,23 @@ class DrawHelper {
     return point;
   }
 
-  static checkPointsInViewport(points, offset, canvasSize) {
+  static getPointsDistance(p1, p2) {
+    let diffX = p1[0] - p2[0];
+
+    let diffY = p1[1] - p2[1];
+
+    return Math.sqrt(diffX * diffX + diffY * diffY);
+  }
+
+  static checkPointsInViewport(points, offset, scale, canvasSize) {
+    let scaledCanvasSize = {
+      height: canvasSize.height / scale,
+      width: canvasSize.width / scale
+    };
+
     for (let i = 0; i < points.length; i++) {
-      if (points[i][0] >= offset[0] && points[i][0] <= offset[0] + canvasSize.width &&
-        points[i][1] >= offset[1] && points[i][1] <= offset[1] + canvasSize.height) {
+      if (points[i][0] >= offset[0] && points[i][0] <= offset[0] + scaledCanvasSize.width &&
+        points[i][1] >= offset[1] && points[i][1] <= offset[1] + scaledCanvasSize.height) {
           return true;
       }
     }
@@ -63,6 +76,13 @@ class DrawHelper {
     } else {
       return DrawHelper.rgbToHex(value);
     }
+  }
+
+  static getMidPoint(p1, p2) {
+    return [
+      p1[0] + (p2[0] - p1[0]) / 2,
+      p1[1] + (p2[1] - p1[1]) / 2
+    ];
   }
 
   static rgbToHex(value) {

@@ -37,6 +37,10 @@ class Eraser {
 
     let curPoint = DrawHelper.getPointFromEvent(event, this._canvasElement);
 
+    // set the point to the unscaled X and Y
+    curPoint[0] = curPoint[0] / this._config.scale;
+    curPoint[1] = curPoint[1] / this._config.scale;
+
     let tmpX = curPoint[0] + this._config.offset[0];
     let tmpY = curPoint[1] + this._config.offset[1];
 
@@ -73,6 +77,10 @@ class Eraser {
     };
 
     let curPoint = DrawHelper.getPointFromEvent(event, this._canvasElement);
+
+    // set the point to the unscaled X and Y
+    curPoint[0] = curPoint[0] / this._config.scale;
+    curPoint[1] = curPoint[1] / this._config.scale;
 
     let tmpX = curPoint[0] + this._config.offset[0];
     let tmpY = curPoint[1] + this._config.offset[1];
@@ -163,7 +171,7 @@ class Eraser {
     let matchingShapes = [];
 
     for (let i = 0; i < this._config.shapes.length; i++) {
-      if (DrawHelper.checkPointsInViewport(this._config.shapes[i].points, this._config.offset, this._canvasSize)) {
+      if (DrawHelper.checkPointsInViewport(this._config.shapes[i].points, this._config.offset, this._config.scale, this._canvasSize)) {
         let matchedShape = this._checkShapeMatching(curPoint, this._config.shapes[i]);
 
         if (matchedShape) {
