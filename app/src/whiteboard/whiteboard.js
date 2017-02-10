@@ -443,9 +443,15 @@ class Whiteboard {
 
       this._drawer.setConfig({
         offset: this._offset,
-        scale: this._scale,
         originX: this._originX,
-        originY: this._originY
+        originY: this._originY,
+        scale: this._scale
+      });
+
+      this._map.setConfig({
+        originX: this._originX,
+        originY: this._originY,
+        scale: this._scale
       });
 
       this.redraw();
@@ -720,10 +726,13 @@ class Whiteboard {
       height: this._config.map.height,
       lineWidth: this._config.map.lineWidth,
       offset: this._offset,
+      originX: this._originX,
+      originY: this._originY,
+      scale: this._scale,
       setOffsetCallback: this._onMapSetOffsetCallback.bind(this),
       srcCanvas: this._canvasElement,
       srcNode: this._config.map.srcNode,
-      width: this._config.map.width,
+      width: this._config.map.width
     });
   }
 

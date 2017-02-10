@@ -15,6 +15,7 @@
         "sourceType": "module"
     },
     "rules": {
+        "comma-dangle": "error",
         "constructor-super": "warn",
         "no-const-assign": "warn",
         "no-redeclare": "error",

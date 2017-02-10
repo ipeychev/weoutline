@@ -104,8 +104,8 @@ class Map {
     let srcCanvasRect = this._config.srcCanvas.getBoundingClientRect();
 
     let srcCanvasSize = {
-      height: srcCanvasRect.height,
-      width: srcCanvasRect.width
+      height: srcCanvasRect.height / this._config.scale,
+      width: srcCanvasRect.width / this._config.scale
     };
 
     let mapRect = this._mapElement.getBoundingClientRect();
@@ -117,8 +117,8 @@ class Map {
     return {
       height: srcCanvasSize.height / ratioY,
       width: srcCanvasSize.width / ratioX,
-      x: this._config.offset[0] / ratioX,
-      y: this._config.offset[1] / ratioY
+      x: (this._config.offset[0] + this._config.originX) / ratioX,
+      y: (this._config.offset[1] + this._config.originY) / ratioY
     };
   }
 
