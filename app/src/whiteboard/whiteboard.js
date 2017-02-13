@@ -203,12 +203,12 @@ class Whiteboard {
       this._context.beginPath();
       this._context.strokeStyle = '#000000';
       this._context.lineWidth = 1;
-      this._context.moveTo(i - this._offset[0], 0);
+      this._context.moveTo(i - this._offset[0], this._origin[1]);
 
       if (i % 100 === 0) {
-        this._context.lineTo(i - this._offset[0], 10);
+        this._context.lineTo(i - this._offset[0], this._origin[1] + 10);
       } else {
-        this._context.lineTo(i - this._offset[0], 5);
+        this._context.lineTo(i - this._offset[0], this._origin[1] + 5);
       }
       this._context.stroke();
 
@@ -218,7 +218,7 @@ class Whiteboard {
         this._context.textBaseline = 'alphabetic';
         this._context.font = this._config.whiteboard.rulerFontSize + 'px';
         this._context.fillStyle = '#000000';
-        this._context.fillText(i, i - this._offset[0], 20);
+        this._context.fillText(i, i - this._offset[0], this._origin[1] + 20);
       }
     }
   }
@@ -228,12 +228,12 @@ class Whiteboard {
       this._context.beginPath();
       this._context.strokeStyle = '#000000';
       this._context.lineWidth = 1;
-      this._context.moveTo(0, i - this._offset[1]);
+      this._context.moveTo(this._origin[0], i - this._offset[1]);
 
       if (i % 100 === 0) {
-        this._context.lineTo(10, i - this._offset[1]);
+        this._context.lineTo(this._origin[0] + 10, i - this._offset[1]);
       } else {
-        this._context.lineTo(5, i - this._offset[1]);
+        this._context.lineTo(this._origin[0] + 5, i - this._offset[1]);
       }
       this._context.stroke();
 
@@ -243,7 +243,7 @@ class Whiteboard {
         this._context.textBaseline = i + 20 < this._config.whiteboard.height ? 'middle' : 'bottom';
         this._context.font = this._config.whiteboard.rulerFontSize + 'px';
         this._context.fillStyle = '#000000';
-        this._context.fillText(i, 12, i - this._offset[1]);
+        this._context.fillText(i, this._origin[0] + 12, i - this._offset[1]);
       }
     }
   }
