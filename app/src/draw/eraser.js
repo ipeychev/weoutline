@@ -72,8 +72,8 @@ class Eraser {
 
   start(event) {
     this._canvasSize = {
-      height: this._canvasElement.height / this._config.scale,
-      width: this._canvasElement.width / this._config.scale
+      height: this._canvasElement.height,
+      width: this._canvasElement.width
     };
 
     let curPoint = DrawHelper.getPointFromEvent(event, this._canvasElement);
