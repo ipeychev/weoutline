@@ -171,7 +171,7 @@ class Eraser {
     let matchingShapes = [];
 
     for (let i = 0; i < this._config.shapes.length; i++) {
-      if (DrawHelper.checkPointsInViewport(this._config.shapes[i].points, this._config.offset, this._canvasSize)) {
+      if (DrawHelper.checkPointsInViewport(this._config.shapes[i].points, this._config.offset, this._config.scale, this._canvasSize)) {
         let matchedShape = this._checkShapeMatching(curPoint, this._config.shapes[i]);
 
         if (matchedShape) {

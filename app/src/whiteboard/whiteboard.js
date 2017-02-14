@@ -88,7 +88,7 @@ class Whiteboard {
 
     for (let i = 0; i < this._shapes.length; i++) {
       if (this._shapes[i].type === ShapeType.LINE) {
-        if (DrawHelper.checkPointsInViewport(this._shapes[i].points, this._offset, canvasSize)) {
+        if (DrawHelper.checkPointsInViewport(this._shapes[i].points, this._offset, this._scale, canvasSize)) {
           let points = this._shapes[i].points.map((point) => {
             return DrawHelper.getPointWithOffset(point, this._offset);
           });
@@ -151,6 +151,7 @@ class Whiteboard {
 
           this._offset[0] = 0;
           this._offset[1] = 0;
+          this._scale = 1;
 
           this._saveState(this._whiteboardId);
 
@@ -198,7 +199,7 @@ class Whiteboard {
   }
 
   _drawHorizontalRuler() {
-    let posY = this._offset[1] < 0 ? 0 : this._offset[1];
+    let posY = this._offset[1] < 0 ? Math.abs(this._offset[1]) : 0;
 
     for (let i = 0; i <= this._config.whiteboard.width; i += 20) {
       this._context.beginPath();
@@ -225,7 +226,7 @@ class Whiteboard {
   }
 
   _drawVerticalRuler() {
-    let posX = this._offset[0] < 0 ? 0 : this._offset[0];
+    let posX = this._offset[0] < 0 ? Math.abs(this._offset[0]) : 0;
 
     for (let i = 20; i <= this._config.whiteboard.height; i += 20) {
       this._context.beginPath();

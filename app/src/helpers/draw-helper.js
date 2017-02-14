@@ -46,10 +46,15 @@ class DrawHelper {
     return point;
   }
 
-  static checkPointsInViewport(points, offset, canvasSize) {
+  static checkPointsInViewport(points, offset, scale, canvasSize) {
+    let scaledCanvasSize = {
+      height: canvasSize.height / scale,
+      width: canvasSize.width / scale
+    };
+
     for (let i = 0; i < points.length; i++) {
-      if (points[i][0] >= offset[0] && points[i][0] <= offset[0] + canvasSize.width &&
-        points[i][1] >= offset[1] && points[i][1] <= offset[1] + canvasSize.height) {
+      if (points[i][0] >= offset[0] && points[i][0] <= offset[0] + scaledCanvasSize.width &&
+        points[i][1] >= offset[1] && points[i][1] <= offset[1] + scaledCanvasSize.height) {
           return true;
       }
     }
