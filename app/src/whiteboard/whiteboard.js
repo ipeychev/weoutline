@@ -149,11 +149,23 @@ class Whiteboard {
         eraseWhiteBoardCallback: () => {
           this.deleteShapes(this._shapes);
 
+          this._context.setTransform(1, 0, 0, 1, 0, 0);
+
           this._offset[0] = 0;
           this._offset[1] = 0;
           this._scale = 1;
 
           this._saveState(this._whiteboardId);
+
+          this._drawer.setConfig({
+            offset: this._offset,
+            scale: this._scale
+          });
+
+          this._map.setConfig({
+            offset: this._offset,
+            scale: this._scale
+          });
 
           this.redraw();
         }
