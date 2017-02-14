@@ -38,7 +38,6 @@ class Whiteboard {
 
     this._resizeCanvas();
     this._setScale();
-    this._setOrigin();
 
     this._setActiveTool();
 
@@ -107,7 +106,7 @@ class Whiteboard {
   }
 
   redraw() {
-    this._context.clearRect(this._origin[0], this._origin[1], this._context.canvas.width/this._scale, this._context.canvas.height/this._scale);
+    this._context.clearRect(0, 0, this._context.canvas.width/this._scale, this._context.canvas.height/this._scale);
 
     this.drawRulers();
 
@@ -199,16 +198,18 @@ class Whiteboard {
   }
 
   _drawHorizontalRuler() {
+    let posY = this._offset[1] < 0 ? 0 : this._offset[1];
+
     for (let i = 0; i <= this._config.whiteboard.width; i += 20) {
       this._context.beginPath();
       this._context.strokeStyle = '#000000';
       this._context.lineWidth = 1;
-      this._context.moveTo(i - this._offset[0], this._origin[1]);
+      this._context.moveTo(i - this._offset[0], posY);
 
       if (i % 100 === 0) {
-        this._context.lineTo(i - this._offset[0], this._origin[1] + 10);
+        this._context.lineTo(i - this._offset[0], posY + 10);
       } else {
-        this._context.lineTo(i - this._offset[0], this._origin[1] + 5);
+        this._context.lineTo(i - this._offset[0], posY + 5);
       }
       this._context.stroke();
 
@@ -218,22 +219,24 @@ class Whiteboard {
         this._context.textBaseline = 'alphabetic';
         this._context.font = this._config.whiteboard.rulerFontSize + 'px';
         this._context.fillStyle = '#000000';
-        this._context.fillText(i, i - this._offset[0], this._origin[1] + 20);
+        this._context.fillText(i, i - this._offset[0], posY + 20);
       }
     }
   }
 
   _drawVerticalRuler() {
+    let posX = this._offset[0] < 0 ? 0 : this._offset[0];
+
     for (let i = 20; i <= this._config.whiteboard.height; i += 20) {
       this._context.beginPath();
       this._context.strokeStyle = '#000000';
       this._context.lineWidth = 1;
-      this._context.moveTo(this._origin[0], i - this._offset[1]);
+      this._context.moveTo(posX, i - this._offset[1]);
 
       if (i % 100 === 0) {
-        this._context.lineTo(this._origin[0] + 10, i - this._offset[1]);
+        this._context.lineTo(posX + 10, i - this._offset[1]);
       } else {
-        this._context.lineTo(this._origin[0] + 5, i - this._offset[1]);
+        this._context.lineTo(posX + 5, i - this._offset[1]);
       }
       this._context.stroke();
 
@@ -243,7 +246,7 @@ class Whiteboard {
         this._context.textBaseline = i + 20 < this._config.whiteboard.height ? 'middle' : 'bottom';
         this._context.font = this._config.whiteboard.rulerFontSize + 'px';
         this._context.fillStyle = '#000000';
-        this._context.fillText(i, this._origin[0] + 12, i - this._offset[1]);
+        this._context.fillText(i, posX + 12, i - this._offset[1]);
       }
     }
   }
@@ -262,21 +265,17 @@ class Whiteboard {
 
   _fetchState() {
     let offset;
-    let origin;
     let scale;
 
     if (this._whiteboardId) {
       offset = localStorage.getItem(this._whiteboardId + '_' + 'offset');
-      origin = localStorage.getItem(this._whiteboardId + '_' + 'origin');
       scale = localStorage.getItem(this._whiteboardId + '_' + 'scale');
     } else {
       offset = localStorage.getItem('offset');
-      origin = localStorage.getItem('origin');
       scale = localStorage.getItem('scale');
     }
 
     this._offset = JSON.parse(offset) || [0, 0];
-    this._origin = JSON.parse(origin) || [0, 0];
     this._scale = JSON.parse(scale) || 1;
   }
 
@@ -409,7 +408,6 @@ class Whiteboard {
     let canvasSize = this._resizeCanvas();
 
     this._setScale();
-    this._setOrigin();
 
     this._updateOffset({
       canvasHeight: canvasSize.height,
@@ -434,24 +432,20 @@ class Whiteboard {
 
       var zoom = 1 - wheel/2;
 
-      this._context.translate(this._origin[0], this._origin[1]);
       this._context.scale(zoom, zoom);
 
-      this._origin[0] = ((mouseX / this._scale) + this._origin[0]) - (mouseX / (this._scale * zoom));
-      this._origin[1] = ((mouseY / this._scale) + this._origin[1]) - (mouseY / (this._scale * zoom));
-
-      this._context.translate(-this._origin[0], -this._origin[1]);
+      this._offset[0] = ((mouseX / this._scale) + this._offset[0]) - (mouseX / (this._scale * zoom));
+      this._offset[1] = ((mouseY / this._scale) + this._offset[1]) - (mouseY / (this._scale * zoom));
 
       this._scale *= zoom;
 
       this._drawer.setConfig({
         offset: this._offset,
-        origin: this._origin,
         scale: this._scale
       });
 
       this._map.setConfig({
-        origin: this._origin,
+        offset: this._offset,
         scale: this._scale
       });
 
@@ -557,8 +551,8 @@ class Whiteboard {
       y = 0;
     }
 
-    this._offset[0] = x - this._origin[0];
-    this._offset[1] = y - this._origin[1];
+    this._offset[0] = x;
+    this._offset[1] = y;
 
     this.redraw();
 
@@ -670,11 +664,9 @@ class Whiteboard {
   _saveState(whiteboardId) {
     if (whiteboardId) {
       localStorage.setItem(whiteboardId + '_' + 'offset', JSON.stringify(this._offset));
-      localStorage.setItem(whiteboardId + '_' + 'origin', JSON.stringify(this._origin));
       localStorage.setItem(whiteboardId + '_' + 'scale', JSON.stringify(this._scale));
     } else {
       localStorage.setItem('offset', JSON.stringify(this._offset));
-      localStorage.setItem('origin', JSON.stringify(this._origin));
       localStorage.setItem('scale', JSON.stringify(this._scale));
     }
   }
@@ -729,8 +721,7 @@ class Whiteboard {
         lineWidth: this._getLineWidth(),
         minPointDistance: this._config.whiteboard.minPointDistance,
         offset: this._offset,
-        scale: this._scale,
-        origin: this._origin
+        scale: this._scale
       });
     } else if (this._config.whiteboard.activeTool === Tools.eraser) {
       this._drawer = new Eraser({
@@ -738,13 +729,10 @@ class Whiteboard {
         callback: this._onShapesErasedCallback.bind(this),
         canvas: this._canvasElement,
         offset: this._offset,
+        scale: this._scale,
         shapes: this._shapes
       });
     }
-  }
-
-  _setOrigin() {
-    this._context.translate(-this._origin[0], -this._origin[1]);
   }
 
   _setToolValues(toolValues) {
@@ -778,7 +766,6 @@ class Whiteboard {
       height: this._config.map.height,
       lineWidth: this._config.map.lineWidth,
       offset: this._offset,
-      origin: this._origin,
       scale: this._scale,
       setOffsetCallback: this._onMapSetOffsetCallback.bind(this),
       srcCanvas: this._canvasElement,

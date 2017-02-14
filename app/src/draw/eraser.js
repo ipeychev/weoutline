@@ -37,6 +37,10 @@ class Eraser {
 
     let curPoint = DrawHelper.getPointFromEvent(event, this._canvasElement);
 
+    // set the point to the unscaled X and Y
+    curPoint[0] = curPoint[0] / this._config.scale;
+    curPoint[1] = curPoint[1] / this._config.scale;
+
     let tmpX = curPoint[0] + this._config.offset[0];
     let tmpY = curPoint[1] + this._config.offset[1];
 
@@ -68,11 +72,15 @@ class Eraser {
 
   start(event) {
     this._canvasSize = {
-      height: this._canvasElement.height,
-      width: this._canvasElement.width
+      height: this._canvasElement.height / this._config.scale,
+      width: this._canvasElement.width / this._config.scale
     };
 
     let curPoint = DrawHelper.getPointFromEvent(event, this._canvasElement);
+
+    // set the point to the unscaled X and Y
+    curPoint[0] = curPoint[0] / this._config.scale;
+    curPoint[1] = curPoint[1] / this._config.scale;
 
     let tmpX = curPoint[0] + this._config.offset[0];
     let tmpY = curPoint[1] + this._config.offset[1];
