@@ -540,16 +540,18 @@ class Whiteboard {
     let x = point[0] - canvasWidth / 2;
     let y = point[1] - canvasHeight / 2;
 
-    if (x + canvasWidth > this._config.whiteboard.width) {
-      x = this._config.whiteboard.width - canvasWidth;
-    } else if (x < 0) {
-      x = 0;
-    }
+    if (this._scale >= 1) {
+      if (x + canvasWidth > this._config.whiteboard.width) {
+        x = this._config.whiteboard.width - canvasWidth;
+      } else if (x < 0) {
+        x = 0;
+      }
 
-    if (y + canvasHeight > this._config.whiteboard.height) {
-      y = this._config.whiteboard.height - canvasHeight;
-    } else if (y < 0) {
-      y = 0;
+      if (y + canvasHeight > this._config.whiteboard.height) {
+        y = this._config.whiteboard.height - canvasHeight;
+      } else if (y < 0) {
+        y = 0;
+      }
     }
 
     this._offset[0] = x;
