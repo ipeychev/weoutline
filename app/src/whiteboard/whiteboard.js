@@ -434,21 +434,22 @@ class Whiteboard {
 
   _onScroll(event) {
     let allowedOffset;
+    let zoom;
 
     if (event.deltaMode === 0) {
       event.preventDefault();
 
-      var mouseX = event.offsetX;
-      var mouseY = event.offsetY;
+      let mouseX = event.offsetX;
+      let mouseY = event.offsetY;
 
-      var wheel = event.wheelDelta / 120;
+      let wheel = event.wheelDelta / 120;
 
-      var zoom = 1 - wheel/2;
+      zoom = 1 - wheel/2;
 
       this._context.scale(zoom, zoom);
 
-      this._offset[0] = ((mouseX / this._scale) + this._offset[0]) - (mouseX / (this._scale * zoom));
-      this._offset[1] = ((mouseY / this._scale) + this._offset[1]) - (mouseY / (this._scale * zoom));
+      this._offset[0] = (mouseX / this._scale + this._offset[0]) - (mouseX / this._scale * zoom);
+      this._offset[1] = (mouseY / this._scale + this._offset[1]) - (mouseY / this._scale * zoom);
 
       this._scale *= zoom;
 
@@ -533,10 +534,33 @@ class Whiteboard {
           let distance2 = Math.abs(Math.sqrt((x3-x4)*(x3-x4) + (y3-y4)*(y3-y4)));
 
           if (distance2 > distance1) {
-            
+            zoom = 1.1;
           } else {
-            
+            zoom = 0.75;
           }
+
+          let zoomPoint = DrawHelper.getMidPoint(curPoint0, curPoint1);
+
+          this._context.scale(zoom, zoom);
+
+          this._offset[0] = (zoomPoint[0] / this._scale + this._offset[0]) - (zoomPoint[0] / this._scale * zoom);
+          this._offset[1] = (zoomPoint[1] / this._scale + this._offset[1]) - (zoomPoint[1] / this._scale * zoom);
+
+          this._scale *= zoom;
+
+          this._drawer.setConfig({
+            offset: this._offset,
+            scale: this._scale
+          });
+
+          this._map.setConfig({
+            offset: this._offset,
+            scale: this._scale
+          });
+
+          this._saveStateWithTimeout(this._whiteboardId);
+
+          this.redraw();
 
           this._lastPoint0 = curPoint0;
           this._lastPoint1 = curPoint1;

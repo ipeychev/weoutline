@@ -70,6 +70,13 @@ class DrawHelper {
     }
   }
 
+  static getMidPoint(p1, p2) {
+    return [
+      p1[0] + (p2[0] - p1[0]) / 2,
+      p1[1] + (p2[1] - p1[1]) / 2
+    ];
+  }
+
   static rgbToHex(value) {
     let result = /rgb\s*\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)/.exec(value);
     let r = parseInt(result[1], 10);

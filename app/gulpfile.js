@@ -108,7 +108,7 @@ function buildSrc(callback) {
                   presets: ['es2015']
                 }
               }
-            ],
+            ]
           },
           {
             test: /\.scss$/,
