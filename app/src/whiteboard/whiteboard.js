@@ -471,7 +471,6 @@ class Whiteboard {
 
   _onScroll(event) {
     let allowedOffset;
-    let zoom;
 
     if (event.deltaMode === 0) {
       event.preventDefault();
@@ -481,7 +480,7 @@ class Whiteboard {
 
       let wheel = event.wheelDelta / 120;
 
-      zoom = 1 - wheel/2;
+      let zoom = 1 - wheel/2;
 
       this._context.scale(zoom, zoom);
 
@@ -510,8 +509,8 @@ class Whiteboard {
         let curPoint0 = [event.touches[0].pageX, event.touches[0].pageY];
         let curPoint1 = [event.touches[1].pageX, event.touches[1].pageY];
 
-        if (Math.abs(curPoint0[0] - this._lastPoint0[0]) >= 20 || Math.abs(curPoint0[1] - this._lastPoint0[1]) >= 20 ||
-          Math.abs(curPoint1[0] - this._lastPoint1[0]) >= 20 || Math.abs(curPoint1[1] - this._lastPoint1[1]) >= 20) {
+        if (Math.abs(curPoint0[0] - this._lastPoint0[0]) >= 10 || Math.abs(curPoint0[1] - this._lastPoint0[1]) >= 10 ||
+          Math.abs(curPoint1[0] - this._lastPoint1[0]) >= 10 || Math.abs(curPoint1[1] - this._lastPoint1[1]) >= 10) {
 
           this._dragModeSet = true;
 
@@ -553,48 +552,43 @@ class Whiteboard {
         let curPoint0 = [event.touches[0].pageX, event.touches[0].pageY];
         let curPoint1 = [event.touches[1].pageX, event.touches[1].pageY];
 
-        let x1 = curPoint0[0];
-        let x2 = this._lastPoint0[0];
-        let y1 = curPoint0[1];
-        let y2 = this._lastPoint0[1];
+        let curDistance = DrawHelper.getPointsDistance(curPoint0, curPoint1);
+        let lastDistance = DrawHelper.getPointsDistance(this._lastPoint0, this._lastPoint1);
 
-        let x3 = curPoint1[0];
-        let x4 = this._lastPoint1[0];
-        let y3 = curPoint1[1];
-        let y4 = this._lastPoint1[1];
+        let zoom = 0;
 
-        let distance1 = Math.abs(Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2)));
-
-        let distance2 = Math.abs(Math.sqrt((x3-x4)*(x3-x4) + (y3-y4)*(y3-y4)));
-
-        if (distance2 > distance1) {
-          zoom = 1.1;
-        } else {
-          zoom = 0.9;
+        if (Math.abs(curDistance - lastDistance) >= 3) {
+          if (curDistance > lastDistance) {
+            zoom = 1.1;
+          } else if (curDistance < lastDistance) {
+            zoom = 0.9;
+          }
         }
 
-        let [zoomPointX, zoomPointY] = DrawHelper.getMidPoint(curPoint0, curPoint1);
+        if (zoom !== 0) {
+          let [zoomPointX, zoomPointY] = DrawHelper.getMidPoint(curPoint0, curPoint1);
 
-        this._context.scale(zoom, zoom);
+          this._context.scale(zoom, zoom);
 
-        this._offset[0] = ((zoomPointX / this._scale) + this._offset[0]) - (zoomPointX / (this._scale * zoom));
-        this._offset[1] = ((zoomPointY / this._scale) + this._offset[1]) - (zoomPointY / (this._scale * zoom));
+          this._offset[0] = ((zoomPointX / this._scale) + this._offset[0]) - (zoomPointX / (this._scale * zoom));
+          this._offset[1] = ((zoomPointY / this._scale) + this._offset[1]) - (zoomPointY / (this._scale * zoom));
 
-        this._scale *= zoom;
+          this._scale *= zoom;
 
-        this._drawer.setConfig({
-          offset: this._offset,
-          scale: this._scale
-        });
+          this._drawer.setConfig({
+            offset: this._offset,
+            scale: this._scale
+          });
 
-        this._map.setConfig({
-          offset: this._offset,
-          scale: this._scale
-        });
+          this._map.setConfig({
+            offset: this._offset,
+            scale: this._scale
+          });
 
-        this.redraw();
+          this.redraw();
 
-        this._saveStateWithTimeout(this._whiteboardId);
+          this._saveStateWithTimeout(this._whiteboardId);
+        }
 
         this._lastPoint0 = curPoint0;
         this._lastPoint1 = curPoint1;

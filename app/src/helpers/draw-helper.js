@@ -46,6 +46,14 @@ class DrawHelper {
     return point;
   }
 
+  static getPointsDistance(p1, p2) {
+    let diffX = p1[0] - p2[0];
+
+    let diffY = p1[1] - p2[1];
+
+    return Math.sqrt(diffX * diffX + diffY * diffY);
+  }
+
   static checkPointsInViewport(points, offset, scale, canvasSize) {
     let scaledCanvasSize = {
       height: canvasSize.height / scale,
