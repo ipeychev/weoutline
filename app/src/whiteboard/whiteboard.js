@@ -47,6 +47,14 @@ class Whiteboard {
         this.redraw();
         this._loadSpinner.classList.add('hidden');
       });
+
+    if (this._whiteboardId) {
+      this._data.watchShapes(this._whiteboardId, this._sessionId, {
+        onShapeCreated: this._onShapeCreatedRemotelyCallback.bind(this),
+        onShapeErased: this._onShapeErasedRemotelyCallback.bind(this),
+        onShapeWatchError: this._onShapeWatchError.bind(this)
+      });
+    }
   }
 
   addShapes(shapes) {
@@ -72,6 +80,8 @@ class Whiteboard {
     this._detachListeners();
 
     window.clearTimeout(this._saveStateTimeout);
+
+    this._data.destroy();
   }
 
   drawRulers() {
@@ -293,7 +303,7 @@ class Whiteboard {
   }
 
   _generateSessionId() {
-    window.crypto.getRandomValues(new Uint32Array(1))[0];
+    return window.crypto.getRandomValues(new Uint32Array(1))[0];
   }
 
   _generateWhiteboardId() {
@@ -415,6 +425,33 @@ class Whiteboard {
     values.fullscreen = BrowserHelper.getFullScreenModeValue();
 
     this._toolbarTools.setValues(values);
+  }
+
+  _onMapSetOffsetCallback(point) {
+    let canvasHeight = this._canvasElement.height;
+    let canvasWidth = this._canvasElement.width;
+
+    let x = point[0] - canvasWidth / 2;
+    let y = point[1] - canvasHeight / 2;
+
+    if (x + canvasWidth > this._config.whiteboard.width) {
+      x = this._config.whiteboard.width - canvasWidth;
+    } else if (x < 0) {
+      x = 0;
+    }
+
+    if (y + canvasHeight > this._config.whiteboard.height) {
+      y = this._config.whiteboard.height - canvasHeight;
+    } else if (y < 0) {
+      y = 0;
+    }
+
+    this._offset[0] = x;
+    this._offset[1] = y;
+
+    this.redraw();
+
+    this._saveOffset(this._whiteboardId, this._offset);
   }
 
   _onResize() {
@@ -594,7 +631,7 @@ class Whiteboard {
     this._saveState(this._whiteboardId);
   }
 
-  _onShapeCreatedCallback(shape) {
+  _onShapeCreatedLocallyCallback(shape) {
     // change points coordinates according to 0,0
     shape.points = shape.points.map((point) => {
       return DrawHelper.getPointWithoutOffset(point, this._offset);
@@ -608,13 +645,43 @@ class Whiteboard {
     this.redraw();
   }
 
-  _onShapesErasedCallback(shapes) {
+  _onShapeCreatedRemotelyCallback(shape) {
+    this._shapes = this._addShapesToCollection(this._shapes, [shape]);
+
+    if (this._config.whiteboard.activeTool === Tools.eraser) {
+      this._drawer.setConfig({
+        shapes: this._shapes
+      });
+    }
+
+    this.redraw();
+  }
+
+  _onShapeErasedRemotelyCallback(shape) {
+    this._shapes = this._removeShapesFromCollection(this._shapes, [shape]);
+
+    this.redraw();
+
+    if (this._config.whiteboard.activeTool === Tools.eraser) {
+      this._drawer.setConfig({
+        shapes: this._shapes
+      });
+    }
+  }
+
+  _onShapeWatchError(error) {
+    alert('On shape watch error ' + error.message);
+  }
+
+  _onShapesErasedLocallyCallback(shapes) {
     this.deleteShapes(shapes);
     this.redraw();
 
-    this._drawer.setConfig({
-      shapes: this._shapes
-    });
+    if (this._config.whiteboard.activeTool === Tools.eraser) {
+      this._drawer.setConfig({
+        shapes: this._shapes
+      });
+    }
   }
 
   _onShareWhiteboardCallback() {
@@ -635,6 +702,12 @@ class Whiteboard {
 
             if (!this._whiteboardId) {
               this._whiteboardId = payload.whiteboardId;
+
+              this._data.watchShapes(this._whiteboardId, this._sessionId, {
+                onShapeCreated: this._onShapeCreatedRemotelyCallback.bind(this),
+                onShapeErased: this._onShapeErasedRemotelyCallback.bind(this),
+                onShapeWatchError: this._onShapeWatchError.bind(this)
+              });
             }
           }
         });
@@ -747,7 +820,7 @@ class Whiteboard {
     if (this._config.whiteboard.activeTool === Tools.line) {
       this._drawer = new DrawLine({
         boardSize: [this._config.whiteboard.width, this._config.whiteboard.height],
-        callback: this._onShapeCreatedCallback.bind(this),
+        callback: this._onShapeCreatedLocallyCallback.bind(this),
         canvas: this._canvasElement,
         color: this._config.whiteboard.color,
         globalCompositeOperation: 'source-over',
@@ -761,7 +834,7 @@ class Whiteboard {
     } else if (this._config.whiteboard.activeTool === Tools.eraser) {
       this._drawer = new Eraser({
         boardSize: [this._config.whiteboard.width, this._config.whiteboard.height],
-        callback: this._onShapesErasedCallback.bind(this),
+        callback: this._onShapesErasedLocallyCallback.bind(this),
         canvas: this._canvasElement,
         offset: this._offset,
         scale: this._scale,

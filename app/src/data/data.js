@@ -5,6 +5,18 @@ class Data {
     this._data = WeDeploy.data(config.url);
   }
 
+  destroy() {
+    if (this._watchRefCreate) {
+      this._watchRefCreate.off('create', this._onShapeActionListener);
+      this._watchRefCreate.off('fail', this._onShapeWatchFailListener);
+    }
+
+    if (this._watchRefDelete) {
+      this._watchRefDelete.off('delete', this._onShapeActionListener);
+      this._watchRefDelete.off('fail', this._onShapeWatchFailListener);
+    }
+  }
+
   createOrUpdateWhiteboardBookmark(params) {
     if (params.id) {
       this.updateWhiteboardBookmark(params);
@@ -63,15 +75,30 @@ class Data {
     });
   }
 
-  watch(whiteboardId, sessionId, successCallback, errorCallback) {
-    this._data
-      .limit(1)
-      .orderBy('id', 'desc')
-      .where('board', whiteboardId)
+  watchShapes(whiteboardId, sessionId, callbacks) {
+    this._onShapeActionListener = (event) => {
+      if (event.type === 'create') {
+        callbacks.onShapeCreated(event.document);
+      } else if (event.type === 'delete') {
+        callbacks.onShapeErased(event.document);
+      }
+    };
+
+    this._onShapeWatchFailListener = (error) => {
+      callbacks.onShapeWatchError(error);
+    };
+
+    this._watchRefCreate = this._data
       .where('sessionId', '!=', sessionId)
-      .watch('shapes')
-      .on('changes', successCallback)
-      .on('fail', errorCallback);
+      .watch(whiteboardId)
+      .on('create', this._onShapeActionListener)
+      .on('fail', this._onShapeWatchFailListener);
+
+    this._watchRefDelete = this._data
+      .where('sessionId', '!=', sessionId)
+      .watch(whiteboardId)
+      .on('delete', this._onShapeActionListener)
+      .on('fail', this._onShapeWatchFailListener);
   }
 }
 
