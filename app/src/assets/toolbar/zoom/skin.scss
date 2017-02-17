@@ -1,0 +1,11 @@
+@import '../../sass-import-once';
+
+@import '../skin.scss';
+
+@include exports('toolbar-zoom-skin') {
+  .toolbar-zoom {
+    .icon-container {
+      background-color: #32a8e6;
+    }
+  }
+}

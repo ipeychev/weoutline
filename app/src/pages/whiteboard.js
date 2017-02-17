@@ -39,6 +39,9 @@ window.addEventListener('load', () => {
         currentUser: auth.currentUser,
         srcNode: 'toolbarUser'
       },
+      toolbarZoom: {
+        srcNode: 'toolbarZoom'
+      },
       whiteboard: {
         activeTool: activeTool,
         color: color,

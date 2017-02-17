@@ -1,0 +1,25 @@
+@import '../../sass-import-once';
+
+@import '../structure.scss';
+
+@include exports('toolbar-zoom-structure') {
+  .toolbar-zoom {
+    display: flex;
+    padding: 0px;
+
+    .icon-container {
+      display: flex;
+      height: 36px;
+      justify-content: center;
+      margin: 0px;
+      padding: 0px;
+      width: 36px;
+
+      &.plus, &.minus {
+        .icon {
+          margin-bottom: 5px;
+        }
+      }
+    }
+  }
+}

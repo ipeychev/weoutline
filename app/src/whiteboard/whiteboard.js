@@ -10,8 +10,12 @@ import Map from '../map/map';
 import ShareWhiteboardModal from './share-whiteboard';
 import ToolbarTools from '../toolbar/toolbar-tools';
 import ToolbarUser from '../toolbar/toolbar-user';
+import ToolbarZoom from '../toolbar/toolbar-zoom';
 import Tools from '../draw/tools';
 import { ShapeType } from '../draw/shape';
+
+let ZOOM_DECREASE_VALUE = 0.9;
+let ZOOM_INCREASE_VALUE = 1.1;
 
 class Whiteboard {
   constructor(config) {
@@ -33,6 +37,7 @@ class Whiteboard {
     this._setupMap();
     this._setupToolbarTools();
     this._setupToolbarUser();
+    this._setupToolbarZoom();
 
     this._attachListeners();
 
@@ -129,6 +134,36 @@ class Whiteboard {
     return shapesList.concat(shapes);
   }
 
+  _applyZoom(zoomPoint, zoom) {
+    let zoomPointX = zoomPoint[0];
+    let zoomPointY = zoomPoint[1];
+
+    this._context.scale(zoom, zoom);
+
+    this._offset[0] = ((zoomPointX / this._scale) + this._offset[0]) - (zoomPointX / (this._scale * zoom));
+    this._offset[1] = ((zoomPointY / this._scale) + this._offset[1]) - (zoomPointY / (this._scale * zoom));
+
+    this._scale *= zoom;
+
+    this._drawer.setConfig({
+      offset: this._offset,
+      scale: this._scale
+    });
+
+    this._map.setConfig({
+      offset: this._offset,
+      scale: this._scale
+    });
+
+    this._toolbarZoom.setValues({
+      scale: this._scale
+    });
+
+    this.redraw();
+
+    this._saveStateWithTimeout(this._whiteboardId);
+  }
+
   _attachListeners() {
     this._onTouchStartListener = this._onTouchStart.bind(this);
     this._onTouchMoveListener = this._onTouchMove.bind(this);
@@ -159,30 +194,40 @@ class Whiteboard {
         eraseWhiteBoardCallback: () => {
           this.deleteShapes(this._shapes);
 
-          this._context.setTransform(1, 0, 0, 1, 0, 0);
-
-          this._offset[0] = 0;
-          this._offset[1] = 0;
-          this._scale = 1;
-
-          this._saveState(this._whiteboardId);
-
-          this._drawer.setConfig({
-            offset: this._offset,
-            scale: this._scale
-          });
-
-          this._map.setConfig({
-            offset: this._offset,
-            scale: this._scale
-          });
-
-          this.redraw();
+          this._resetState();
         }
       });
     }
 
     this._eraseWhiteboardModal.show();
+  }
+
+  _decreaseZoomCallback() {
+    let tmpScale = this._scale * ZOOM_DECREASE_VALUE;
+
+    if (tmpScale < 0.1 || tmpScale > 10) {
+      return;
+    }
+
+    let viewportMidPoint = [this._offset[0] + (this._canvasElement.width / this._scale) / 2, this._offset[1] + (this._canvasElement.height / this._scale) / 2];
+
+    this._applyZoom(viewportMidPoint, ZOOM_DECREASE_VALUE);
+  }
+
+  _increaseZoomCallback() {
+    let tmpScale = this._scale * ZOOM_INCREASE_VALUE;
+
+    if (tmpScale < 0.1 || tmpScale > 10) {
+      return;
+    }
+
+    let viewportMidPoint = [this._offset[0] + (this._canvasElement.width / this._scale) / 2, this._offset[1] + (this._canvasElement.height / this._scale) / 2];
+
+    this._applyZoom(viewportMidPoint, ZOOM_INCREASE_VALUE);
+  }
+
+  _normalizeZoomCallback() {
+    this._resetState();
   }
 
   _detachListeners() {
@@ -216,7 +261,7 @@ class Whiteboard {
       })
       .catch((error) => {
         alert('Deleting the shapes failed!');
-        console.log(error);
+        console.error(error);
       });
   }
 
@@ -473,10 +518,39 @@ class Whiteboard {
     if (event.deltaMode === 0) {
       event.preventDefault();
 
-      let allowedOffset = this._getAllowedOffset([event.deltaX, event.deltaY]);
+      let mouseX = event.offsetX;
+      let mouseY = event.offsetY;
 
-      this._offset[0] += allowedOffset[0];
-      this._offset[1] += allowedOffset[1];
+      let wheel = event.wheelDelta / 120;
+
+      let zoom = 1 - wheel/2;
+
+      let tmpScale = this._scale * zoom;
+
+      if (tmpScale < 0.1 || tmpScale > 10) {
+        return;
+      }
+
+      this._context.scale(zoom, zoom);
+
+      this._offset[0] = ((mouseX / this._scale) + this._offset[0]) - (mouseX / (this._scale * zoom));
+      this._offset[1] = ((mouseY / this._scale) + this._offset[1]) - (mouseY / (this._scale * zoom));
+
+      this._scale *= zoom;
+
+      this._drawer.setConfig({
+        offset: this._offset,
+        scale: this._scale
+      });
+
+      this._map.setConfig({
+        offset: this._offset,
+        scale: this._scale
+      });
+
+      this._toolbarZoom.setValues({
+        scale: this._scale
+      });
 
       this.redraw();
 
@@ -635,7 +709,7 @@ class Whiteboard {
       })
       .catch((error) => {
         alert('Error retrieving whiteboard bookmark');
-        console.log(error);
+        console.error(error);
         shareWhiteboardModal.hide();
       });
   }
@@ -671,35 +745,16 @@ class Whiteboard {
 
     if (Math.abs(curDistance - lastDistance) >= 3) {
       if (curDistance > lastDistance) {
-        zoom = 1.1;
+        zoom = ZOOM_INCREASE_VALUE;
       } else if (curDistance < lastDistance) {
-        zoom = 0.9;
+        zoom = ZOOM_DECREASE_VALUE;
       }
     }
 
     if (zoom !== 0) {
-      let [zoomPointX, zoomPointY] = DrawHelper.getMidPoint(curPoint0, curPoint1);
+      let zoomPoint = DrawHelper.getMidPoint(curPoint0, curPoint1);
 
-      this._context.scale(zoom, zoom);
-
-      this._offset[0] = ((zoomPointX / this._scale) + this._offset[0]) - (zoomPointX / (this._scale * zoom));
-      this._offset[1] = ((zoomPointY / this._scale) + this._offset[1]) - (zoomPointY / (this._scale * zoom));
-
-      this._scale *= zoom;
-
-      this._drawer.setConfig({
-        offset: this._offset,
-        scale: this._scale
-      });
-
-      this._map.setConfig({
-        offset: this._offset,
-        scale: this._scale
-      });
-
-      this.redraw();
-
-      this._saveStateWithTimeout(this._whiteboardId);
+      this._applyZoom(zoomPoint, zoom);
     }
 
     this._lastPoint0 = curPoint0;
@@ -718,6 +773,32 @@ class Whiteboard {
 
       return true;
     });
+  }
+
+  _resetState() {
+    this._context.setTransform(1, 0, 0, 1, 0, 0);
+
+    this._offset[0] = 0;
+    this._offset[1] = 0;
+    this._scale = 1;
+
+    this._saveState(this._whiteboardId);
+
+    this._drawer.setConfig({
+      offset: this._offset,
+      scale: this._scale
+    });
+
+    this._map.setConfig({
+      offset: this._offset,
+      scale: this._scale
+    });
+
+    this._toolbarZoom.setValues({
+      scale: this._scale
+    });
+
+    this.redraw();
   }
 
   _resizeCanvas() {
@@ -767,7 +848,7 @@ class Whiteboard {
       })
       .catch((error) => {
         alert('Creating whiteboard and saving shapes failed!');
-        console.log(error);
+        console.error(error);
       });
   }
 
@@ -892,6 +973,19 @@ class Whiteboard {
     this._toolbarUser = new ToolbarUser(config);
   }
 
+  _setupToolbarZoom() {
+    let config = {
+      decreaseZoomCallback: this._decreaseZoomCallback.bind(this),
+      increaseZoomCallback: this._increaseZoomCallback.bind(this),
+      normalizeZoomCallback: this._normalizeZoomCallback.bind(this),
+      scale: this._scale
+    };
+
+    Object.assign(config, this._config.toolbarZoom);
+
+    this._toolbarZoom = new ToolbarZoom(config);
+  }
+
   _shareWhiteboard(params) {
     if (params.saveShapes) {
       history.pushState(null, null, window.location.origin + '/wb/' + params.whiteboardId);
@@ -903,7 +997,7 @@ class Whiteboard {
           })
           .catch((error) => {
             alert('Creating whiteboard and saving shapes failed!');
-            console.log(error);
+            console.error(error);
           });
       }
 
