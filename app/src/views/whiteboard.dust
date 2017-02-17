@@ -17,7 +17,30 @@
     </div>
 
     <div id="mapContainer" class="map-container">
-      <canvas width="150" height="150" id="map" class="map"></canvas>
+      <canvas width="120" height="120" id="map" class="map"></canvas>
+      <div id="toolbarZoom" class="toolbar toolbar-zoom hidden">
+        <div class="toolbar-item">
+          <div class="toolbar-item-value">
+            <button class="icon-container plus" id="zoomIncrease">
+              <span class="icon">+</span>
+            </button>
+          </div>
+        </div>
+        <div class="toolbar-item">
+          <div class="toolbar-item-value">
+            <button class="icon-container value" id="zoomValue">
+              <span class="icon">1</span>
+            </button>
+          </div>
+        </div>
+        <div class="toolbar-item">
+          <div class="toolbar-item-value">
+            <button class="icon-container minus" id="zoomDecrease">
+              <span class="icon">-</span>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="spinner loading" id="loadSpinner">
