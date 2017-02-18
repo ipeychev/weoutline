@@ -2,10 +2,10 @@
 
 @include exports('map-structure') {
   .map-container {
-    height: 120px;
+    height: 150px;
     position: absolute;
     right: 20px;
     top: 100px;
-    width: 120px;
+    width: 150px;
   }
 }

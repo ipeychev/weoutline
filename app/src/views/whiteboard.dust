@@ -17,27 +17,26 @@
     </div>
 
     <div id="mapContainer" class="map-container">
-      <canvas width="120" height="120" id="map" class="map"></canvas>
+      <canvas width="150" height="150" id="map" class="map"></canvas>
       <div id="toolbarZoom" class="toolbar toolbar-zoom hidden">
-        <div class="toolbar-item">
+        <div class="toolbar-item" id="zoomModeEnable">
           <div class="toolbar-item-value">
-            <button class="icon-container plus" id="zoomIncrease">
-              <span class="icon">+</span>
-            </button>
+            <span class="icon icon-zoom"></span>
           </div>
         </div>
-        <div class="toolbar-item">
+        <div class="toolbar-item" id="zoomIncrease">
           <div class="toolbar-item-value">
-            <button class="icon-container value" id="zoomValue">
-              <span class="icon">1</span>
-            </button>
+            <span class="icon icon-plus"></span>
           </div>
         </div>
-        <div class="toolbar-item">
+        <div class="toolbar-item" id="zoomValue">
           <div class="toolbar-item-value">
-            <button class="icon-container minus" id="zoomDecrease">
-              <span class="icon">-</span>
-            </button>
+            <span class="icon value">1</span>
+          </div>
+        </div>
+        <div class="toolbar-item" id="zoomDecrease">
+          <div class="toolbar-item-value">
+            <span class="icon icon-minus"></span>
           </div>
         </div>
       </div>
@@ -113,7 +112,7 @@
 
       <div id="clear" class="toolbar-item">
         <div class="toolbar-item-value">
-          <span class="icon icon-delete"></span>
+          <span class="icon icon-times"></span>
         </div>
       </div>
 

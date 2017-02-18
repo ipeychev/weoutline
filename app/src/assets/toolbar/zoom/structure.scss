@@ -4,21 +4,14 @@
 
 @include exports('toolbar-zoom-structure') {
   .toolbar-zoom {
-    display: flex;
     padding: 0px;
 
-    .icon-container {
-      display: flex;
+    .toolbar-item {
       height: 36px;
-      justify-content: center;
-      margin: 0px;
-      padding: 0px;
       width: 36px;
 
-      &.plus, &.minus {
-        .icon {
-          margin-bottom: 5px;
-        }
+      .toolbar-item-value .icon {
+        font-size: 14px;
       }
     }
   }

@@ -53,7 +53,20 @@ class ToolbarZoom extends Toolbar {
 
     let targetNode = event.target;
 
-    if (this._zoomDecreaseNode.contains(targetNode)) {
+    if (this._zoomModeEnableNode.contains(targetNode)) {
+      let nodeValue = this._zoomModeEnableNode.querySelector('.toolbar-item-value');
+      let zoomModeEnabled = nodeValue.classList.contains('active');
+
+      if (zoomModeEnabled) {
+        nodeValue.classList.remove('active');
+      } else {
+        nodeValue.classList.add('active');
+      }
+
+      this._config.enableZoomModeCallback({
+        zoomModeEnabled: !zoomModeEnabled
+      });
+    } else if (this._zoomDecreaseNode.contains(targetNode)) {
       this._config.decreaseZoomCallback();
     } else if (this._zoomIncreaseNode.contains(targetNode)) {
       this._config.increaseZoomCallback();
@@ -66,6 +79,7 @@ class ToolbarZoom extends Toolbar {
     this._element = document.getElementById(this._config.srcNode);
 
     this._zoomDecreaseNode = this._element.querySelector('#zoomDecrease');
+    this._zoomModeEnableNode = this._element.querySelector('#zoomModeEnable');
     this._zoomIncreaseNode = this._element.querySelector('#zoomIncrease');
     this._zoomValueNode = this._element.querySelector('#zoomValue');
   }

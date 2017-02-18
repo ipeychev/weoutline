@@ -14,9 +14,6 @@ import ToolbarZoom from '../toolbar/toolbar-zoom';
 import Tools from '../draw/tools';
 import { ShapeType } from '../draw/shape';
 
-let ZOOM_DECREASE_VALUE = 0.9;
-let ZOOM_INCREASE_VALUE = 1.1;
-
 class Whiteboard {
   constructor(config) {
     config = config || {};
@@ -203,27 +200,29 @@ class Whiteboard {
   }
 
   _decreaseZoomCallback() {
-    let tmpScale = this._scale * ZOOM_DECREASE_VALUE;
+    let scaleMultiplier = (this._scale - 0.1) / this._scale;
+    let tmpScale = this._scale * scaleMultiplier;
 
     if (tmpScale < 0.1 || tmpScale > 10) {
       return;
     }
 
-    let viewportMidPoint = [this._offset[0] + (this._canvasElement.width / this._scale) / 2, this._offset[1] + (this._canvasElement.height / this._scale) / 2];
+    let viewportMidPoint = [this._canvasElement.width / this._scale / 2, this._canvasElement.height / this._scale / 2];
 
-    this._applyZoom(viewportMidPoint, ZOOM_DECREASE_VALUE);
+    this._applyZoom(viewportMidPoint, scaleMultiplier);
   }
 
   _increaseZoomCallback() {
-    let tmpScale = this._scale * ZOOM_INCREASE_VALUE;
+    let scaleMultiplier = (this._scale + 0.1) / this._scale;
+    let tmpScale = this._scale * scaleMultiplier;
 
     if (tmpScale < 0.1 || tmpScale > 10) {
       return;
     }
 
-    let viewportMidPoint = [this._offset[0] + (this._canvasElement.width / this._scale) / 2, this._offset[1] + (this._canvasElement.height / this._scale) / 2];
+    let viewportMidPoint = [this._canvasElement.width / this._scale / 2, this._canvasElement.height / this._scale / 2];
 
-    this._applyZoom(viewportMidPoint, ZOOM_INCREASE_VALUE);
+    this._applyZoom(viewportMidPoint, scaleMultiplier);
   }
 
   _normalizeZoomCallback() {
@@ -317,6 +316,10 @@ class Whiteboard {
         this._context.fillText(i, posX + 12, i - this._offset[1]);
       }
     }
+  }
+
+  _enableZoomModeCallback(data) {
+    this._zoomModeEnabled = data.zoomModeEnabled;
   }
 
   _fetchShapes() {
@@ -515,49 +518,35 @@ class Whiteboard {
   }
 
   _onScroll(event) {
+    event.preventDefault();
+
     if (event.deltaMode === 0) {
-      event.preventDefault();
+      if (this._zoomModeEnabled) {
+        let mouseX = event.offsetX;
+        let mouseY = event.offsetY;
 
-      let mouseX = event.offsetX;
-      let mouseY = event.offsetY;
+        let wheel = event.wheelDelta / 120;
 
-      let wheel = event.wheelDelta / 120;
+        let zoom = 1 - wheel/2;
 
-      let zoom = 1 - wheel/2;
+        let tmpScale = this._scale * zoom;
 
-      let tmpScale = this._scale * zoom;
+        if (tmpScale < 0.1 || tmpScale > 10) {
+          return;
+        }
 
-      if (tmpScale < 0.1 || tmpScale > 10) {
-        return;
+        this._applyZoom([mouseX, mouseY], zoom);
+      } else {
+        let allowedOffset = this._getAllowedOffset([event.deltaX, event.deltaY]);
+
+        this._offset[0] += allowedOffset[0];
+        this._offset[1] += allowedOffset[1];
+
+        this.redraw();
+
+        this._saveStateWithTimeout(this._whiteboardId);
       }
-
-      this._context.scale(zoom, zoom);
-
-      this._offset[0] = ((mouseX / this._scale) + this._offset[0]) - (mouseX / (this._scale * zoom));
-      this._offset[1] = ((mouseY / this._scale) + this._offset[1]) - (mouseY / (this._scale * zoom));
-
-      this._scale *= zoom;
-
-      this._drawer.setConfig({
-        offset: this._offset,
-        scale: this._scale
-      });
-
-      this._map.setConfig({
-        offset: this._offset,
-        scale: this._scale
-      });
-
-      this._toolbarZoom.setValues({
-        scale: this._scale
-      });
-
-      this.redraw();
-
-      this._saveStateWithTimeout(this._whiteboardId);
     } else if (event.touches.length > 1) {
-      event.preventDefault();
-
       if (!this._dragModeSet) {
         this._setDragMode(event);
       } else if (this._dragMode === 'pan') {
@@ -724,6 +713,11 @@ class Whiteboard {
     if (event.touches.length > 1) {
       this._dragModeSet = false;
 
+      if (this._zoomModeEnabled) {
+        this._dragModeSet = true;
+        this._dragMode = 'zoom';
+      }
+
       this._lastPoint0 = [event.touches[0].pageX, event.touches[0].pageY];
       this._lastPoint1 = [event.touches[1].pageX, event.touches[1].pageY];
     }
@@ -741,20 +735,26 @@ class Whiteboard {
     let curDistance = DrawHelper.getPointsDistance(curPoint0, curPoint1);
     let lastDistance = DrawHelper.getPointsDistance(this._lastPoint0, this._lastPoint1);
 
-    let zoom = 0;
+    let scaleMultiplier = 0;
 
     if (Math.abs(curDistance - lastDistance) >= 3) {
       if (curDistance > lastDistance) {
-        zoom = ZOOM_INCREASE_VALUE;
+        scaleMultiplier = (this._scale + 0.1) / this._scale;
       } else if (curDistance < lastDistance) {
-        zoom = ZOOM_DECREASE_VALUE;
+        scaleMultiplier = (this._scale - 0.1) / this._scale;
       }
     }
 
-    if (zoom !== 0) {
+    if (scaleMultiplier !== 0) {
+      let tmpScale = this._scale * scaleMultiplier;
+
+      if (tmpScale < 0.1 || tmpScale > 10) {
+        return;
+      }
+
       let zoomPoint = DrawHelper.getMidPoint(curPoint0, curPoint1);
 
-      this._applyZoom(zoomPoint, zoom);
+      this._applyZoom(zoomPoint, scaleMultiplier);
     }
 
     this._lastPoint0 = curPoint0;
@@ -976,6 +976,7 @@ class Whiteboard {
   _setupToolbarZoom() {
     let config = {
       decreaseZoomCallback: this._decreaseZoomCallback.bind(this),
+      enableZoomModeCallback: this._enableZoomModeCallback.bind(this),
       increaseZoomCallback: this._increaseZoomCallback.bind(this),
       normalizeZoomCallback: this._normalizeZoomCallback.bind(this),
       scale: this._scale
