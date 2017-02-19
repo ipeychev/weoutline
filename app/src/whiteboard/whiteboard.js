@@ -170,7 +170,7 @@ class Whiteboard {
     this._orientationChangeListener = () => {setTimeout(this._onResize.bind(this), 100);};
     this._onFullscreenChangeListener = this._onFullscreenChange.bind(this);
 
-    if (BrowserHelper.isTouchDevice()) {
+    if (BrowserHelper.getTouchEventsSupport()) {
       this._canvasElement.addEventListener('touchstart', this._onTouchStartListener, { passive: true });
       this._canvasElement.addEventListener('touchmove', this._onTouchMoveListener);
     } else {

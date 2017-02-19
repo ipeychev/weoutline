@@ -35,7 +35,7 @@ class ToolbarUser extends Toolbar {
     this._documentInteractionListener = this._onDocumentInteraction.bind(this);
     this._touchEndListener = this._onTouchEnd.bind(this);
 
-    if (BrowserHelper.isTouchDevice()) {
+    if (BrowserHelper.getTouchEventsSupport()) {
       this._element.addEventListener('touchend', this._touchEndListener);
       document.addEventListener('touchstart', this._documentInteractionListener);
     } else {

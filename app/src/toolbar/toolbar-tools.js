@@ -62,7 +62,7 @@ class ToolbarTools extends Toolbar {
     this._orientationChangeListener = () => {window.setTimeout(this._onResize.bind(this), 100);};
     this._touchEndListener = this._onTouchEnd.bind(this);
 
-    if (BrowserHelper.isTouchDevice()) {
+    if (BrowserHelper.getTouchEventsSupport()) {
       this._element.addEventListener('touchend', this._touchEndListener, { passive: true });
       document.addEventListener('touchstart', this._documentInteractionListener);
     } else {

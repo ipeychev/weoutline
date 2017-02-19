@@ -104,7 +104,7 @@ class Eraser {
     this._finishListener = this.finish.bind(this);
     this._startListener = this.start.bind(this);
 
-    if (BrowserHelper.isTouchDevice()) {
+    if (BrowserHelper.getTouchEventsSupport()) {
       this._canvasElement.addEventListener('touchcancel', this._cancelListener, {passive: true});
       this._canvasElement.addEventListener('touchend', this._finishListener, {passive: true});
       this._canvasElement.addEventListener('touchmove', this._eraseListener);

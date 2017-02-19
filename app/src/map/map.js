@@ -80,7 +80,7 @@ class Map {
     this._touchMoveListener = this._onTouchMove.bind(this);
     this._touchStartListener = this._onTouchStart.bind(this);
 
-    if (BrowserHelper.isTouchDevice()) {
+    if (BrowserHelper.getTouchEventsSupport()) {
       this._mapElement.addEventListener('touchend', this._touchEndListener, { passive: true });
       this._mapElement.addEventListener('touchmove', this._touchMoveListener);
       this._mapElement.addEventListener('touchstart', this._touchStartListener);

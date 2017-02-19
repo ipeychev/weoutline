@@ -32,7 +32,7 @@ class ToolbarZoom extends Toolbar {
     this._clickListener = this._onClick.bind(this);
     this._touchEndListener = this._onTouchEnd.bind(this);
 
-    if (BrowserHelper.isTouchDevice()) {
+    if (BrowserHelper.getTouchEventsSupport()) {
       this._element.addEventListener('touchend', this._touchEndListener);
     } else {
       this._element.addEventListener('click', this._clickListener);

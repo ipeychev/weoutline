@@ -43,8 +43,8 @@ class BrowserHelper {
     }
   }
 
-  static isTouchDevice() {
-    return 'ontouchstart' in window || navigator.maxTouchPoints;
+  static getTouchEventsSupport() {
+    return 'ontouchstart' in window;
   }
 
   static requestFullscreen(element) {
