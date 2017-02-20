@@ -60,5 +60,18 @@
         }
       }
     }
+
+    .powered-by {
+      bottom: 5px;
+      font-size: 10px;
+      position: fixed;
+      right: 20px;
+
+      a {
+        border-bottom: 2px solid transparent;
+        display: inline-block;
+        font-weight: bold;
+      }
+    }
   }
 }
