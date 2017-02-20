@@ -195,5 +195,7 @@
         </div>
       </div>
     </div>
+
+    <div class="powered-by">Powered by <a href="http://wedeploy.com">WeDeploy™</a>. Brought to you by <a href="https://liferay.com">Liferay.</a></div>
   </div>
 {/bodyContent}
