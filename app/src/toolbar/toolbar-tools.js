@@ -53,6 +53,7 @@ class ToolbarTools extends Toolbar {
     this._setToolSize(this._penNode, config.penSize);
     this._setColor(config.color);
     this._setFullscreen(config.fullscreen);
+    this._setMapHidden(config.mapHidden);
   }
 
   _attachListeners() {
@@ -115,6 +116,12 @@ class ToolbarTools extends Toolbar {
     if (BrowserHelper.isFullScreenSupported()) {
       this._fullScreenNode.classList.remove('hidden');
     }
+
+    if (this._config.mapHidden) {
+      this._showMapNode.classList.add('hidden');
+    } else {
+      this._showMapNode.classList.remove('hidden');
+    }
   }
 
   _onClick(event) {
@@ -142,6 +149,8 @@ class ToolbarTools extends Toolbar {
       });
     } else if (this._clearNode.contains(targetNode)) {
       this._config.clearWhiteboardCallback();
+    } else if (this._showMapNode.contains(targetNode)) {
+      this._config.showMapCallback();
     } else if (this._shareNode.contains(targetNode)) {
       this._config.shareWhiteboardCallback();
     } else if (this._fullScreenNode.contains(targetNode)) {
@@ -205,6 +214,14 @@ class ToolbarTools extends Toolbar {
     }
   }
 
+  _setMapHidden(mapHidden) {
+    if (mapHidden) {
+      this._showMapNode.classList.remove('hidden');
+    } else {
+      this._showMapNode.classList.add('hidden');
+    }
+  }
+
   _setToolSize(rootNode, value) {
     this._deactivateOptions(rootNode);
 
@@ -231,6 +248,7 @@ class ToolbarTools extends Toolbar {
     this._fullScreenNode = this._element.querySelector('#fullscreen');
     this._penNode = this._element.querySelector('#pen');
     this._shareNode = this._element.querySelector('#share');
+    this._showMapNode = this._element.querySelector('#map');
   }
 }
 

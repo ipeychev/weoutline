@@ -475,6 +475,12 @@ class Whiteboard {
     this._toolbarTools.setValues(values);
   }
 
+  _onMapHideCallback() {
+    let values = this._toolbarTools.getValues();
+    values.mapHidden = true;
+    this._toolbarTools.setValues(values);
+  }
+
   _onMapSetOffsetCallback(point) {
     let canvasHeight = this._canvasElement.height / this._scale;
     let canvasWidth = this._canvasElement.width / this._scale;
@@ -502,6 +508,18 @@ class Whiteboard {
     this.redraw();
 
     this._saveState(this._whiteboardId);
+  }
+
+  _onMapShowCallback() {
+    this._map.setConfig({
+      mapHidden: false
+    });
+
+    this._map.draw(this._shapes);
+
+    let values = this._toolbarTools.getValues();
+    values.mapHidden = false;
+    this._toolbarTools.setValues(values);
   }
 
   _onResize() {
@@ -912,6 +930,8 @@ class Whiteboard {
       container: this._config.map.container,
       height: this._config.map.height,
       lineWidth: this._config.map.lineWidth,
+      mapHidden: this._config.map.mapHidden,
+      mapHideCallback: this._onMapHideCallback.bind(this),
       offset: this._offset,
       scale: this._scale,
       setOffsetCallback: this._onMapSetOffsetCallback.bind(this),
@@ -925,6 +945,7 @@ class Whiteboard {
     let config = {
       clearWhiteboardCallback: this._clearWhiteboard.bind(this),
       fullscreenCallback: this._handleFullscreen.bind(this),
+      showMapCallback: this._onMapShowCallback.bind(this),
       shareWhiteboardCallback: this._onShareWhiteboardCallback.bind(this),
       valuesCallback: this._setToolValues.bind(this)
     };

@@ -16,8 +16,11 @@
       <canvas id="canvas" class="draw-area"></canvas>
     </div>
 
-    <div id="mapContainer" class="map-container">
+    <div id="mapContainer" class="map-container hidden">
       <canvas width="150" height="150" id="map" class="map"></canvas>
+      <div class="map-hide" id="mapHide">
+        <span class="icon icon-times"></span>
+      </div>
       <div id="toolbarZoom" class="toolbar toolbar-zoom hidden">
         <div class="toolbar-item" id="zoomModeEnable">
           <div class="toolbar-item-value">
@@ -119,6 +122,12 @@
       <div id="share" class="toolbar-item">
         <div class="toolbar-item-value">
           <span class="icon icon-share-alt"></span>
+        </div>
+      </div>
+
+      <div id="map" class="toolbar-item hidden">
+        <div class="toolbar-item-value">
+          <span class="icon icon-map-o"></span>
         </div>
       </div>
 

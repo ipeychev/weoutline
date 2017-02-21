@@ -7,15 +7,20 @@ import { ShapeType } from '../draw/shape';
 
 class Map {
   constructor(config) {
+    this._config = config;
+
     this._mapElement = document.getElementById(config.srcNode);
+
+    this._mapContainer = document.getElementById(config.container);
+    this._mapHideElement = this._mapContainer.querySelector('#mapHide');
 
     this._mapContext = this._mapElement.getContext('2d');
 
+    this._initItems();
+
     this._attachListeners();
 
-    this._draggable = new Draggable(document.getElementById(config.container));
-
-    this._config = config;
+    this._draggable = new Draggable(this._mapContainer);
   }
 
   destroy() {
@@ -70,6 +75,8 @@ class Map {
 
   setConfig(config) {
     this._config = Object.assign(this._config, config);
+
+    this._setMapHidden(config.mapHidden);
   }
 
   _attachListeners() {
@@ -78,13 +85,16 @@ class Map {
     this._mouseUpListener = this._onMouseUp.bind(this);
     this._touchEndListener = this._onTouchEnd.bind(this);
     this._touchMoveListener = this._onTouchMove.bind(this);
+    this._mapHideListener = this._onMapHideClick.bind(this);
     this._touchStartListener = this._onTouchStart.bind(this);
 
     if (BrowserHelper.getTouchEventsSupport()) {
+      this._mapHideElement.addEventListener('touchend', this._mapHideListener, { passive: true });
       this._mapElement.addEventListener('touchend', this._touchEndListener, { passive: true });
       this._mapElement.addEventListener('touchmove', this._touchMoveListener);
       this._mapElement.addEventListener('touchstart', this._touchStartListener);
     } else {
+      this._mapHideElement.addEventListener('click', this._mapHideListener);
       this._mapElement.addEventListener('mousedown', this._mouseDownListener);
       this._mapElement.addEventListener('mousemove', this._mouseMoveListener);
       this._mapElement.addEventListener('mouseup', this._mouseUpListener);
@@ -92,6 +102,8 @@ class Map {
   }
 
   _detachListeners() {
+    this._mapHideElement.addEventListener('click', this._mapHideListener);
+    this._mapHideElement.addEventListener('touchend', this._mapHideListener, { passive: true });
     this._mapElement.addEventListener('mousedown', this._mouseDownListener);
     this._mapElement.addEventListener('mousemove', this._mouseMoveListener);
     this._mapElement.addEventListener('mouseup', this._mouseUpListener);
@@ -122,6 +134,10 @@ class Map {
     };
   }
 
+  _initItems() {
+    this._setMapHidden(this._config.mapHidden);
+  }
+
   _isPointInMapViewport(point, mapViewportRect) {
     mapViewportRect = mapViewportRect || this._getMapViewportRect();
 
@@ -131,6 +147,12 @@ class Map {
     } else {
       return false;
     }
+  }
+
+  _onMapHideClick() {
+    this._mapContainer.classList.add('hidden');
+
+    this._config.mapHideCallback();
   }
 
   _onMouseDown(event) {
@@ -226,6 +248,14 @@ class Map {
         event.preventDefault();
         event.stopPropagation();
       }
+    }
+  }
+
+  _setMapHidden(mapHidden) {
+    if (mapHidden) {
+      this._mapContainer.classList.add('hidden');
+    } else {
+      this._mapContainer.classList.remove('hidden');
     }
   }
 
