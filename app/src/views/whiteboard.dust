@@ -141,7 +141,7 @@
         <ul class="toolbar-item-options hidden">
           <li class="toolbar-item-option">
             <a id="userProfile" draggable="false" href="/user/profile">
-              <span class="icon icon-user"></span>
+              <span class="icon icon-user-o"></span>
               <span>My account</span>
             </a>
           </li>
