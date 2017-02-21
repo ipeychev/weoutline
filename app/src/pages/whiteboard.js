@@ -17,7 +17,7 @@ window.addEventListener('load', () => {
 
     let activeTool = Tools.line;
     let color = '#000000';
-    let mapHidden = true;
+    let mapHidden = false;
     let penSize = 4;
 
     whiteboard = new Whiteboard({
