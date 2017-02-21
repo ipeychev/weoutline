@@ -44,23 +44,33 @@ class Data {
   }
 
   getWhiteboardBookmark(userId, whiteboardId) {
-    return this._data
-      .where('userId', '=', userId)
-      .where('whiteboardId', '=', whiteboardId)
-      .get('user2whiteboard');
+    return this._fetchAll((limit, offset) => {
+      return this._data
+        .limit(limit)
+        .offset(offset)
+        .where('userId', '=', userId)
+        .where('whiteboardId', '=', whiteboardId)
+        .search('user2whiteboard');
+    }, 10000);
   }
 
   fetchShapes(whiteboardId) {
-    return this._data
-      .limit(10000)
-      .get(whiteboardId);
+    return this._fetchAll((limit, offset) => {
+      return this._data
+        .limit(limit)
+        .offset(offset)
+        .search(whiteboardId);
+    }, 10000);
   }
 
   fetchWhiteboardBookmarks(userId) {
-    return this._data
-      .limit(10000)
-      .where('userId', '=', userId)
-      .get('user2whiteboard');
+    return this._fetchAll((limit, offset) => {
+      return this._data
+        .limit(limit)
+        .offset(offset)
+        .where('userId', '=', userId)
+        .search('user2whiteboard');
+    }, 10000);
   }
 
   saveShapes(whiteboardId, shapes) {
@@ -99,6 +109,36 @@ class Data {
       .watch(whiteboardId)
       .on('delete', this._onShapeActionListener)
       .on('fail', this._onShapeWatchFailListener);
+  }
+
+  _fetchAll(queryFn, limit) {
+    return new Promise((resolve) => {
+      queryFn(limit, 0)
+        .then((result) => {
+          let total = result.total;
+
+          if (result.documents.length < total) {
+            let finalResult = [].concat(result.documents);
+
+            let fetchPromises = [];
+
+            for (let i = limit; i < total; i += limit) {
+              fetchPromises.push(queryFn(limit, i));
+            }
+
+            Promise.all(fetchPromises)
+              .then((results) => {
+                for (let i = 0; i < results.length; i++) {
+                  finalResult = finalResult.concat(results[i].documents);
+                }
+
+                resolve(finalResult);
+              });
+          } else {
+            resolve(result.documents);
+          }
+        });
+    });
   }
 }
 
