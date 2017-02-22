@@ -152,7 +152,7 @@ class Whiteboard {
       scale: this._scale
     });
 
-    this._toolbarZoom.setValues({
+    this._toolbarZoom.setConfig({
       scale: this._scale
     });
 
@@ -472,13 +472,17 @@ class Whiteboard {
 
     values.fullscreen = BrowserHelper.getFullScreenModeValue();
 
-    this._toolbarTools.setValues(values);
+    this._toolbarTools.setConfig(values);
   }
 
   _onMapHideCallback() {
     let values = this._toolbarTools.getValues();
     values.mapHidden = true;
-    this._toolbarTools.setValues(values);
+    this._toolbarTools.setConfig(values);
+
+    this._map.setConfig({
+      mapHidden: true
+    });
   }
 
   _onMapSetOffsetCallback(point) {
@@ -519,7 +523,7 @@ class Whiteboard {
 
     let values = this._toolbarTools.getValues();
     values.mapHidden = false;
-    this._toolbarTools.setValues(values);
+    this._toolbarTools.setConfig(values);
   }
 
   _onResize() {
@@ -785,7 +789,7 @@ class Whiteboard {
       scale: this._scale
     });
 
-    this._toolbarZoom.setValues({
+    this._toolbarZoom.setConfig({
       scale: this._scale
     });
 

@@ -22,7 +22,7 @@ class ToolbarZoom extends Toolbar {
     this._detachListeners();
   }
 
-  setValues(config) {
+  setConfig(config) {
     Object.assign(this._config, config);
 
     this._zoomValueNode.querySelector('.icon').innerHTML = Math.round(100 * config.scale);

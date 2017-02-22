@@ -76,7 +76,7 @@ class Map {
   setConfig(config) {
     this._config = Object.assign(this._config, config);
 
-    this._setMapHidden(config.mapHidden);
+    this._setMapHidden(this._config.mapHidden);
   }
 
   _attachListeners() {
@@ -150,8 +150,6 @@ class Map {
   }
 
   _onMapHideClick() {
-    this._mapContainer.classList.add('hidden');
-
     this._config.mapHideCallback();
   }
 

@@ -19,7 +19,7 @@ class ToolbarTools extends Toolbar {
     this._attachListeners();
     this._positionToolbar();
     this._initItems();
-    this.setValues(config);
+    this.setConfig(config);
 
     this._element.classList.remove('hidden');
   }
@@ -41,7 +41,7 @@ class ToolbarTools extends Toolbar {
     return values;
   }
 
-  setValues(config) {
+  setConfig(config) {
     this._deactivateValues();
 
     if (config.activeTool === Tools.line) {
