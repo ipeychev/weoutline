@@ -131,15 +131,18 @@ class ToolbarTools extends Toolbar {
 
     if (this._penNode.contains(targetNode)) {
       this._updateToolbarView(this._penNode, targetNode, {
-        activateValue: true
+        activateMenuItem: true,
+        activateValueItem: true
       });
     } else if (this._eraserNode.contains(targetNode)) {
       this._updateToolbarView(this._eraserNode, targetNode, {
-        activateValue: true
+        activateMenuItem: true,
+        activateValueItem: true
       });
     } else if (this._colorNode.contains(targetNode)) {
       this._updateToolbarView(this._colorNode, targetNode, {
-        activateValue: false,
+        activateMenuItem: true,
+        activateValueItem: false,
         setCurrentValue: {
           source: 'style',
           nodeSelector: '.icon',
@@ -152,7 +155,16 @@ class ToolbarTools extends Toolbar {
     } else if (this._showMapNode.contains(targetNode)) {
       this._config.showMapCallback();
     } else if (this._shareNode.contains(targetNode)) {
-      this._config.shareWhiteboardCallback();
+      this._updateToolbarView(this._shareNode, targetNode, {
+        activateMenuItem: false,
+        activateValueItem: false
+      });
+
+      if (this._shareWhiteboardLinkNode.contains(targetNode)) {
+        this._config.shareWhiteboardLinkCallback();
+      } else if (this._shareWhiteboardImageNode.contains(targetNode)) {
+        this._config.shareWhiteboardImageCallback();
+      }
     } else if (this._fullScreenNode.contains(targetNode)) {
       this._config.fullscreenCallback();
     } else {
@@ -242,13 +254,15 @@ class ToolbarTools extends Toolbar {
   _setupContainer() {
     this._element = document.getElementById(this._config.srcNode);
 
-    this._clearNode = this._element.querySelector('#clear');
-    this._colorNode = this._element.querySelector('#color');
-    this._eraserNode = this._element.querySelector('#eraser');
-    this._fullScreenNode = this._element.querySelector('#fullscreen');
-    this._penNode = this._element.querySelector('#pen');
-    this._shareNode = this._element.querySelector('#share');
-    this._showMapNode = this._element.querySelector('#map');
+    this._clearNode = this._element.querySelector('#toolClear');
+    this._colorNode = this._element.querySelector('#toolColor');
+    this._eraserNode = this._element.querySelector('#toolEraser');
+    this._fullScreenNode = this._element.querySelector('#toolFullscreen');
+    this._penNode = this._element.querySelector('#toolPen');
+    this._shareNode = this._element.querySelector('#toolShareWhiteboard');
+    this._shareWhiteboardImageNode = this._element.querySelector('#toolShareWhiteboardImage');
+    this._shareWhiteboardLinkNode = this._element.querySelector('#toolShareWhiteboardLink');
+    this._showMapNode = this._element.querySelector('#toolMap');
   }
 }
 

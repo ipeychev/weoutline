@@ -78,13 +78,13 @@ class Toolbar {
         }
 
         // the main item (tool) should be activated, deactivate the others, activate current one
-        if (config.activateValue) {
+        if (config.activateValueItem) {
           this._deactivateValues();
           rootNode.querySelector('.toolbar-item-value').classList.add('active');
         }
       } else {
         // user clicked on an item inside the menu, get the option and hide the menu
-        if (config.activateValue) {
+        if (config.activateValueItem) {
           this._deactivateValues();
           rootNode.querySelector('.toolbar-item-value').classList.add('active');
         }
@@ -97,7 +97,9 @@ class Toolbar {
           targetNode = targetNode.parentNode;
         }
 
-        targetNode.classList.add('active');
+        if (config.activateMenuItem) {
+          targetNode.classList.add('active');
+        }
 
         if (config.setCurrentValue) {
           this._setItemValue(targetNode, rootNode, config);
@@ -110,7 +112,7 @@ class Toolbar {
       // and activate the current menu
       this._hideMenu();
 
-      if (config.activateValue) {
+      if (config.activateValueItem) {
         this._deactivateValues();
         rootNode.querySelector('.toolbar-item-value').classList.add('active');
       }

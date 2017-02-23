@@ -98,6 +98,8 @@ class Whiteboard {
       width: this._canvasElement.width
     };
 
+    let shapes = [];
+
     for (let i = 0; i < this._shapes.length; i++) {
       if (this._shapes[i].type === ShapeType.LINE) {
         if (DrawHelper.checkPointsInViewport(this._shapes[i].points, this._offset, this._scale, canvasSize)) {
@@ -105,16 +107,16 @@ class Whiteboard {
             return DrawHelper.getPointWithOffset(point, this._offset);
           });
 
-          Draw.line(points, this._context, {
-            color: this._shapes[i].color,
-            globalCompositeOperation: 'source-over',
-            lineCap: 'round',
-            lineJoin: 'round',
-            lineWidth: DrawHelper.getPixelScaledNumber(this._shapes[i].lineWidth)
-          });
+          shapes.push(Object.assign({}, this._shapes[i], {
+            points: points
+          }));
         }
       }
     }
+
+    this._drawShapes(shapes, {
+      context: this._context
+    });
   }
 
   redraw() {
@@ -287,6 +289,20 @@ class Whiteboard {
         this._context.font = this._config.whiteboard.rulerFontSize + 'px';
         this._context.fillStyle = '#000000';
         this._context.fillText(i, i - this._offset[0], posY + 20);
+      }
+    }
+  }
+
+  _drawShapes(shapes, params) {
+    for (let i = 0; i < shapes.length; i++) {
+      if (shapes[i].type === ShapeType.LINE) {
+        Draw.line(shapes[i].points, params.context, {
+          color: shapes[i].color,
+          globalCompositeOperation: 'source-over',
+          lineCap: 'round',
+          lineJoin: 'round',
+          lineWidth: DrawHelper.getPixelScaledNumber(shapes[i].lineWidth)
+        });
       }
     }
   }
@@ -661,7 +677,24 @@ class Whiteboard {
     }
   }
 
-  _onShareWhiteboardCallback() {
+  _onShareWhiteboardImageCallback() {
+    let canvasElement = document.createElement('canvas');
+    canvasElement.height = this._config.whiteboard.height;
+    canvasElement.width = this._config.whiteboard.width;
+
+    let context = canvasElement.getContext('2d');
+
+    context.fillStyle = '#ffffff';
+    context.fillRect(0, 0, this._config.whiteboard.width, this._config.whiteboard.height);
+
+    this._drawShapes(this._shapes, {
+      context: context
+    });
+
+    window.location = canvasElement.toDataURL('image/png');
+  }
+
+  _onShareWhiteboardLinkCallback() {
     let shareWhiteboardModal = this._getShareWhiteboardModal();
     shareWhiteboardModal.show();
 
@@ -950,7 +983,8 @@ class Whiteboard {
       clearWhiteboardCallback: this._clearWhiteboard.bind(this),
       fullscreenCallback: this._handleFullscreen.bind(this),
       showMapCallback: this._onMapShowCallback.bind(this),
-      shareWhiteboardCallback: this._onShareWhiteboardCallback.bind(this),
+      shareWhiteboardImageCallback: this._onShareWhiteboardImageCallback.bind(this),
+      shareWhiteboardLinkCallback: this._onShareWhiteboardLinkCallback.bind(this),
       valuesCallback: this._setToolValues.bind(this)
     };
 

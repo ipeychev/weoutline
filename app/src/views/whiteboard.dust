@@ -54,7 +54,7 @@
     </div>
 
     <div id="toolbarTools" class="toolbar toolbar-tools hidden">
-      <div id="pen" class="toolbar-item">
+      <div id="toolPen" class="toolbar-item">
         <div class="toolbar-item-value active" id="penSize">
           <span class="icon icon-pencil"></span>
         </div>
@@ -82,12 +82,12 @@
           </li>
         </ul>
       </div>
-      <div id="eraser" class="toolbar-item">
+      <div id="toolEraser" class="toolbar-item">
         <div class="toolbar-item-value" id="eraserSize">
           <span class="icon icon-eraser"></span>
         </div>
       </div>
-      <div id="color" class="toolbar-item">
+      <div id="toolColor" class="toolbar-item">
         <div class="toolbar-item-value">
           <span class="icon icon-paint-brush"></span>
         </div>
@@ -113,25 +113,33 @@
         </ul>
       </div>
 
-      <div id="clear" class="toolbar-item">
+      <div id="toolClear" class="toolbar-item">
         <div class="toolbar-item-value">
           <span class="icon icon-times"></span>
         </div>
       </div>
 
-      <div id="share" class="toolbar-item">
+      <div id="toolShareWhiteboard" class="toolbar-item">
         <div class="toolbar-item-value">
           <span class="icon icon-share-alt"></span>
         </div>
+        <ul class="toolbar-item-options hidden">
+          <li class="toolbar-item-option" id="toolShareWhiteboardLink">
+            <span class="icon icon-link"></span>
+          </li>
+          <li class="toolbar-item-option"id="toolShareWhiteboardImage">
+            <span class="icon icon-image"></span>
+          </li>
+        </ul>
       </div>
 
-      <div id="map" class="toolbar-item hidden">
+      <div id="toolMap" class="toolbar-item hidden">
         <div class="toolbar-item-value">
           <span class="icon icon-map-o"></span>
         </div>
       </div>
 
-      <div id="fullscreen" class="toolbar-item hidden">
+      <div id="toolFullscreen" class="toolbar-item hidden">
         <div class="toolbar-item-value">
           <span class="icon icon-expand"></span>
           <span class="icon icon-compress hidden"></span>
@@ -140,7 +148,7 @@
     </div>
 
     <div id="toolbarUser" class="toolbar toolbar-user hidden">
-      <div id="user" class="toolbar-item">
+      <div id="userItem" class="toolbar-item">
         <div class="toolbar-item-value">
           <img id="userSignedIn" class="icon icon-signed-in hidden" draggable="false" src="/assets/images/user-unknown.png">
           <a id="userSignIn" draggable="false" href="/user/sign-in">

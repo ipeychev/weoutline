@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'wo';
   src:
-    url('/assets/fonts/fonts/wo.ttf?unzvo0') format('truetype'),
-    url('/assets/fonts/fonts/wo.woff?unzvo0') format('woff'),
-    url('/assets/fonts/fonts/wo.svg?unzvo0#wo') format('svg');
+    url('/assets/fonts/fonts/wo.ttf?55q3oi') format('truetype'),
+    url('/assets/fonts/fonts/wo.woff?55q3oi') format('woff'),
+    url('/assets/fonts/fonts/wo.svg?55q3oi#wo') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -35,6 +35,9 @@
 .icon-times:before {
   content: "\f00d";
 }
+.icon-image:before {
+  content: "\f03e";
+}
 .icon-pencil:before {
   content: "\f040";
 }
@@ -46,6 +49,9 @@
 }
 .icon-sign-out:before {
   content: "\f08b";
+}
+.icon-link:before {
+  content: "\f08e";
 }
 .icon-sign-in:before {
   content: "\f090";

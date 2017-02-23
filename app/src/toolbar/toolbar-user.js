@@ -104,7 +104,8 @@ class ToolbarUser extends Toolbar {
         this._config.signOutCallback();
       } else if (this._userSignedInNode.contains(targetNode)) {
         this._updateToolbarView(this._userNode, targetNode, {
-          activateValue: false
+          activateMenuItem: false,
+          activateValueItem: false
         });
       }
 
@@ -118,7 +119,7 @@ class ToolbarUser extends Toolbar {
   _setupContainer() {
     this._element = document.getElementById(this._config.srcNode);
 
-    this._userNode = this._element.querySelector('#user');
+    this._userNode = this._element.querySelector('#userItem');
     this._userProfileNode = this._element.querySelector('#userProfile');
     this._userSignInNode = this._element.querySelector('#userSignIn');
     this._userSignedInNode = this._element.querySelector('#userSignedIn');
