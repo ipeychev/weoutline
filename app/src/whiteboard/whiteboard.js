@@ -1021,6 +1021,13 @@ class Whiteboard {
 
   _shareWhiteboard(params) {
     if (params.saveShapes) {
+      navigator.share({
+          title: document.title,
+          text: "Hello World",
+          url: window.location.href
+      }).then(() => console.log('Successful share'))
+      .catch(error => console.log('Error sharing:', error));
+
       history.pushState(null, null, window.location.origin + '/wb/' + params.whiteboardId);
 
       if (this._shapes.length) {

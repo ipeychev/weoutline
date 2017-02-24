@@ -3,6 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, minimal-ui">
+    <!-- Origin Trial Token, feature = Web Share, origin = http://localhost:3000, expires = 2017-04-07 -->
+    <meta http-equiv="origin-trial" data-feature="Web Share" data-expires="2017-04-07" content="Akgp1am6OjUMH924y1MSrCh17VGcESqhObHy8nYtGCXryg/5TFcvjzfYr5zH0gMq0Wj1X9rLvOBcDwpdFHymuwcAAABLeyJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjMwMDAiLCJmZWF0dXJlIjoiV2ViU2hhcmUiLCJleHBpcnkiOjE0OTE1NzQyNjN9">
 
     <title>{+title}WeOutline, a shared whiteboard, designed to work among teams{/title}</title>
 
