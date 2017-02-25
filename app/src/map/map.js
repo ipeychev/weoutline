@@ -1,4 +1,3 @@
-const simplify = require('simplify-path');
 import BrowserHelper from '../helpers/browser-helper';
 import Draggable from '../draggable/draggable';
 import Draw from '../draw/draw';
@@ -56,19 +55,31 @@ class Map {
 
     for (let i = 0; i < shapes.length; i++) {
       if (shapes[i].type === ShapeType.LINE) {
-        let points = simplify(shapes[i].points, 10);
-
-        points = points.map((point) => {
-          return [point[0] / ratioX, point[1] / ratioY];
-        });
-
-        Draw.line(points, this._mapContext, {
+        let config = {
           color: shapes[i].color,
           globalCompositeOperation: 'source-over',
           lineCap: 'round',
           lineJoin: 'round',
           lineWidth: Math.round(DrawHelper.getPixelScaledNumber(shapes[i].lineWidth) / 4)
-        });
+        };
+
+        if (shapes[i].curves && shapes[i].curves.length) {
+          let curves = shapes[i].curves.map((curve) => {
+            return [
+              [curve[0][0] / ratioX, curve[0][1] / ratioY],
+              [curve[1][0] / ratioX, curve[1][1] / ratioY],
+              [curve[2][0] / ratioX, curve[2][1] / ratioY],
+              [curve[3][0] / ratioX, curve[3][1] / ratioY]
+            ];
+          });
+
+          Draw.bezierCurve(curves, this._mapContext, config);
+        } else {
+          let points = shapes[i].points.map((point) => {
+            return [point[0] / ratioX, point[1] / ratioY];
+          });
+          Draw.line(points, this._mapContext, config);
+        }
       }
     }
   }

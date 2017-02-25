@@ -49,6 +49,7 @@ window.addEventListener('load', () => {
         activeTool: activeTool,
         color: color,
         currentUser: auth.currentUser,
+        curveFitTolerance: 30,
         dataURL: 'data.weoutline.wedeploy.io',
         height: whiteboardSize.height,
         id: getWhiteboardId(),

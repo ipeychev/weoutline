@@ -1,6 +1,24 @@
 import DrawHelper from '../helpers/draw-helper';
 
 export default class Draw {
+  static bezierCurve(curves, context, config) {
+
+    context.lineCap = config.lineCap;
+    context.lineJoin = config.lineJoin;
+    context.lineWidth = config.lineWidth;
+    context.strokeStyle = config.color;
+
+    context.beginPath();
+
+    for (let i = 0; i < curves.length; i++) {
+      let curve = curves[i];
+      context.moveTo(curve[0][0], curve[0][1]);
+      context.bezierCurveTo(curve[1][0], curve[1][1], curve[2][0], curve[2][1], curve[3][0], curve[3][1]);
+    }
+
+    context.stroke();
+  }
+
   static line(points, context, config) {
     let p1 = points[0];
     let p2 = points[1];

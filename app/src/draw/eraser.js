@@ -116,9 +116,7 @@ class Eraser {
     }
   }
 
-  _checkShapeMatching(curPoint, shape) {
-    let points = shape.points;
-
+  _checkShapeMatching(curPoint, shapePoints) {
     let p1 = [curPoint[0] - 10, curPoint[1]];
     let p2 = [curPoint[0] + 10, curPoint[1]];
     let p3 = [curPoint[0], curPoint[1] - 10];
@@ -129,12 +127,12 @@ class Eraser {
     let i = 0, j = 1;
 
     do {
-      if (points.length === 1) {
-        point1 = [points[0][0] - 5, points[0][1] - 5];
-        point2 = [points[0][0] + 5, points[0][1] + 5];
+      if (shapePoints.length === 1) {
+        point1 = [shapePoints[0][0] - 5, shapePoints[0][1] - 5];
+        point2 = [shapePoints[0][0] + 5, shapePoints[0][1] + 5];
       } else {
-        point1 = points[i];
-        point2 = points[j];
+        point1 = shapePoints[i];
+        point2 = shapePoints[j];
       }
 
       let intersection = this._isIntersecting(p1, p2, point1, point2);
@@ -148,7 +146,7 @@ class Eraser {
       }
 
       i++, j++;
-    } while (i < points.length - 1);
+    } while (i < shapePoints.length - 1);
 
     return false;
   }
@@ -171,8 +169,18 @@ class Eraser {
     let matchingShapes = [];
 
     for (let i = 0; i < this._config.shapes.length; i++) {
-      if (DrawHelper.checkPointsInViewport(this._config.shapes[i].points, this._config.offset, this._config.scale, this._canvasSize)) {
-        let matchedShape = this._checkShapeMatching(curPoint, this._config.shapes[i]);
+      let points = [];
+
+      if (this._config.shapes.curves && this._config.shapes[i].curves.length) {
+        this._config.shapes[i].curves.forEach((curve) => {
+          points.push(curve[0], curve[3]);
+        });
+      } else {
+        points = this._config.shapes[i].points;
+      }
+
+      if (DrawHelper.checkPointsInViewport(points, this._config.offset, this._config.scale, this._canvasSize)) {
+        let matchedShape = this._checkShapeMatching(curPoint, points);
 
         if (matchedShape) {
           matchingShapes.push(this._config.shapes[i]);

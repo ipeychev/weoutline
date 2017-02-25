@@ -1,3 +1,4 @@
+const fitCurve = require('fit-curve');
 import BrowserHelper from '../helpers/browser-helper';
 import CryptHelper from '../helpers/crypt-helper';
 import Data from '../data/data';
@@ -21,6 +22,7 @@ class Whiteboard {
     this._config = config;
 
     this._shapes = [];
+    this._shapesInViewport = [];
 
     this._loadSpinner = document.getElementById(this._config.whiteboard.loadSpinnerId);
     this._whiteboardId = this._config.whiteboard.id;
@@ -46,6 +48,13 @@ class Whiteboard {
     this._fetchShapes()
       .then((shapes) => {
         this._shapes = shapes || [];
+        this._shapes.forEach((shape) => {
+          if (!shape.curves || !shape.curves.length) {
+            shape.curves = fitCurve(shape.points, this._config.whiteboard.curveFitTolerance);
+          }
+        });
+
+        this._filterShapesInViewport();
         this.redraw();
         this._loadSpinner.classList.add('hidden');
       });
@@ -67,11 +76,16 @@ class Whiteboard {
 
   deleteShapes(shapes) {
     this._shapes = this._removeShapesFromCollection(this._shapes, shapes);
+    this._shapesInViewport = this._removeShapesFromCollection(this._shapesInViewport, shapes);
 
     this._deleteShapes(this._whiteboardId, shapes);
   }
 
   destroy() {
+    if (!this._whiteboardId) {
+      this._saveShapesLocally(this._shapes);
+    }
+
     if (this._drawer) {
       this._drawer.destroy();
     }
@@ -81,6 +95,8 @@ class Whiteboard {
 
     this._detachListeners();
 
+    window.clearTimeout(this._deleteShapesTimeout);
+    window.clearTimeout(this._saveShapesTimeout);
     window.clearTimeout(this._saveStateTimeout);
 
     this._data.destroy();
@@ -93,24 +109,31 @@ class Whiteboard {
   }
 
   drawShapes() {
-    let canvasSize = {
-      height: this._canvasElement.height,
-      width: this._canvasElement.width
-    };
-
     let shapes = [];
 
-    for (let i = 0; i < this._shapes.length; i++) {
-      if (this._shapes[i].type === ShapeType.LINE) {
-        if (DrawHelper.checkPointsInViewport(this._shapes[i].points, this._offset, this._scale, canvasSize)) {
-          let points = this._shapes[i].points.map((point) => {
+    for (let i = 0; i < this._shapesInViewport.length; i++) {
+      if (this._shapesInViewport[i].type === ShapeType.LINE) {
+        let curves;
+        let points;
+        if (this._shapesInViewport[i].curves && this._shapesInViewport[i].curves.length) {
+          curves = this._shapesInViewport[i].curves.map((curve) => {
+            return [
+              DrawHelper.getPointWithOffset(curve[0], this._offset),
+              DrawHelper.getPointWithOffset(curve[1], this._offset),
+              DrawHelper.getPointWithOffset(curve[2], this._offset),
+              DrawHelper.getPointWithOffset(curve[3], this._offset)
+            ];
+          });
+        } else {
+          points = this._shapesInViewport[i].points.map((point) => {
             return DrawHelper.getPointWithOffset(point, this._offset);
           });
-
-          shapes.push(Object.assign({}, this._shapes[i], {
-            points: points
-          }));
         }
+
+        shapes.push(Object.assign({}, this._shapesInViewport[i], {
+          curves: curves,
+          points: points
+        }));
       }
     }
 
@@ -158,19 +181,22 @@ class Whiteboard {
       scale: this._scale
     });
 
+    this._filterShapesInViewport();
+
     this.redraw();
 
     this._saveStateWithTimeout(this._whiteboardId);
   }
 
   _attachListeners() {
-    this._onTouchStartListener = this._onTouchStart.bind(this);
-    this._onTouchMoveListener = this._onTouchMove.bind(this);
-    this._onWheelListener = this._onScroll.bind(this);
+    this._beforeUnloadListener = this._beforeUnload.bind(this);
     this._onContextMenuListener = function(e) { e.preventDefault(); };
-    this._resizeListener = this._onResize.bind(this);
-    this._orientationChangeListener = () => {setTimeout(this._onResize.bind(this), 100);};
     this._onFullscreenChangeListener = this._onFullscreenChange.bind(this);
+    this._onTouchMoveListener = this._onTouchMove.bind(this);
+    this._onTouchStartListener = this._onTouchStart.bind(this);
+    this._onWheelListener = this._onScroll.bind(this);
+    this._orientationChangeListener = () => {setTimeout(this._onResize.bind(this), 100);};
+    this._resizeListener = this._onResize.bind(this);
 
     if (BrowserHelper.getTouchEventsSupport()) {
       this._canvasElement.addEventListener('touchstart', this._onTouchStartListener, { passive: true });
@@ -182,8 +208,15 @@ class Whiteboard {
 
     document.addEventListener(BrowserHelper.getFullscreenChangeEventName(this._canvasElement), this._onFullscreenChangeListener);
 
+    window.addEventListener('beforeunload', this._beforeUnloadListener);
     window.addEventListener('orientationchange', this._orientationChangeListener);
     window.addEventListener('resize', this._resizeListener);
+  }
+
+  _beforeUnload() {
+    if (!this._whiteboardId) {
+      this._saveShapesLocally(this._shapes);
+    }
   }
 
   _clearWhiteboard() {
@@ -237,6 +270,7 @@ class Whiteboard {
     this._canvasElement.removeEventListener('touchmove', this._onTouchMoveListener);
     this._canvasElement.removeEventListener('touchstart', this._onTouchStartListener, { passive: true });
     this._canvasElement.removeEventListener('wheel', this._onWheelListener);
+    window.removeEventListener('beforeunload', this._beforeUnloadListener);
     window.removeEventListener('orientationchange', this._orientationChangeListener);
     window.removeEventListener('resize', this._resizeListener);
   }
@@ -245,7 +279,7 @@ class Whiteboard {
     if (this._whiteboardId) {
       this._deleteShapesOnWhiteboard(whiteboard, shapes);
     } else {
-      this._deleteShapesLocally(shapes);
+      this._deleteShapesLocallyWithTimeout(shapes);
     }
   }
 
@@ -253,6 +287,14 @@ class Whiteboard {
     let localShapes = JSON.parse(localStorage.getItem('shapes')) || [];
     localShapes = this._removeShapesFromCollection(localShapes, shapes);
     localStorage.setItem('shapes', JSON.stringify(localShapes));
+  }
+
+  _deleteShapesLocallyWithTimeout(shapes) {
+    window.clearTimeout(this._deleteShapesTimeout);
+
+    this._deleteShapesTimeout = window.setTimeout(() => {
+      this._deleteShapesLocally(shapes);
+    }, 1000);
   }
 
   _deleteShapesOnWhiteboard(whiteboardId, shapes) {
@@ -296,13 +338,19 @@ class Whiteboard {
   _drawShapes(shapes, params) {
     for (let i = 0; i < shapes.length; i++) {
       if (shapes[i].type === ShapeType.LINE) {
-        Draw.line(shapes[i].points, params.context, {
+        let config = {
           color: shapes[i].color,
           globalCompositeOperation: 'source-over',
           lineCap: 'round',
           lineJoin: 'round',
           lineWidth: DrawHelper.getPixelScaledNumber(shapes[i].lineWidth)
-        });
+        };
+
+        if (shapes[i].curves && shapes[i].curves.length) {
+          Draw.bezierCurve(shapes[i].curves, params.context, config);
+        } else {
+          Draw.line(shapes[i].points, params.context, config);
+        }
       }
     }
   }
@@ -364,6 +412,26 @@ class Whiteboard {
 
     this._offset = JSON.parse(offset) || [0, 0];
     this._scale = JSON.parse(scale) || 1;
+  }
+
+  _filterShapesInViewport() {
+    let canvasSize = {
+      height: this._canvasElement.height,
+      width: this._canvasElement.width
+    };
+
+    this._shapesInViewport = this._shapes.filter((shape) => {
+      let points = [];
+      if (shape.curves && shape.curves.length) {
+        shape.curves.forEach((curve) => {
+          points.push(curve[0], curve[3]);
+        });
+      } else {
+        points = shape.points;
+      }
+
+      return DrawHelper.checkPointsInViewport(points, this._offset, this._scale, canvasSize);
+    });
   }
 
   _generateSessionId() {
@@ -525,6 +593,7 @@ class Whiteboard {
     this._offset[0] = x;
     this._offset[1] = y;
 
+    this._filterShapesInViewport();
     this.redraw();
 
     this._saveState(this._whiteboardId);
@@ -554,6 +623,7 @@ class Whiteboard {
       width: this._config.whiteboard.width
     });
 
+    this._filterShapesInViewport();
     this.redraw();
   }
 
@@ -581,6 +651,8 @@ class Whiteboard {
 
         this._offset[0] += allowedOffset[0];
         this._offset[1] += allowedOffset[1];
+
+        this._filterShapesInViewport();
 
         this.redraw();
 
@@ -616,6 +688,7 @@ class Whiteboard {
       offset: this._offset
     });
 
+    this._filterShapesInViewport();
     this.redraw();
 
     this._saveStateWithTimeout(this._whiteboardId);
@@ -630,20 +703,25 @@ class Whiteboard {
       return DrawHelper.getPointWithoutOffset(point, this._offset);
     });
 
+    shape.curves = fitCurve(shape.points, this._config.whiteboard.curveFitTolerance);
+
     shape.id = CryptHelper.getId();
 
     shape.sessionId = this._sessionId;
 
     this.addShapes([shape]);
+    this._shapesInViewport.push(shape);
     this.redraw();
   }
 
   _onShapeCreatedRemotelyCallback(shape) {
     this._shapes = this._addShapesToCollection(this._shapes, [shape]);
 
+    this._filterShapesInViewport();
+
     if (this._config.whiteboard.activeTool === Tools.eraser) {
       this._drawer.setConfig({
-        shapes: this._shapes
+        shapes: this._shapesInViewport
       });
     }
 
@@ -653,11 +731,13 @@ class Whiteboard {
   _onShapeErasedRemotelyCallback(shape) {
     this._shapes = this._removeShapesFromCollection(this._shapes, [shape]);
 
+    this._filterShapesInViewport();
+
     this.redraw();
 
     if (this._config.whiteboard.activeTool === Tools.eraser) {
       this._drawer.setConfig({
-        shapes: this._shapes
+        shapes: this._shapesInViewport
       });
     }
   }
@@ -668,11 +748,12 @@ class Whiteboard {
 
   _onShapesErasedLocallyCallback(shapes) {
     this.deleteShapes(shapes);
+    this._filterShapesInViewport();
     this.redraw();
 
     if (this._config.whiteboard.activeTool === Tools.eraser) {
       this._drawer.setConfig({
-        shapes: this._shapes
+        shapes: this._shapesInViewport
       });
     }
   }
@@ -865,7 +946,7 @@ class Whiteboard {
     if (this._whiteboardId) {
       this._saveShapesOnWhiteboard(this._whiteboardId, shapes);
     } else {
-      this._saveShapesLocally(shapes);
+      this._saveShapesLocallyWithTimeout(shapes);
     }
   }
 
@@ -884,6 +965,14 @@ class Whiteboard {
     let localShapes = JSON.parse(localStorage.getItem('shapes')) || [];
     localShapes = localShapes.concat(shapes);
     localStorage.setItem('shapes', JSON.stringify(localShapes));
+  }
+
+  _saveShapesLocallyWithTimeout(shapes) {
+    window.clearTimeout(this._saveShapesTimeout);
+
+    this._saveShapesTimeout = window.setTimeout(() => {
+      this._saveShapesLocally(shapes);
+    }, 3000);
   }
 
   _setActiveTool() {
@@ -912,7 +1001,7 @@ class Whiteboard {
         canvas: this._canvasElement,
         offset: this._offset,
         scale: this._scale,
-        shapes: this._shapes
+        shapes: this._shapesInViewport
       });
     }
   }
