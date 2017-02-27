@@ -484,20 +484,20 @@ class Whiteboard {
   }
 
   _onFullscreenChange() {
-    let values = this._toolbarTools.getValues();
+    let config = this._toolbarTools.getConfig();
 
-    values.fullscreen = BrowserHelper.getFullScreenModeValue();
+    config.fullscreen = BrowserHelper.getFullScreenModeValue();
 
-    this._toolbarTools.setConfig(values);
+    this._toolbarTools.setConfig(config);
   }
 
   _onMapHideCallback() {
-    let values = this._toolbarTools.getValues();
-    values.mapHidden = true;
-    this._toolbarTools.setConfig(values);
+    let config = this._toolbarTools.getConfig();
+    config.mapVisible = false;
+    this._toolbarTools.setConfig(config);
 
     this._map.setConfig({
-      mapHidden: true
+      mapVisible: false
     });
   }
 
@@ -532,14 +532,14 @@ class Whiteboard {
 
   _onMapShowCallback() {
     this._map.setConfig({
-      mapHidden: false
+      mapVisible: true
     });
 
     this._map.draw(this._shapes);
 
-    let values = this._toolbarTools.getValues();
-    values.mapHidden = false;
-    this._toolbarTools.setConfig(values);
+    let config = this._toolbarTools.getConfig();
+    config.mapVisible = true;
+    this._toolbarTools.setConfig(config);
   }
 
   _onResize() {
@@ -937,8 +937,8 @@ class Whiteboard {
       }
   }
 
-  _setToolValues(toolValues) {
-    Object.assign(this._config.whiteboard, toolValues);
+  _setToolValues(toolConfig) {
+    Object.assign(this._config.whiteboard, toolConfig);
 
     this._setActiveTool();
   }
@@ -967,8 +967,8 @@ class Whiteboard {
       container: this._config.map.container,
       height: this._config.map.height,
       lineWidth: this._config.map.lineWidth,
-      mapHidden: this._config.map.mapHidden,
       mapHideCallback: this._onMapHideCallback.bind(this),
+      mapVisible: this._config.map.mapVisible,
       offset: this._offset,
       scale: this._scale,
       setOffsetCallback: this._onMapSetOffsetCallback.bind(this),
@@ -982,9 +982,9 @@ class Whiteboard {
     let config = {
       clearWhiteboardCallback: this._clearWhiteboard.bind(this),
       fullscreenCallback: this._handleFullscreen.bind(this),
-      showMapCallback: this._onMapShowCallback.bind(this),
       shareWhiteboardImageCallback: this._onShareWhiteboardImageCallback.bind(this),
       shareWhiteboardLinkCallback: this._onShareWhiteboardLinkCallback.bind(this),
+      showMapCallback: this._onMapShowCallback.bind(this),
       valuesCallback: this._setToolValues.bind(this)
     };
 

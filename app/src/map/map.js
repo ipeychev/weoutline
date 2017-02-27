@@ -76,7 +76,7 @@ class Map {
   setConfig(config) {
     this._config = Object.assign(this._config, config);
 
-    this._setMapHidden(this._config.mapHidden);
+    this._setMapVisible(this._config.mapVisible);
   }
 
   _attachListeners() {
@@ -135,7 +135,7 @@ class Map {
   }
 
   _initItems() {
-    this._setMapHidden(this._config.mapHidden);
+    this._setMapVisible(this._config.mapVisible);
   }
 
   _isPointInMapViewport(point, mapViewportRect) {
@@ -249,11 +249,11 @@ class Map {
     }
   }
 
-  _setMapHidden(mapHidden) {
-    if (mapHidden) {
-      this._mapContainer.classList.add('hidden');
-    } else {
+  _setMapVisible(mapVisible) {
+    if (mapVisible) {
       this._mapContainer.classList.remove('hidden');
+    } else {
+      this._mapContainer.classList.add('hidden');
     }
   }
 

@@ -31,10 +31,12 @@ class ToolbarTools extends Toolbar {
     window.clearTimeout(this._hideMenuTimeout);
   }
 
-  getValues() {
+  getConfig() {
     let values = {
       activeTool: this._getActiveTool(),
       color: this._getColor(),
+      fullscreen: this._getFullscreen(),
+      mapVisible: this._getMapVisible(),
       penSize: this._getPenSize()
     };
 
@@ -53,7 +55,7 @@ class ToolbarTools extends Toolbar {
     this._setToolSize(this._penNode, config.penSize);
     this._setColor(config.color);
     this._setFullscreen(config.fullscreen);
-    this._setMapHidden(config.mapHidden);
+    this._setMapVisible(config.mapVisible);
   }
 
   _attachListeners() {
@@ -101,6 +103,14 @@ class ToolbarTools extends Toolbar {
     return DrawHelper.colorToHex(style.getPropertyValue('color'));
   }
 
+  _getFullscreen() {
+    return this._config.fullscreen;
+  }
+
+  _getMapVisible() {
+    return this._config.mapVisible;
+  }
+
   _getPenSize() {
     return this._getToolSize(this._penNode);
   }
@@ -117,7 +127,7 @@ class ToolbarTools extends Toolbar {
       this._fullScreenNode.classList.remove('hidden');
     }
 
-    if (this._config.mapHidden) {
+    if (this._config.mapVisible) {
       this._showMapNode.classList.add('hidden');
     } else {
       this._showMapNode.classList.remove('hidden');
@@ -171,7 +181,7 @@ class ToolbarTools extends Toolbar {
       return;
     }
 
-    let values = this.getValues();
+    let values = this.getConfig();
 
     this._config.valuesCallback(values);
 
@@ -179,7 +189,7 @@ class ToolbarTools extends Toolbar {
   }
 
   _onColorChange() {
-    let values = this.getValues();
+    let values = this.getConfig();
 
     this._config.valuesCallback(values);
   }
@@ -214,6 +224,8 @@ class ToolbarTools extends Toolbar {
   }
 
   _setFullscreen(fullscreen) {
+    this._config.fullscreen = fullscreen;
+
     let fullScreenExpandNode = this._fullScreenNode.querySelector('.icon-expand');
     let fullScreenCompressNode = this._fullScreenNode.querySelector('.icon-compress');
 
@@ -226,11 +238,13 @@ class ToolbarTools extends Toolbar {
     }
   }
 
-  _setMapHidden(mapHidden) {
-    if (mapHidden) {
-      this._showMapNode.classList.remove('hidden');
-    } else {
+  _setMapVisible(mapVisible) {
+    this._config.mapVisible = mapVisible;
+
+    if (mapVisible) {
       this._showMapNode.classList.add('hidden');
+    } else {
+      this._showMapNode.classList.remove('hidden');
     }
   }
 

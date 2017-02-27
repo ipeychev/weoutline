@@ -17,7 +17,7 @@ window.addEventListener('load', () => {
 
     let activeTool = Tools.line;
     let color = '#000000';
-    let mapHidden = false;
+    let mapVisible = true;
     let penSize = 4;
 
     whiteboard = new Whiteboard({
@@ -26,7 +26,7 @@ window.addEventListener('load', () => {
         container: 'mapContainer',
         height: whiteboardSize.height,
         lineWidth: 1,
-        mapHidden: mapHidden,
+        mapVisible: mapVisible,
         srcNode: 'map',
         width: whiteboardSize.width
       },
@@ -34,7 +34,7 @@ window.addEventListener('load', () => {
         activeTool: activeTool,
         color: color,
         fullscreen: false,
-        mapHidden: mapHidden,
+        mapVisible: mapVisible,
         penSize: penSize,
         srcNode: 'toolbarTools'
       },
