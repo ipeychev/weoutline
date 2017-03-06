@@ -13,7 +13,7 @@ class ToolbarZoom extends Toolbar {
 
     this._attachListeners();
 
-    this._initItems();
+    this._updateUI();
 
     this._element.classList.remove('hidden');
   }
@@ -22,14 +22,9 @@ class ToolbarZoom extends Toolbar {
     this._detachListeners();
   }
 
-  setConfig(config) {
-    Object.assign(this._config, config);
-
-    this._zoomValueNode.querySelector('.icon').innerHTML = Math.round(100 * config.scale);
-  }
-
   _attachListeners() {
     this._clickListener = this._onClick.bind(this);
+    this._stateChangeListener = this._onStateChange.bind(this);
     this._touchEndListener = this._onTouchEnd.bind(this);
 
     if (BrowserHelper.getTouchEventsSupport()) {
@@ -37,15 +32,14 @@ class ToolbarZoom extends Toolbar {
     } else {
       this._element.addEventListener('click', this._clickListener);
     }
+
+    this._config.stateHolder.on('stateChange', this._stateChangeListener);
   }
 
   _detachListeners() {
+    this._config.stateHolder.off('stateChange', this._stateChangeListener);
     this._element.removeEventListener('click', this._clickListener);
     this._element.removeEventListener('touchend', this._touchEndListener);
-  }
-
-  _initItems() {
-    this._zoomValueNode.querySelector('.icon').innerHTML = Math.round(100 * this._config.scale);
   }
 
   _onClick(event) {
@@ -72,6 +66,35 @@ class ToolbarZoom extends Toolbar {
       this._config.increaseZoomCallback();
     } else if (this._zoomValueNode.contains(targetNode)) {
       this._config.normalizeZoomCallback();
+    }
+  }
+
+  _onStateChange(params) {
+    if (params.prop === 'scale') {
+      this._setZoom();
+    }
+  }
+
+  _updateUI() {
+    this._setZoom();
+    this._setZoomEnabled();
+  }
+
+  _setZoom() {
+    let state = this._config.stateHolder.getState();
+
+    this._zoomValueNode.querySelector('.icon').innerHTML = Math.round(100 * state.scale);
+  }
+
+  _setZoomEnabled() {
+    let state = this._config.stateHolder.getState();
+
+    let nodeValue = this._zoomModeEnableNode.querySelector('.toolbar-item-value');
+
+    if (state.zoomModeEnabled) {
+      nodeValue.classList.add('active');
+    } else {
+      nodeValue.classList.remove('active');
     }
   }
 

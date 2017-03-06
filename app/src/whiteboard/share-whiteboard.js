@@ -208,7 +208,7 @@ class ShareWhiteboardModal {
       };
     }
 
-    this._config.shareWhiteBoardCallback(payload);
+    this._config.shareWhiteboardCallback(payload);
 
     this.hide();
   }

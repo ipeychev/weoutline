@@ -37,15 +37,17 @@ class Eraser {
 
     let curPoint = DrawHelper.getPointFromEvent(event, this._canvasElement);
 
-    // set the point to the unscaled X and Y
-    curPoint[0] = curPoint[0] / this._config.scale;
-    curPoint[1] = curPoint[1] / this._config.scale;
+    let state = this._config.stateHolder.getState();
 
-    let tmpX = curPoint[0] + this._config.offset[0];
-    let tmpY = curPoint[1] + this._config.offset[1];
+    // set the point to the unscaled X and Y
+    curPoint[0] = curPoint[0] / state.scale;
+    curPoint[1] = curPoint[1] / state.scale;
+
+    let tmpX = curPoint[0] + state.offset[0];
+    let tmpY = curPoint[1] + state.offset[1];
 
     if (tmpX > 0 && tmpX < this._config.boardSize[0] && tmpY > 0 && tmpY < this._config.boardSize[1]) {
-      curPoint = DrawHelper.getPointWithoutOffset(curPoint, this._config.offset);
+      curPoint = DrawHelper.getPointWithoutOffset(curPoint, state.offset);
 
       let matchingShapes = this._getMatchingShapes(curPoint);
 
@@ -78,15 +80,17 @@ class Eraser {
 
     let curPoint = DrawHelper.getPointFromEvent(event, this._canvasElement);
 
-    // set the point to the unscaled X and Y
-    curPoint[0] = curPoint[0] / this._config.scale;
-    curPoint[1] = curPoint[1] / this._config.scale;
+    let state = this._config.stateHolder.getState();
 
-    let tmpX = curPoint[0] + this._config.offset[0];
-    let tmpY = curPoint[1] + this._config.offset[1];
+    // set the point to the unscaled X and Y
+    curPoint[0] = curPoint[0] / state.scale;
+    curPoint[1] = curPoint[1] / state.scale;
+
+    let tmpX = curPoint[0] + state.offset[0];
+    let tmpY = curPoint[1] + state.offset[1];
 
     if (tmpX > 0 && tmpX < this._config.boardSize[0] && tmpY > 0 && tmpY < this._config.boardSize[1]) {
-      curPoint = DrawHelper.getPointWithoutOffset(curPoint, this._config.offset);
+      curPoint = DrawHelper.getPointWithoutOffset(curPoint, state.offset);
 
       let matchingShapes = this._getMatchingShapes(curPoint);
 
@@ -170,12 +174,14 @@ class Eraser {
   _getMatchingShapes(curPoint) {
     let matchingShapes = [];
 
-    for (let i = 0; i < this._config.shapes.length; i++) {
-      if (DrawHelper.checkPointsInViewport(this._config.shapes[i].points, this._config.offset, this._config.scale, this._canvasSize)) {
-        let matchedShape = this._checkShapeMatching(curPoint, this._config.shapes[i]);
+    let state = this._config.stateHolder.getState();
+
+    for (let i = 0; i < state.shapes.length; i++) {
+      if (DrawHelper.checkPointsInViewport(state.shapes[i].points, state.offset, state.scale, this._canvasSize)) {
+        let matchedShape = this._checkShapeMatching(curPoint, state.shapes[i]);
 
         if (matchedShape) {
-          matchingShapes.push(this._config.shapes[i]);
+          matchingShapes.push(state.shapes[i]);
         }
       }
     }

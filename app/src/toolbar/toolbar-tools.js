@@ -19,7 +19,7 @@ class ToolbarTools extends Toolbar {
     this._attachListeners();
     this._positionToolbar();
     this._initItems();
-    this.setConfig(config);
+    this._updateUI();
 
     this._element.classList.remove('hidden');
   }
@@ -43,26 +43,12 @@ class ToolbarTools extends Toolbar {
     return values;
   }
 
-  setConfig(config) {
-    this._deactivateValues();
-
-    if (config.activeTool === Tools.line) {
-      this._penNode.querySelector('.toolbar-item-value').classList.add('active');
-    } else if (config.activeTool === Tools.eraser) {
-      this._eraserNode.querySelector('.toolbar-item-value').classList.add('active');
-    }
-
-    this._setToolSize(this._penNode, config.penSize);
-    this._setColor(config.color);
-    this._setFullscreen(config.fullscreen);
-    this._setMapVisible(config.mapVisible);
-  }
-
   _attachListeners() {
     this._clickListener = this._onClick.bind(this);
     this._documentInteractionListener = this._onDocumentInteraction.bind(this);
-    this._resizeListener = this._onResize.bind(this);
     this._orientationChangeListener = () => {window.setTimeout(this._onResize.bind(this), 100);};
+    this._resizeListener = this._onResize.bind(this);
+    this._stateChangeListener = this._onStateChange.bind(this);
     this._touchEndListener = this._onTouchEnd.bind(this);
 
     if (BrowserHelper.getTouchEventsSupport()) {
@@ -75,11 +61,14 @@ class ToolbarTools extends Toolbar {
 
     window.addEventListener('orientationchange', this._orientationChangeListener);
     window.addEventListener('resize', this._resizeListener);
+
+    this._config.stateHolder.on('stateChange', this._stateChangeListener);
   }
 
   _detachListeners() {
     document.removeEventListener('mousedown', this._documentInteractionListener);
     document.removeEventListener('touchstart', this._documentInteractionListener);
+    this._config.stateHolder.off('stateChange', this._stateChangeListener);
     this._element.removeEventListener('click', this._clickListener);
     this._element.removeEventListener('touchend', this._touchEndListener, { passive: true });
     window.removeEventListener('orientationchange', this._orientationChangeListener);
@@ -103,14 +92,6 @@ class ToolbarTools extends Toolbar {
     return DrawHelper.colorToHex(style.getPropertyValue('color'));
   }
 
-  _getFullscreen() {
-    return this._config.fullscreen;
-  }
-
-  _getMapVisible() {
-    return this._config.mapVisible;
-  }
-
   _getPenSize() {
     return this._getToolSize(this._penNode);
   }
@@ -126,12 +107,6 @@ class ToolbarTools extends Toolbar {
     if (BrowserHelper.isFullScreenSupported()) {
       this._fullScreenNode.classList.remove('hidden');
     }
-
-    if (this._config.mapVisible) {
-      this._showMapNode.classList.add('hidden');
-    } else {
-      this._showMapNode.classList.remove('hidden');
-    }
   }
 
   _onClick(event) {
@@ -144,11 +119,14 @@ class ToolbarTools extends Toolbar {
         activateMenuItem: true,
         activateValueItem: true
       });
+
+      this._config.valueChange('penSize', this._getPenSize());
     } else if (this._eraserNode.contains(targetNode)) {
       this._updateToolbarView(this._eraserNode, targetNode, {
         activateMenuItem: true,
         activateValueItem: true
       });
+      this._config.valueChange('activeTool', Tools.eraser);
     } else if (this._colorNode.contains(targetNode)) {
       this._updateToolbarView(this._colorNode, targetNode, {
         activateMenuItem: true,
@@ -160,6 +138,8 @@ class ToolbarTools extends Toolbar {
           property: 'color'
         }
       });
+
+      this._config.valueChange('color', this._getColor());
     } else if (this._clearNode.contains(targetNode)) {
       this._config.clearWhiteboardCallback();
     } else if (this._showMapNode.contains(targetNode)) {
@@ -181,34 +161,44 @@ class ToolbarTools extends Toolbar {
       return;
     }
 
-    let values = this.getConfig();
-
-    this._config.valuesCallback(values);
-
     this._hideMenuTimeout = window.setTimeout(this._hideMenu.bind(this), 5000);
-  }
-
-  _onColorChange() {
-    let values = this.getConfig();
-
-    this._config.valuesCallback(values);
   }
 
   _onResize() {
     this._positionToolbar();
   }
 
-  _setColor(value) {
+  _onStateChange(params) {
+    if (params.prop === 'activeTool') {
+      if (params.value === Tools.line) {
+        this._penNode.querySelector('.toolbar-item-value').classList.add('active');
+      } else if (params.value === Tools.eraser) {
+        this._eraserNode.querySelector('.toolbar-item-value').classList.add('active');
+      }
+    } else if (params.prop === 'penSize') {
+      this._setToolSize();
+    } else if (params.prop === 'color') {
+      this._setColor();
+    } else if (params.prop === 'fullscreen') {
+      this._setFullscreen();
+    } else if (params.prop === 'mapVisible') {
+      this._setMapVisible();
+    }
+  }
+
+  _setColor() {
     this._deactivateOptions(this._colorNode);
 
     let nodes = this._colorNode.querySelectorAll('.toolbar-item-option .icon');
+
+    let state = this._config.stateHolder.getState();
 
     for (let i = 0; nodes && i < nodes.length; i++) {
       let optionNode = nodes.item(i);
 
       let style = window.getComputedStyle(optionNode);
 
-      if (DrawHelper.colorToHex(style.getPropertyValue('color')) === value) {
+      if (DrawHelper.colorToHex(style.getPropertyValue('color')) === state.color) {
         optionNode.parentNode.classList.add('active');
 
         this._setItemValue(optionNode.parentNode, this._colorNode, {
@@ -223,13 +213,13 @@ class ToolbarTools extends Toolbar {
     }
   }
 
-  _setFullscreen(fullscreen) {
-    this._config.fullscreen = fullscreen;
-
+  _setFullscreen() {
     let fullScreenExpandNode = this._fullScreenNode.querySelector('.icon-expand');
     let fullScreenCompressNode = this._fullScreenNode.querySelector('.icon-compress');
 
-    if (fullscreen) {
+    let state = this._config.stateHolder.getState();
+
+    if (state.fullscreen) {
       fullScreenExpandNode.classList.add('hidden');
       fullScreenCompressNode.classList.remove('hidden');
     } else {
@@ -238,27 +228,29 @@ class ToolbarTools extends Toolbar {
     }
   }
 
-  _setMapVisible(mapVisible) {
-    this._config.mapVisible = mapVisible;
+  _setMapVisible() {
+    let state = this._config.stateHolder.getState();
 
-    if (mapVisible) {
+    if (state.mapVisible) {
       this._showMapNode.classList.add('hidden');
     } else {
       this._showMapNode.classList.remove('hidden');
     }
   }
 
-  _setToolSize(rootNode, value) {
-    this._deactivateOptions(rootNode);
+  _setToolSize() {
+    this._deactivateOptions(this._penNode);
 
-    let nodes = rootNode.querySelectorAll('.toolbar-item-option .icon');
+    let nodes = this._penNode.querySelectorAll('.toolbar-item-option .icon');
+
+    let state = this._config.stateHolder.getState();
 
     for (let i = 0; nodes && i < nodes.length; i++) {
       let optionNode = nodes.item(i);
 
       let style = window.getComputedStyle(optionNode);
 
-      if (parseInt(style.getPropertyValue('font-size'), 10) === value) {
+      if (parseInt(style.getPropertyValue('font-size'), 10) === state.penSize) {
         optionNode.parentNode.classList.add('active');
         break;
       }
@@ -277,6 +269,23 @@ class ToolbarTools extends Toolbar {
     this._shareWhiteboardImageNode = this._element.querySelector('#toolShareWhiteboardImage');
     this._shareWhiteboardLinkNode = this._element.querySelector('#toolShareWhiteboardLink');
     this._showMapNode = this._element.querySelector('#toolMap');
+  }
+
+  _updateUI() {
+    let state = this._config.stateHolder.getState();
+
+    this._deactivateValues();
+
+    if (state.activeTool === Tools.line) {
+      this._penNode.querySelector('.toolbar-item-value').classList.add('active');
+    } else if (state.activeTool === Tools.eraser) {
+      this._eraserNode.querySelector('.toolbar-item-value').classList.add('active');
+    }
+
+    this._setToolSize();
+    this._setColor();
+    this._setFullscreen();
+    this._setMapVisible();
   }
 }
 
