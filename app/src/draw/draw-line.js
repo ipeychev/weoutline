@@ -49,10 +49,12 @@ class DrawLine {
 
     event.preventDefault();
 
+    let state = this._config.stateHolder.getState();
+
     let curPoint = DrawHelper.getPointFromEvent(event, this._canvasElement);
     // set the point to the unscaled X and Y
-    curPoint[0] = curPoint[0] / this._config.scale;
-    curPoint[1] = curPoint[1] / this._config.scale;
+    curPoint[0] = curPoint[0] / state.scale;
+    curPoint[1] = curPoint[1] / state.scale;
 
     if (this._config.minPointDistance > 0) {
       let distance = Math.sqrt((this._lastPoint[0] - curPoint[0]) * (this._lastPoint[0] - curPoint[0]) +
@@ -63,16 +65,16 @@ class DrawLine {
       }
     }
 
-    let tmpX = this._lastPoint[0] + this._config.offset[0];
-    let tmpY = this._lastPoint[1] + this._config.offset[1];
+    let tmpX = this._lastPoint[0] + state.offset[0];
+    let tmpY = this._lastPoint[1] + state.offset[1];
 
     if (tmpX > 0 && tmpX < this._config.boardSize[0] && tmpY > 0 && tmpY < this._config.boardSize[1]) {
       this._lastPoint = Draw.lineToMidPoint(this._lastPoint, curPoint, this._context, {
-        color: this._config.color,
+        color: state.color,
         globalCompositeOperation: this._config.globalCompositeOperation,
         lineCap: this._config.lineCap,
         lineJoin: this._config.lineJoin,
-        lineWidth: DrawHelper.getPixelScaledNumber(this._config.lineWidth)
+        lineWidth: DrawHelper.getPixelScaledNumber(state.penSize)
       });
 
       this._points.push(curPoint);
@@ -89,13 +91,15 @@ class DrawLine {
 
     this._isDrawing = false;
 
+    let state = this._config.stateHolder.getState();
+
     // In case of draw canceling, there won't be any points
     // Creating a shape is not needed in this case
     if (this._points.length) {
       let shape = new Shape({
-        color: this._config.color,
+        color: state.color,
         points: this._points.slice(0),
-        lineWidth: this._config.lineWidth,
+        lineWidth: state.penSize,
         type: ShapeType.LINE
       });
 
@@ -112,16 +116,18 @@ class DrawLine {
   start(event) {
     this._lastPoint = DrawHelper.getPointFromEvent(event, this._canvasElement);
 
-    // set the point to the unscaled X and Y
-    this._lastPoint[0] = this._lastPoint[0] / this._config.scale;
-    this._lastPoint[1] = this._lastPoint[1] / this._config.scale;
+    let state = this._config.stateHolder.getState();
 
-    let tmpX = this._lastPoint[0] + this._config.offset[0];
-    let tmpY = this._lastPoint[1] + this._config.offset[1];
+    // set the point to the unscaled X and Y
+    this._lastPoint[0] = this._lastPoint[0] / state.scale;
+    this._lastPoint[1] = this._lastPoint[1] / state.scale;
+
+    let tmpX = this._lastPoint[0] + state.offset[0];
+    let tmpY = this._lastPoint[1] + state.offset[1];
 
     if (tmpX > 0 && tmpX < this._config.boardSize[0] && tmpY > 0 && tmpY < this._config.boardSize[1]) {
-      this._context.lineWidth = DrawHelper.getPixelScaledNumber(this._config.lineWidth);
-      this._context.strokeStyle = this._config.color;
+      this._context.lineWidth = DrawHelper.getPixelScaledNumber(state.penSize);
+      this._context.strokeStyle = state.color;
 
       this._points.push(this._lastPoint);
 

@@ -6,8 +6,10 @@ import DrawHelper from '../helpers/draw-helper';
 import DrawLine from '../draw/draw-line';
 import EraseWhiteboardModal from './erase-whiteboard';
 import Eraser from '../draw/eraser';
+import IndexedDB from '../storage/indexeddb';
 import Map from '../map/map';
 import ShareWhiteboardModal from './share-whiteboard';
+import StateHolder from '../state/state-holder';
 import ToolbarTools from '../toolbar/toolbar-tools';
 import ToolbarUser from '../toolbar/toolbar-user';
 import ToolbarZoom from '../toolbar/toolbar-zoom';
@@ -20,55 +22,52 @@ class Whiteboard {
 
     this._config = config;
 
-    this._shapes = [];
-
     this._loadSpinner = document.getElementById(this._config.whiteboard.loadSpinnerId);
-    this._whiteboardId = this._config.whiteboard.id;
     this._sessionId = this._generateSessionId();
 
-    this._fetchState();
+    this._setupIndexedDb()
+      .then(() => {
+        this._fetchState()
+          .then((state) => {
+            this._stateHolder = new StateHolder({
+              state: state
+            });
 
-    this._setupCanvas();
-    this._setupContext();
-    this._setupData();
-    this._setupMap();
-    this._setupToolbarTools();
-    this._setupToolbarUser();
-    this._setupToolbarZoom();
+            this._setupCanvas();
+            this._setupContext();
+            this._setupData();
+            this._setupMap();
+            this._setupToolbarTools();
+            this._setupToolbarUser();
+            this._setupToolbarZoom();
 
-    this._attachListeners();
+            this._attachListeners();
 
-    this._resizeCanvas();
-    this._setScale();
+            this._resizeCanvas();
+            this._setScale();
 
-    this._setActiveTool();
+            this._setActiveTool();
 
-    this._fetchShapes()
-      .then((shapes) => {
-        this._shapes = shapes || [];
-        this.redraw();
-        this._loadSpinner.classList.add('hidden');
+            this._fetchShapes()
+              .then((shapes) => {
+                this._stateHolder.setProp('shapes', shapes);
+
+                this._loadSpinner.classList.add('hidden');
+              })
+              .catch((error) => {
+                alert('Error fetching shapes!');
+                console.error('Error fetching shapes', error);
+              });
+
+            if (state.whiteboardId) {
+              this._data.watchShapes(state.whiteboardId, this._sessionId, {
+                onShapeCreated: this._onShapeCreatedRemotelyCallback.bind(this),
+                onShapeErased: this._onShapeErasedRemotelyCallback.bind(this),
+                onShapeWatchError: this._onShapeWatchError.bind(this)
+              });
+            }
+          });
       });
-
-    if (this._whiteboardId) {
-      this._data.watchShapes(this._whiteboardId, this._sessionId, {
-        onShapeCreated: this._onShapeCreatedRemotelyCallback.bind(this),
-        onShapeErased: this._onShapeErasedRemotelyCallback.bind(this),
-        onShapeWatchError: this._onShapeWatchError.bind(this)
-      });
-    }
-  }
-
-  addShapes(shapes) {
-    this._shapes = this._addShapesToCollection(this._shapes, shapes);
-
-    this._saveShapes(this._whiteboardId, shapes);
-  }
-
-  deleteShapes(shapes) {
-    this._shapes = this._removeShapesFromCollection(this._shapes, shapes);
-
-    this._deleteShapes(this._whiteboardId, shapes);
   }
 
   destroy() {
@@ -76,8 +75,10 @@ class Whiteboard {
       this._drawer.destroy();
     }
 
-    this._toolbarTools.destroy();
     this._map.destroy();
+    this._toolbarTools.destroy();
+    this._toolbarUser.destroy();
+    this._toolbarZoom.destroy();
 
     this._detachListeners();
 
@@ -99,15 +100,16 @@ class Whiteboard {
     };
 
     let shapes = [];
+    let state = this._stateHolder.getState();
 
-    for (let i = 0; i < this._shapes.length; i++) {
-      if (this._shapes[i].type === ShapeType.LINE) {
-        if (DrawHelper.checkPointsInViewport(this._shapes[i].points, this._offset, this._scale, canvasSize)) {
-          let points = this._shapes[i].points.map((point) => {
-            return DrawHelper.getPointWithOffset(point, this._offset);
+    for (let i = 0; i < state.shapes.length; i++) {
+      if (state.shapes[i].type === ShapeType.LINE) {
+        if (DrawHelper.checkPointsInViewport(state.shapes[i].points, state.offset, state.scale, canvasSize)) {
+          let points = state.shapes[i].points.map((point) => {
+            return DrawHelper.getPointWithOffset(point, state.offset);
           });
 
-          shapes.push(Object.assign({}, this._shapes[i], {
+          shapes.push(Object.assign({}, state.shapes[i], {
             points: points
           }));
         }
@@ -120,13 +122,15 @@ class Whiteboard {
   }
 
   redraw() {
-    this._context.clearRect(0, 0, this._context.canvas.width/this._scale, this._context.canvas.height/this._scale);
+    let state = this._stateHolder.getState();
+
+    this._context.clearRect(0, 0, this._context.canvas.width/state.scale, this._context.canvas.height/state.scale);
 
     this.drawRulers();
 
     this.drawShapes();
 
-    this._map.draw(this._shapes);
+    this._map.draw(state.shapes);
   }
 
   _addShapesToCollection(shapesList, shapes) {
@@ -137,40 +141,31 @@ class Whiteboard {
     let zoomPointX = zoomPoint[0];
     let zoomPointY = zoomPoint[1];
 
+    let state = this._stateHolder.getState();
+
     this._context.scale(zoom, zoom);
 
-    this._offset[0] = ((zoomPointX / this._scale) + this._offset[0]) - (zoomPointX / (this._scale * zoom));
-    this._offset[1] = ((zoomPointY / this._scale) + this._offset[1]) - (zoomPointY / (this._scale * zoom));
+    let newOffset = [
+      ((zoomPointX / state.scale) + state.offset[0]) - (zoomPointX / (state.scale * zoom)),
+      ((zoomPointY / state.scale) + state.offset[1]) - (zoomPointY / (state.scale * zoom))
+    ];
 
-    this._scale *= zoom;
-
-    this._drawer.setConfig({
-      offset: this._offset,
-      scale: this._scale
+    this._stateHolder.setProp('offset', newOffset, {
+      suppressChangeEmit: true
     });
 
-    this._map.setConfig({
-      offset: this._offset,
-      scale: this._scale
-    });
-
-    this._toolbarZoom.setConfig({
-      scale: this._scale
-    });
-
-    this.redraw();
-
-    this._saveStateWithTimeout(this._whiteboardId);
+    this._stateHolder.setProp('scale', state.scale * zoom);
   }
 
   _attachListeners() {
-    this._onTouchStartListener = this._onTouchStart.bind(this);
-    this._onTouchMoveListener = this._onTouchMove.bind(this);
-    this._onWheelListener = this._onScroll.bind(this);
     this._onContextMenuListener = function(e) { e.preventDefault(); };
-    this._resizeListener = this._onResize.bind(this);
-    this._orientationChangeListener = () => {setTimeout(this._onResize.bind(this), 100);};
     this._onFullscreenChangeListener = this._onFullscreenChange.bind(this);
+    this._onTouchMoveListener = this._onTouchMove.bind(this);
+    this._onTouchStartListener = this._onTouchStart.bind(this);
+    this._onWheelListener = this._onScroll.bind(this);
+    this._orientationChangeListener = () => {setTimeout(this._onResize.bind(this), 100);};
+    this._resizeListener = this._onResize.bind(this);
+    this._stateChangeListener = this._onStateChange.bind(this);
 
     if (BrowserHelper.getTouchEventsSupport()) {
       this._canvasElement.addEventListener('touchstart', this._onTouchStartListener, { passive: true });
@@ -184,14 +179,22 @@ class Whiteboard {
 
     window.addEventListener('orientationchange', this._orientationChangeListener);
     window.addEventListener('resize', this._resizeListener);
+
+    this._stateHolder.on('stateChange', this._stateChangeListener);
   }
 
   _clearWhiteboard() {
     if (!this._eraseWhiteboardModal) {
+      let state = this._stateHolder.getState();
+
       this._eraseWhiteboardModal = new EraseWhiteboardModal({
         srcNode: 'eraseWhiteboard',
         eraseWhiteBoardCallback: () => {
-          this.deleteShapes(this._shapes);
+          let newShapes = [];
+
+          this._deleteShapes(state.shapes);
+
+          this._stateHolder.setProp('shapes', newShapes);
 
           this._resetState();
         }
@@ -202,27 +205,31 @@ class Whiteboard {
   }
 
   _decreaseZoomCallback() {
-    let scaleMultiplier = (this._scale - 0.1) / this._scale;
-    let tmpScale = this._scale * scaleMultiplier;
+    let state = this._stateHolder.getState();
+
+    let scaleMultiplier = (state.scale - 0.1) / state.scale;
+    let tmpScale = state.scale * scaleMultiplier;
 
     if (tmpScale < 0.1 || tmpScale > 10) {
       return;
     }
 
-    let viewportMidPoint = [this._canvasElement.width / this._scale / 2, this._canvasElement.height / this._scale / 2];
+    let viewportMidPoint = [this._canvasElement.width / state.scale / 2, this._canvasElement.height / state.scale / 2];
 
     this._applyZoom(viewportMidPoint, scaleMultiplier);
   }
 
   _increaseZoomCallback() {
-    let scaleMultiplier = (this._scale + 0.1) / this._scale;
-    let tmpScale = this._scale * scaleMultiplier;
+    let state = this._stateHolder.getState();
+
+    let scaleMultiplier = (state.scale + 0.1) / state.scale;
+    let tmpScale = state.scale * scaleMultiplier;
 
     if (tmpScale < 0.1 || tmpScale > 10) {
       return;
     }
 
-    let viewportMidPoint = [this._canvasElement.width / this._scale / 2, this._canvasElement.height / this._scale / 2];
+    let viewportMidPoint = [this._canvasElement.width / state.scale / 2, this._canvasElement.height / state.scale / 2];
 
     this._applyZoom(viewportMidPoint, scaleMultiplier);
   }
@@ -237,22 +244,32 @@ class Whiteboard {
     this._canvasElement.removeEventListener('touchmove', this._onTouchMoveListener);
     this._canvasElement.removeEventListener('touchstart', this._onTouchStartListener, { passive: true });
     this._canvasElement.removeEventListener('wheel', this._onWheelListener);
+    this._stateHolder.off('stateChange', this._stateChangeListener);
     window.removeEventListener('orientationchange', this._orientationChangeListener);
     window.removeEventListener('resize', this._resizeListener);
   }
 
-  _deleteShapes(whiteboard, shapes) {
-    if (this._whiteboardId) {
-      this._deleteShapesOnWhiteboard(whiteboard, shapes);
+  _deleteShapes(shapes) {
+    let state = this._stateHolder.getState();
+
+    if (state.whiteboardId) {
+      this._deleteShapesOnWhiteboard(state.whiteboardId, shapes);
     } else {
       this._deleteShapesLocally(shapes);
     }
   }
 
   _deleteShapesLocally(shapes) {
-    let localShapes = JSON.parse(localStorage.getItem('shapes')) || [];
-    localShapes = this._removeShapesFromCollection(localShapes, shapes);
-    localStorage.setItem('shapes', JSON.stringify(localShapes));
+    let shapesPromises = [];
+
+    for (let i = 0; i < shapes.length; i++) {
+      shapesPromises.push(this._indexedDb.deleteItem('shapes', shapes[i].id));
+    }
+
+    Promise.all(shapesPromises)
+      .catch((error) => {
+        console.log('Error deleting shapes locally', error);
+      });
   }
 
   _deleteShapesOnWhiteboard(whiteboardId, shapes) {
@@ -267,18 +284,20 @@ class Whiteboard {
   }
 
   _drawHorizontalRuler() {
-    let posY = this._offset[1] < 0 ? Math.abs(this._offset[1]) : 0;
+    let state = this._stateHolder.getState();
+
+    let posY = state.offset[1] < 0 ? Math.abs(state.offset[1]) : 0;
 
     for (let i = 0; i <= this._config.whiteboard.width; i += 20) {
       this._context.beginPath();
       this._context.strokeStyle = '#000000';
       this._context.lineWidth = 1;
-      this._context.moveTo(i - this._offset[0], posY);
+      this._context.moveTo(i - state.offset[0], posY);
 
       if (i % 100 === 0) {
-        this._context.lineTo(i - this._offset[0], posY + 10);
+        this._context.lineTo(i - state.offset[0], posY + 10);
       } else {
-        this._context.lineTo(i - this._offset[0], posY + 5);
+        this._context.lineTo(i - state.offset[0], posY + 5);
       }
       this._context.stroke();
 
@@ -288,7 +307,7 @@ class Whiteboard {
         this._context.textBaseline = 'alphabetic';
         this._context.font = this._config.whiteboard.rulerFontSize + 'px';
         this._context.fillStyle = '#000000';
-        this._context.fillText(i, i - this._offset[0], posY + 20);
+        this._context.fillText(i, i - state.offset[0], posY + 20);
       }
     }
   }
@@ -308,18 +327,20 @@ class Whiteboard {
   }
 
   _drawVerticalRuler() {
-    let posX = this._offset[0] < 0 ? Math.abs(this._offset[0]) : 0;
+    let state = this._stateHolder.getState();
+
+    let posX = state.offset[0] < 0 ? Math.abs(state.offset[0]) : 0;
 
     for (let i = 20; i <= this._config.whiteboard.height; i += 20) {
       this._context.beginPath();
       this._context.strokeStyle = '#000000';
       this._context.lineWidth = 1;
-      this._context.moveTo(posX, i - this._offset[1]);
+      this._context.moveTo(posX, i - state.offset[1]);
 
       if (i % 100 === 0) {
-        this._context.lineTo(posX + 10, i - this._offset[1]);
+        this._context.lineTo(posX + 10, i - state.offset[1]);
       } else {
-        this._context.lineTo(posX + 5, i - this._offset[1]);
+        this._context.lineTo(posX + 5, i - state.offset[1]);
       }
       this._context.stroke();
 
@@ -329,41 +350,32 @@ class Whiteboard {
         this._context.textBaseline = i + 20 < this._config.whiteboard.height ? 'middle' : 'bottom';
         this._context.font = this._config.whiteboard.rulerFontSize + 'px';
         this._context.fillStyle = '#000000';
-        this._context.fillText(i, posX + 12, i - this._offset[1]);
+        this._context.fillText(i, posX + 12, i - state.offset[1]);
       }
     }
   }
 
   _enableZoomModeCallback(data) {
-    this._zoomModeEnabled = data.zoomModeEnabled;
+    this._stateHolder.setProp('zoomModeEnabled', data.zoomModeEnabled);
   }
 
   _fetchShapes() {
-    if (this._whiteboardId) {
-      return this._data.fetchShapes(this._whiteboardId);
-    } else {
-      return new Promise((resolve) => {
-        let localShapes = JSON.parse(localStorage.getItem('shapes'));
+    let state = this._stateHolder.getState();
 
-        resolve(localShapes);
-      });
+    if (state.whiteboardId) {
+      return this._data.fetchShapes(state.whiteboardId);
+    } else {
+      return this._indexedDb.getAllItems('shapes');
     }
   }
 
   _fetchState() {
-    let offset;
-    let scale;
+    let whiteboardId = this._config.state.whiteboardId;
 
-    if (this._whiteboardId) {
-      offset = localStorage.getItem(this._whiteboardId + '_' + 'offset');
-      scale = localStorage.getItem(this._whiteboardId + '_' + 'scale');
-    } else {
-      offset = localStorage.getItem('offset');
-      scale = localStorage.getItem('scale');
-    }
-
-    this._offset = JSON.parse(offset) || [0, 0];
-    this._scale = JSON.parse(scale) || 1;
+    return this._indexedDb.getItem('state', whiteboardId || 'local')
+      .then((state) => {
+        return state || this._config.state;
+      });
   }
 
   _generateSessionId() {
@@ -375,8 +387,10 @@ class Whiteboard {
   }
 
   _getAllowedOffset(scrollData) {
-    let tmpOffsetWidth = this._offset[0] + scrollData[0];
-    let tmpOffsetHeight = this._offset[1] + scrollData[1];
+    let state = this._stateHolder.getState();
+
+    let tmpOffsetWidth = state.offset[0] + scrollData[0];
+    let tmpOffsetHeight = state.offset[1] + scrollData[1];
 
     let allowedOffset = [];
 
@@ -400,7 +414,9 @@ class Whiteboard {
   _getLineWidth() {
     let lineWidth;
 
-    if (this._config.whiteboard.activeTool === Tools.line) {
+    let state = this._stateHolder.getState();
+
+    if (state.activeTool === Tools.line) {
       lineWidth = this._config.whiteboard.penSize;
     }
 
@@ -410,12 +426,13 @@ class Whiteboard {
   _getShareWhiteboardData() {
     let data;
     let whiteboardBookmark;
-    let whiteboardId = this._whiteboardId || this._generateWhiteboardId();
+    let state = this._stateHolder.getState();
+    let whiteboardId = state.whiteboardId || this._generateWhiteboardId();
 
     let url = window.location.origin + '/wb/' + whiteboardId;
 
-    if (this._config.whiteboard.currentUser && this._whiteboardId) {
-      return this._data.getWhiteboardBookmark(this._config.whiteboard.currentUser.id, this._whiteboardId)
+    if (this._config.whiteboard.currentUser && state.whiteboardId) {
+      return this._data.getWhiteboardBookmark(this._config.whiteboard.currentUser.id, state.whiteboardId)
         .then((data) => {
           whiteboardBookmark = data ? data[0] : null;
 
@@ -443,7 +460,7 @@ class Whiteboard {
           url: url,
           whiteboardId: whiteboardId
         };
-      } else if (this._whiteboardId) {
+      } else if (state.whiteboardId) {
         data = {
           action: 'anonymous user + existing whiteboard',
           url: url,
@@ -484,31 +501,25 @@ class Whiteboard {
   }
 
   _onFullscreenChange() {
-    let config = this._toolbarTools.getConfig();
+    let fullscreen = BrowserHelper.getFullScreenModeValue();
 
-    config.fullscreen = BrowserHelper.getFullScreenModeValue();
-
-    this._toolbarTools.setConfig(config);
+    this._stateHolder.setProp('fullscreen', fullscreen);
   }
 
   _onMapHideCallback() {
-    let config = this._toolbarTools.getConfig();
-    config.mapVisible = false;
-    this._toolbarTools.setConfig(config);
-
-    this._map.setConfig({
-      mapVisible: false
-    });
+    this._stateHolder.setProp('mapVisible', false);
   }
 
   _onMapSetOffsetCallback(point) {
-    let canvasHeight = this._canvasElement.height / this._scale;
-    let canvasWidth = this._canvasElement.width / this._scale;
+    let state = this._stateHolder.getState();
+
+    let canvasHeight = this._canvasElement.height / state.scale;
+    let canvasWidth = this._canvasElement.width / state.scale;
 
     let x = point[0] - canvasWidth / 2;
     let y = point[1] - canvasHeight / 2;
 
-    if (this._scale >= 1) {
+    if (state.scale >= 1) {
       if (x + canvasWidth > this._config.whiteboard.width) {
         x = this._config.whiteboard.width - canvasWidth;
       } else if (x < 0) {
@@ -522,24 +533,16 @@ class Whiteboard {
       }
     }
 
-    this._offset[0] = x;
-    this._offset[1] = y;
+    state.offset[0] = x;
+    state.offset[1] = y;
 
     this.redraw();
 
-    this._saveState(this._whiteboardId);
+    this._saveState();
   }
 
   _onMapShowCallback() {
-    this._map.setConfig({
-      mapVisible: true
-    });
-
-    this._map.draw(this._shapes);
-
-    let config = this._toolbarTools.getConfig();
-    config.mapVisible = true;
-    this._toolbarTools.setConfig(config);
+    this._stateHolder.setProp('mapVisible', true);
   }
 
   _onResize() {
@@ -560,8 +563,10 @@ class Whiteboard {
   _onScroll(event) {
     event.preventDefault();
 
+    let state = this._stateHolder.getState();
+
     if (event.deltaMode === 0) {
-      if (this._zoomModeEnabled) {
+      if (state.zoomModeEnabled) {
         let mouseX = event.offsetX;
         let mouseY = event.offsetY;
 
@@ -569,7 +574,7 @@ class Whiteboard {
 
         let zoom = 1 - wheel/2;
 
-        let tmpScale = this._scale * zoom;
+        let tmpScale = state.scale * zoom;
 
         if (tmpScale < 0.1 || tmpScale > 10) {
           return;
@@ -579,12 +584,12 @@ class Whiteboard {
       } else {
         let allowedOffset = this._getAllowedOffset([event.deltaX, event.deltaY]);
 
-        this._offset[0] += allowedOffset[0];
-        this._offset[1] += allowedOffset[1];
+        state.offset[0] += allowedOffset[0];
+        state.offset[1] += allowedOffset[1];
 
         this.redraw();
 
-        this._saveStateWithTimeout(this._whiteboardId);
+        this._saveStateWithTimeout();
       }
     } else if (event.touches.length > 1) {
       if (!this._dragModeSet) {
@@ -605,61 +610,46 @@ class Whiteboard {
       (curPoint[1] - this._lastPoint0[1]) * -1
     ]);
 
-    this._offset[0] += allowedOffset[0];
-    this._offset[1] += allowedOffset[1];
+    let state = this._stateHolder.getState();
 
-    this._drawer.setConfig({
-      offset: this._offset
-    });
-
-    this._map.setConfig({
-      offset: this._offset
-    });
-
-    this.redraw();
-
-    this._saveStateWithTimeout(this._whiteboardId);
+    let newOffset = [state.offset[0] + allowedOffset[0], state.offset[1] + allowedOffset[1]];
+    this._stateHolder.setProp('offset', newOffset);
 
     this._lastPoint0[0] = curPoint[0];
     this._lastPoint0[1] = curPoint[1];
   }
 
   _onShapeCreatedLocallyCallback(shape) {
+    let state = this._stateHolder.getState();
+
     // change points coordinates according to 0,0
     shape.points = shape.points.map((point) => {
-      return DrawHelper.getPointWithoutOffset(point, this._offset);
+      return DrawHelper.getPointWithoutOffset(point, state.offset);
     });
 
     shape.id = CryptHelper.getId();
 
     shape.sessionId = this._sessionId;
 
-    this.addShapes([shape]);
-    this.redraw();
+    let newShapes = this._addShapesToCollection(state.shapes, [shape]);
+
+    this._saveShapes([shape]);
+
+    this._stateHolder.setProp('shapes', newShapes);
   }
 
   _onShapeCreatedRemotelyCallback(shape) {
-    this._shapes = this._addShapesToCollection(this._shapes, [shape]);
+    let state = this._stateHolder.getState();
+    let newShapes = this._addShapesToCollection(state.shapes, [shape]);
 
-    if (this._config.whiteboard.activeTool === Tools.eraser) {
-      this._drawer.setConfig({
-        shapes: this._shapes
-      });
-    }
-
-    this.redraw();
+    this._stateHolder.setProp('shapes', newShapes);
   }
 
   _onShapeErasedRemotelyCallback(shape) {
-    this._shapes = this._removeShapesFromCollection(this._shapes, [shape]);
+    let state = this._stateHolder.getState();
+    let newShapes = this._removeShapesFromCollection(state.shapes, [shape]);
 
-    this.redraw();
-
-    if (this._config.whiteboard.activeTool === Tools.eraser) {
-      this._drawer.setConfig({
-        shapes: this._shapes
-      });
-    }
+    this._stateHolder.setProp('shapes', newShapes);
   }
 
   _onShapeWatchError(error) {
@@ -667,14 +657,12 @@ class Whiteboard {
   }
 
   _onShapesErasedLocallyCallback(shapes) {
-    this.deleteShapes(shapes);
-    this.redraw();
+    let state = this._stateHolder.getState();
+    let newShapes = this._removeShapesFromCollection(state.shapes, shapes);
 
-    if (this._config.whiteboard.activeTool === Tools.eraser) {
-      this._drawer.setConfig({
-        shapes: this._shapes
-      });
-    }
+    this._deleteShapes(shapes);
+
+    this._stateHolder.setProp('shapes', newShapes);
   }
 
   _onShareWhiteboardImageCallback() {
@@ -687,7 +675,9 @@ class Whiteboard {
     context.fillStyle = '#ffffff';
     context.fillRect(0, 0, this._config.whiteboard.width, this._config.whiteboard.height);
 
-    this._drawShapes(this._shapes, {
+    let state = this._stateHolder.getState();
+
+    this._drawShapes(state.shapes, {
       context: context
     });
 
@@ -701,19 +691,21 @@ class Whiteboard {
     this._getShareWhiteboardData()
       .then((data) => {
         shareWhiteboardModal.setConfig({
-          shareWhiteBoardCallback: (payload) => {
+          shareWhiteboardCallback: (payload) => {
+            let state = this._stateHolder.getState();
+
             this._shareWhiteboard({
               createWhiteboardBookmark: payload.createBookmark,
               id: data.whiteboardBookmark ? data.whiteboardBookmark.id : null,
-              saveShapes: !this._whiteboardId,
+              saveShapes: state.whiteboardId !== payload.whiteboardId,
               whiteboardId: payload.whiteboardId,
               whiteboardName: payload.whiteboardName
             });
 
-            if (!this._whiteboardId) {
-              this._whiteboardId = payload.whiteboardId;
+            if (state.whiteboardId !== payload.whiteboardId) {
+              this._stateHolder.setProp('whiteboardId', payload.whiteboardId);
 
-              this._data.watchShapes(this._whiteboardId, this._sessionId, {
+              this._data.watchShapes(payload.whiteboardId, this._sessionId, {
                 onShapeCreated: this._onShapeCreatedRemotelyCallback.bind(this),
                 onShapeErased: this._onShapeErasedRemotelyCallback.bind(this),
                 onShapeWatchError: this._onShapeWatchError.bind(this)
@@ -741,7 +733,9 @@ class Whiteboard {
     if (event.touches.length > 1) {
       this._dragModeSet = false;
 
-      if (this._zoomModeEnabled) {
+      let state = this._stateHolder.getState();
+
+      if (state.zoomModeEnabled) {
         this._dragModeSet = true;
         this._dragMode = 'zoom';
       }
@@ -765,16 +759,18 @@ class Whiteboard {
 
     let scaleMultiplier = 0;
 
+    let state = this._stateHolder.getState();
+
     if (Math.abs(curDistance - lastDistance) >= 3) {
       if (curDistance > lastDistance) {
-        scaleMultiplier = (this._scale + 0.1) / this._scale;
+        scaleMultiplier = (state.scale + 0.1) / state.scale;
       } else if (curDistance < lastDistance) {
-        scaleMultiplier = (this._scale - 0.1) / this._scale;
+        scaleMultiplier = (state.scale - 0.1) / state.scale;
       }
     }
 
     if (scaleMultiplier !== 0) {
-      let tmpScale = this._scale * scaleMultiplier;
+      let tmpScale = state.scale * scaleMultiplier;
 
       if (tmpScale < 0.1 || tmpScale > 10) {
         return;
@@ -806,27 +802,11 @@ class Whiteboard {
   _resetState() {
     this._context.setTransform(1, 0, 0, 1, 0, 0);
 
-    this._offset[0] = 0;
-    this._offset[1] = 0;
-    this._scale = 1;
-
-    this._saveState(this._whiteboardId);
-
-    this._drawer.setConfig({
-      offset: this._offset,
-      scale: this._scale
+    this._stateHolder.setProp('offset', [0, 0], {
+      suppressChangeEmit: true
     });
 
-    this._map.setConfig({
-      offset: this._offset,
-      scale: this._scale
-    });
-
-    this._toolbarZoom.setConfig({
-      scale: this._scale
-    });
-
-    this.redraw();
+    this._stateHolder.setProp('scale', 1);
   }
 
   _resizeCanvas() {
@@ -843,27 +823,41 @@ class Whiteboard {
     return canvasSize;
   }
 
-  _saveState(whiteboardId) {
-    if (whiteboardId) {
-      localStorage.setItem(whiteboardId + '_' + 'offset', JSON.stringify(this._offset));
-      localStorage.setItem(whiteboardId + '_' + 'scale', JSON.stringify(this._scale));
-    } else {
-      localStorage.setItem('offset', JSON.stringify(this._offset));
-      localStorage.setItem('scale', JSON.stringify(this._scale));
-    }
+  _saveState() {
+    let state = this._stateHolder.getState();
+
+    let stateForSaving = {};
+
+    let keys = Object.keys(state);
+
+    keys.forEach((key) => {
+      if (key !== 'shapes') {
+        stateForSaving[key] = state[key];
+      }
+    });
+
+    this._indexedDb.setItem('state', Object.assign({}, stateForSaving, {
+      id: state.whiteboardId || 'local'
+    }))
+      .catch((error) => {
+        console.log('Error saving state', error);
+      });
   }
 
-  _saveStateWithTimeout(whiteboardId) {
+  _saveStateWithTimeout() {
     window.clearTimeout(this._saveStateTimeout);
 
     this._saveStateTimeout = window.setTimeout(() => {
-      this._saveState(whiteboardId);
+
+      this._saveState();
     }, 300);
   }
 
-  _saveShapes(whiteboardId, shapes) {
-    if (this._whiteboardId) {
-      this._saveShapesOnWhiteboard(this._whiteboardId, shapes);
+  _saveShapes(shapes) {
+    let state = this._stateHolder.getState();
+
+    if (state.whiteboardId) {
+      this._saveShapesOnWhiteboard(state.whiteboardId, shapes);
     } else {
       this._saveShapesLocally(shapes);
     }
@@ -872,7 +866,7 @@ class Whiteboard {
   _saveShapesOnWhiteboard(whiteboardId, shapes) {
     this._data.saveShapes(whiteboardId, shapes)
       .then(() => {
-        console.log('Shapes saved successfully on whiteboard', this._whiteboardId);
+        console.log('Shapes saved successfully on whiteboard', whiteboardId);
       })
       .catch((error) => {
         alert('Creating whiteboard and saving shapes failed!');
@@ -881,9 +875,16 @@ class Whiteboard {
   }
 
   _saveShapesLocally(shapes) {
-    let localShapes = JSON.parse(localStorage.getItem('shapes')) || [];
-    localShapes = localShapes.concat(shapes);
-    localStorage.setItem('shapes', JSON.stringify(localShapes));
+    let shapesPromises = [];
+
+    for (let i = 0; i < shapes.length; i++) {
+      shapesPromises.push(this._indexedDb.setItem('shapes', shapes[i]));
+    }
+
+    Promise.all(shapesPromises)
+      .catch((error) => {
+        console.log('Error saving shapes locally', error);
+      });
   }
 
   _setActiveTool() {
@@ -891,28 +892,26 @@ class Whiteboard {
       this._drawer.destroy();
     }
 
-    if (this._config.whiteboard.activeTool === Tools.line) {
+    let state = this._stateHolder.getState();
+
+    if (state.activeTool === Tools.line) {
       this._drawer = new DrawLine({
         boardSize: [this._config.whiteboard.width, this._config.whiteboard.height],
         callback: this._onShapeCreatedLocallyCallback.bind(this),
         canvas: this._canvasElement,
-        color: this._config.whiteboard.color,
         globalCompositeOperation: 'source-over',
         lineCap: 'round',
         lineJoin: 'round',
         lineWidth: this._getLineWidth(),
         minPointDistance: this._config.whiteboard.minPointDistance,
-        offset: this._offset,
-        scale: this._scale
+        stateHolder: this._stateHolder
       });
-    } else if (this._config.whiteboard.activeTool === Tools.eraser) {
+    } else if (state.activeTool === Tools.eraser) {
       this._drawer = new Eraser({
         boardSize: [this._config.whiteboard.width, this._config.whiteboard.height],
         callback: this._onShapesErasedLocallyCallback.bind(this),
         canvas: this._canvasElement,
-        offset: this._offset,
-        scale: this._scale,
-        shapes: this._shapes
+        stateHolder: this._stateHolder
       });
     }
   }
@@ -937,14 +936,10 @@ class Whiteboard {
       }
   }
 
-  _setToolValues(toolConfig) {
-    Object.assign(this._config.whiteboard, toolConfig);
-
-    this._setActiveTool();
-  }
-
   _setScale() {
-    this._context.scale(this._scale, this._scale);
+    let state = this._stateHolder.getState();
+
+    this._context.scale(state.scale, state.scale);
   }
 
   _setupCanvas() {
@@ -961,21 +956,34 @@ class Whiteboard {
     });
   }
 
+  _setupIndexedDb() {
+    this._indexedDb = new IndexedDB({
+      stores: [
+        {
+          name: 'shapes',
+          keyPath: 'id'
+        },
+        {
+          name: 'state',
+          keyPath: 'id'
+        }
+      ]
+    });
+
+    return this._indexedDb.open('weoutline');
+  }
+
   _setupMap() {
-    this._map = new Map({
-      color: this._config.map.color,
-      container: this._config.map.container,
-      height: this._config.map.height,
-      lineWidth: this._config.map.lineWidth,
+    let config = {
       mapHideCallback: this._onMapHideCallback.bind(this),
-      mapVisible: this._config.map.mapVisible,
-      offset: this._offset,
-      scale: this._scale,
       setOffsetCallback: this._onMapSetOffsetCallback.bind(this),
       srcCanvas: this._canvasElement,
-      srcNode: this._config.map.srcNode,
-      width: this._config.map.width
-    });
+      stateHolder: this._stateHolder
+    };
+
+    Object.assign(config, this._config.map);
+
+    this._map = new Map(config);
   }
 
   _setupToolbarTools() {
@@ -985,7 +993,8 @@ class Whiteboard {
       shareWhiteboardImageCallback: this._onShareWhiteboardImageCallback.bind(this),
       shareWhiteboardLinkCallback: this._onShareWhiteboardLinkCallback.bind(this),
       showMapCallback: this._onMapShowCallback.bind(this),
-      valuesCallback: this._setToolValues.bind(this)
+      stateHolder: this._stateHolder,
+      valueChange: this._onToolsValueChangeCallback.bind(this)
     };
 
     Object.assign(config, this._config.toolbarTools);
@@ -997,7 +1006,8 @@ class Whiteboard {
     let config = {
       currentUser: this._config.whiteboard.currentUser,
       signInCallback: this._onUserSignInCallback.bind(this),
-      signOutCallback: this._config.whiteboard.signOutCallback
+      signOutCallback: this._config.whiteboard.signOutCallback,
+      stateHolder: this._stateHolder
     };
 
     Object.assign(config, this._config.toolbarUser);
@@ -1011,7 +1021,7 @@ class Whiteboard {
       enableZoomModeCallback: this._enableZoomModeCallback.bind(this),
       increaseZoomCallback: this._increaseZoomCallback.bind(this),
       normalizeZoomCallback: this._normalizeZoomCallback.bind(this),
-      scale: this._scale
+      stateHolder: this._stateHolder
     };
 
     Object.assign(config, this._config.toolbarZoom);
@@ -1023,8 +1033,10 @@ class Whiteboard {
     if (params.saveShapes) {
       history.pushState(null, null, window.location.origin + '/wb/' + params.whiteboardId);
 
-      if (this._shapes.length) {
-        this._data.saveShapes(params.whiteboardId, this._shapes)
+      let state = this._stateHolder.getState();
+
+      if (state.shapes.length) {
+        this._data.saveShapes(params.whiteboardId, state.shapes)
           .then(() => {
             console.log('Shapes saved successfully on whiteboard', params.whiteboardId);
           })
@@ -1033,8 +1045,6 @@ class Whiteboard {
             console.error(error);
           });
       }
-
-      this._saveState(this._whiteboardId);
     }
 
     if (params.createWhiteboardBookmark) {
@@ -1047,13 +1057,40 @@ class Whiteboard {
     }
   }
 
-  _updateOffset(params) {
-    if (params.height > params.canvasHeight && params.height - this._offset[1] < params.canvasHeight) {
-      this._offset[1] += params.height - this._offset[1] - params.canvasHeight;
+  _onToolsValueChangeCallback(prop, value) {
+    if (prop === 'penSize') {
+      this._stateHolder.setProp('penSize', value, {
+        suppressChangeEmit: true
+      });
+      this._stateHolder.setProp('activeTool', Tools.line);
+    } else {
+      this._stateHolder.setProp(prop, value);
+    }
+  }
+
+  _onStateChange(params) {
+    let state = this._stateHolder.getState();
+
+    if (params.prop === 'activeTool') {
+      this._setActiveTool();
+    } else if (params.prop === 'mapVisible') {
+      this._map.draw(state.shapes);
+    } else if (params.prop === 'offset' || params.prop === 'scale' || params.prop === 'shapes') {
+      this.redraw();
     }
 
-    if (params.width > params.canvasWidth && params.width - this._offset[0] < params.canvasWidth) {
-      this._offset[0] += params.width - this._offset[0] - params.canvasWidth;
+    this._saveState();
+  }
+
+  _updateOffset(params) {
+    let state = this._stateHolder.getState();
+
+    if (params.height > params.canvasHeight && params.height - state.offset[1] < params.canvasHeight) {
+      state.offset[1] += params.height - state.offset[1] - params.canvasHeight;
+    }
+
+    if (params.width > params.canvasWidth && params.width - state.offset[0] < params.canvasWidth) {
+      state.offset[0] += params.width - state.offset[0] - params.canvasWidth;
     }
   }
 };

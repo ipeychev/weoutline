@@ -16,7 +16,7 @@ class Map {
 
     this._mapContext = this._mapElement.getContext('2d');
 
-    this._initItems();
+    this._updateUI();
 
     this._attachListeners();
 
@@ -30,6 +30,8 @@ class Map {
   }
 
   draw(shapes) {
+    let state = this._config.stateHolder.getState();
+
     this._mapContext.clearRect(0, 0, this._mapContext.canvas.width, this._mapContext.canvas.height);
 
     let mapRect = this._mapElement.getBoundingClientRect();
@@ -43,10 +45,10 @@ class Map {
     let ratioX = this._config.width / mapRect.width;
     let ratioY = this._config.height / mapRect.height;
 
-    let mapViewportRect = this._getMapViewportRect(srcRectSize, [ratioX, ratioY], this._config.offset);
+    let mapViewportRect = this._getMapViewportRect(srcRectSize, [ratioX, ratioY], state.offset);
 
-    this._mapContext.strokeStyle = this._config.color;
-    this._mapContext.lineWidth = this._config.lineWidth;
+    this._mapContext.strokeStyle = this._config.rectColor;
+    this._mapContext.lineWidth = this._config.rectLineWidth;
     this._mapContext.strokeRect(
       mapViewportRect.x,
       mapViewportRect.y,
@@ -73,19 +75,14 @@ class Map {
     }
   }
 
-  setConfig(config) {
-    this._config = Object.assign(this._config, config);
-
-    this._setMapVisible(this._config.mapVisible);
-  }
-
   _attachListeners() {
+    this._mapHideListener = this._onMapHideClick.bind(this);
     this._mouseDownListener = this._onMouseDown.bind(this);
     this._mouseMoveListener = this._onMouseMove.bind(this);
     this._mouseUpListener = this._onMouseUp.bind(this);
+    this._stateChangeListener = this._onStateChange.bind(this);
     this._touchEndListener = this._onTouchEnd.bind(this);
     this._touchMoveListener = this._onTouchMove.bind(this);
-    this._mapHideListener = this._onMapHideClick.bind(this);
     this._touchStartListener = this._onTouchStart.bind(this);
 
     if (BrowserHelper.getTouchEventsSupport()) {
@@ -99,25 +96,30 @@ class Map {
       this._mapElement.addEventListener('mousemove', this._mouseMoveListener);
       this._mapElement.addEventListener('mouseup', this._mouseUpListener);
     }
+
+    this._config.stateHolder.on('stateChange', this._stateChangeListener);
   }
 
   _detachListeners() {
-    this._mapHideElement.addEventListener('click', this._mapHideListener);
-    this._mapHideElement.addEventListener('touchend', this._mapHideListener, { passive: true });
+    this._config.stateHolder.off('stateChange', this._stateChangeListener);
     this._mapElement.addEventListener('mousedown', this._mouseDownListener);
     this._mapElement.addEventListener('mousemove', this._mouseMoveListener);
     this._mapElement.addEventListener('mouseup', this._mouseUpListener);
     this._mapElement.addEventListener('touchend', this._touchEndListener, { passive: true });
     this._mapElement.addEventListener('touchmove', this._touchMoveListener);
     this._mapElement.addEventListener('touchstart', this._touchStartListener);
+    this._mapHideElement.addEventListener('click', this._mapHideListener);
+    this._mapHideElement.addEventListener('touchend', this._mapHideListener, { passive: true });
   }
 
   _getMapViewportRect() {
     let srcCanvasRect = this._config.srcCanvas.getBoundingClientRect();
 
+    let state = this._config.stateHolder.getState();
+
     let srcCanvasSize = {
-      height: srcCanvasRect.height / this._config.scale,
-      width: srcCanvasRect.width / this._config.scale
+      height: srcCanvasRect.height / state.scale,
+      width: srcCanvasRect.width / state.scale
     };
 
     let mapRect = this._mapElement.getBoundingClientRect();
@@ -129,13 +131,9 @@ class Map {
     return {
       height: srcCanvasSize.height / ratioY,
       width: srcCanvasSize.width / ratioX,
-      x: this._config.offset[0] / ratioX,
-      y: this._config.offset[1] / ratioY
+      x: state.offset[0] / ratioX,
+      y: state.offset[1] / ratioY
     };
-  }
-
-  _initItems() {
-    this._setMapVisible(this._config.mapVisible);
   }
 
   _isPointInMapViewport(point, mapViewportRect) {
@@ -191,6 +189,12 @@ class Map {
     this._pointerDown = false;
     this._pointerMove = false;
     this._rectHit = false;
+  }
+
+  _onStateChange(params) {
+    if (params.prop === 'mapVisible') {
+      this._setMapVisible();
+    }
   }
 
   _onTouchEnd(event) {
@@ -249,8 +253,10 @@ class Map {
     }
   }
 
-  _setMapVisible(mapVisible) {
-    if (mapVisible) {
+  _setMapVisible() {
+    let state = this._config.stateHolder.getState();
+
+    if (state.mapVisible) {
       this._mapContainer.classList.remove('hidden');
     } else {
       this._mapContainer.classList.add('hidden');
@@ -262,6 +268,10 @@ class Map {
     let ratioY = whiteboardSize.height / mapRect.height;
 
     this._config.setOffsetCallback([(point[0] - (this._startOffsetX || 0)) * ratioX, (point[1] - (this._startOffsetY || 0)) * ratioY]);
+  }
+
+  _updateUI() {
+    this._setMapVisible();
   }
 }
 

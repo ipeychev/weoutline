@@ -10,32 +10,33 @@ window.addEventListener('load', () => {
   let whiteboard;
 
   function createWhiteboard() {
-    let whiteboardSize = {
-      height: 3000,
-      width: 3000
-    };
+    let whiteboardHeight = 3000;
+    let whiteboardWidth = 3000;
 
-    let activeTool = Tools.line;
-    let color = '#000000';
-    let mapVisible = true;
-    let penSize = 4;
+    let state = {
+      activeTool: Tools.line,
+      color: '#000000',
+      fullscreen: false,
+      mapVisible: true,
+      offset: [0, 0],
+      penSize: 4,
+      scale: 1,
+      shapes: [],
+      whiteboardId: getWhiteboardId(),
+      zoomModeEnabled: false
+    };
 
     whiteboard = new Whiteboard({
       map: {
-        color: color,
         container: 'mapContainer',
-        height: whiteboardSize.height,
-        lineWidth: 1,
-        mapVisible: mapVisible,
+        height: whiteboardHeight,
+        rectColor: '#000000',
+        rectLineWidth: 1,
         srcNode: 'map',
-        width: whiteboardSize.width
+        width: whiteboardWidth
       },
+      state: state,
       toolbarTools: {
-        activeTool: activeTool,
-        color: color,
-        fullscreen: false,
-        mapVisible: mapVisible,
-        penSize: penSize,
         srcNode: 'toolbarTools'
       },
       toolbarUser: {
@@ -46,20 +47,16 @@ window.addEventListener('load', () => {
         srcNode: 'toolbarZoom'
       },
       whiteboard: {
-        activeTool: activeTool,
-        color: color,
         currentUser: auth.currentUser,
         dataURL: 'data.weoutline.wedeploy.io',
-        height: whiteboardSize.height,
-        id: getWhiteboardId(),
+        height: whiteboardHeight,
         loadSpinnerId: 'loadSpinner',
         mainContainer: 'mainContainer',
         minPointDistance: 3,
-        penSize: penSize,
         rulerFontSize: 10,
         signOutCallback: userSignOut,
         srcNode: 'canvas',
-        width: whiteboardSize.width
+        width: whiteboardWidth
       }
     });
   }
