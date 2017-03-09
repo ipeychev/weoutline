@@ -26,6 +26,7 @@ class StateHolder extends EventEmitter {
 
     if (!params || !params.suppressChangeEmit) {
       this.emit('stateChange', {
+        data: params ? params.data : null,
         prop: prop,
         value: value
       });

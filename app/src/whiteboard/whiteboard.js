@@ -694,23 +694,14 @@ class Whiteboard {
           shareWhiteboardCallback: (payload) => {
             let state = this._stateHolder.getState();
 
-            this._shareWhiteboard({
-              createWhiteboardBookmark: payload.createBookmark,
-              id: data.whiteboardBookmark ? data.whiteboardBookmark.id : null,
-              saveShapes: state.whiteboardId !== payload.whiteboardId,
-              whiteboardId: payload.whiteboardId,
-              whiteboardName: payload.whiteboardName
+            this._stateHolder.setProp('whiteboardId', payload.whiteboardId, {
+              data: {
+                bookmarkId: data.whiteboardBookmark ? data.whiteboardBookmark.id : null,
+                createBookmark: payload.createBookmark,
+                oldWhiteboardId: state.whiteboardId,
+                whiteboardName: payload.whiteboardName
+              }
             });
-
-            if (state.whiteboardId !== payload.whiteboardId) {
-              this._stateHolder.setProp('whiteboardId', payload.whiteboardId);
-
-              this._data.watchShapes(payload.whiteboardId, this._sessionId, {
-                onShapeCreated: this._onShapeCreatedRemotelyCallback.bind(this),
-                onShapeErased: this._onShapeErasedRemotelyCallback.bind(this),
-                onShapeWatchError: this._onShapeWatchError.bind(this)
-              });
-            }
           }
         });
 
@@ -1047,9 +1038,9 @@ class Whiteboard {
       }
     }
 
-    if (params.createWhiteboardBookmark) {
+    if (params.createBookmark) {
       this._data.createOrUpdateWhiteboardBookmark({
-        id: params.id,
+        id: params.bookmarkId,
         userId: this._config.whiteboard.currentUser.id,
         whiteboardName: params.whiteboardName,
         whiteboardId: params.whiteboardId
@@ -1077,6 +1068,25 @@ class Whiteboard {
       this._map.draw(state.shapes);
     } else if (params.prop === 'offset' || params.prop === 'scale' || params.prop === 'shapes') {
       this.redraw();
+    } else if (params.prop === 'whiteboardId') {
+      let data = params.data;
+      let whiteboardId = params.value;
+
+      this._shareWhiteboard({
+        bookmarkId: data.bookmarkId,
+        createBookmark: data.createBookmark,
+        saveShapes: data.oldWhiteboardId !== whiteboardId,
+        whiteboardId: whiteboardId,
+        whiteboardName: data.whiteboardName
+      });
+
+      if (data.oldWhiteboardId !== whiteboardId) {
+        this._data.watchShapes(whiteboardId, this._sessionId, {
+          onShapeCreated: this._onShapeCreatedRemotelyCallback.bind(this),
+          onShapeErased: this._onShapeErasedRemotelyCallback.bind(this),
+          onShapeWatchError: this._onShapeWatchError.bind(this)
+        });
+      }
     }
 
     this._saveState();
