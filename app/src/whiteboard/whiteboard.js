@@ -51,10 +51,10 @@ class Whiteboard {
             this._fetchShapes()
               .then((shapes) => {
                 this._stateHolder.setProp('shapes', shapes);
-
                 this._loadSpinner.classList.add('hidden');
               })
               .catch((error) => {
+                this._loadSpinner.classList.add('hidden');
                 alert('Error fetching shapes!');
                 console.error('Error fetching shapes', error);
               });
@@ -374,7 +374,13 @@ class Whiteboard {
 
     return this._indexedDb.getItem('state', whiteboardId || 'local')
       .then((state) => {
-        return state || this._config.state;
+        state = state || this._config.state;
+
+        if (!Array.isArray(state.shapes)) {
+          state.shapes = [];
+        }
+
+        return state;
       });
   }
 
@@ -692,13 +698,10 @@ class Whiteboard {
       .then((data) => {
         shareWhiteboardModal.setConfig({
           shareWhiteboardCallback: (payload) => {
-            let state = this._stateHolder.getState();
-
             this._stateHolder.setProp('whiteboardId', payload.whiteboardId, {
               data: {
                 bookmarkId: data.whiteboardBookmark ? data.whiteboardBookmark.id : null,
                 createBookmark: payload.createBookmark,
-                oldWhiteboardId: state.whiteboardId,
                 whiteboardName: payload.whiteboardName
               }
             });
