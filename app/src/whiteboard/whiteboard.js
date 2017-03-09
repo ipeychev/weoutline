@@ -1070,17 +1070,18 @@ class Whiteboard {
       this.redraw();
     } else if (params.prop === 'whiteboardId') {
       let data = params.data;
+      let oldWhiteboardId = params.prevValue;
       let whiteboardId = params.value;
 
       this._shareWhiteboard({
         bookmarkId: data.bookmarkId,
         createBookmark: data.createBookmark,
-        saveShapes: data.oldWhiteboardId !== whiteboardId,
+        saveShapes: oldWhiteboardId !== whiteboardId,
         whiteboardId: whiteboardId,
         whiteboardName: data.whiteboardName
       });
 
-      if (data.oldWhiteboardId !== whiteboardId) {
+      if (oldWhiteboardId !== whiteboardId) {
         this._data.watchShapes(whiteboardId, this._sessionId, {
           onShapeCreated: this._onShapeCreatedRemotelyCallback.bind(this),
           onShapeErased: this._onShapeErasedRemotelyCallback.bind(this),
