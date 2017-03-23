@@ -72,35 +72,7 @@ class ShareWhiteboardModal {
   }
 
   _renderContent(payload) {
-    if (payload.action === 'anonymous user + new whiteboard') {
-      return {
-        title: 'Share whiteboard',
-        form:
-          `<label for="url">URL</label>
-          <div class="share-whiteboard-url-container">
-            <input id="shareWhiteboardURL" class="share-whiteboard-url-input" name="url" type="text" placeholder="URL" value="${payload.url}" required readonly>
-            <button id="shareWhiteboardCopyURL" class="btn share-whiteboard-url-btn copy">
-              <span class="icon icon-clipboard"></span>
-            </button>
-          </div>
-          </div>`,
-        footer: `<button id="shareWhiteboardButton" class="btn">Share</button>`
-      };
-    } else if (payload.action === 'anonymous user + existing whiteboard') {
-      return {
-        title: 'Share whiteboard',
-        form:
-          `<label for="url">URL</label>
-          <div class="share-whiteboard-url-container">
-            <input id="shareWhiteboardURL" class="share-whiteboard-url-input" name="url" type="text" placeholder="URL" value="${payload.url}" required readonly>
-            <button id="shareWhiteboardCopyURL" class="btn share-whiteboard-url-btn copy">
-              <span class="icon icon-clipboard"></span>
-            </button>
-          </div>
-          </div>`,
-        footer: ``
-      };
-    } else if (payload.action === 'logged user + new bookmark') {
+    if (payload.action === 'logged user + new bookmark') {
       return {
         title: `Share whiteboard`,
         form:
@@ -184,17 +156,7 @@ class ShareWhiteboardModal {
   _shareWhiteboard() {
     let payload;
 
-    if (this._data.action === 'anonymous user + new whiteboard') {
-      payload = {
-        createBookmark: false,
-        whiteboardId: this._data.whiteboardId
-      };
-    } else if (this._data.action === 'anonymous user + existing whiteboard') {
-      payload = {
-        createBookmark: false,
-        whiteboardId: this._data.whiteboardId
-      };
-    } else if (this._data.action === 'logged user + new bookmark') {
+    if (this._data.action === 'logged user + new bookmark') {
       payload = {
         createBookmark: this._shareWhiteboardForm.querySelector('#shareWhiteboardAddName').checked,
         whiteboardId: this._data.whiteboardId,

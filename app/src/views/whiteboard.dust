@@ -151,13 +151,13 @@
       <div id="userItem" class="toolbar-item">
         <div class="toolbar-item-value">
           <img id="userSignedIn" class="icon icon-signed-in hidden" draggable="false" src="/assets/images/user-unknown.png">
-          <a id="userSignIn" draggable="false" href="/user/sign-in">
+          <a id="userSignIn" draggable="false" href="{routeMap.signIn}">
             <span class="icon icon-sign-in"></span>
           </a>
         </div>
         <ul class="toolbar-item-options hidden">
           <li class="toolbar-item-option">
-            <a id="userProfile" draggable="false" href="/user/profile">
+            <a id="userProfile" draggable="false" href="{routeMap.profile}">
               <span class="icon icon-user-o"></span>
               <span>My account</span>
             </a>
@@ -169,6 +169,22 @@
             </a>
           </li>
         </ul>
+      </div>
+    </div>
+
+    <div class="modal hidden" id="proceedToLogin">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span id="proceedToLoginHide" class="hide">x</span>
+          <h2>Login required</h2>
+        </div>
+        <div class="modal-body" id="proceedToLoginBody">
+        </div>
+        <div class="modal-footer">
+          <div class="btn-container proceed-to-login-footer">
+            <button id="proceedToLoginButton" class="btn">Proceed...</button>
+          </div>
+        </div>
       </div>
     </div>
 

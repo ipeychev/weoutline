@@ -91,13 +91,13 @@ class UserSignIn {
   }
 
   _signInWithGithub() {
-    var githubProvider = new this._auth.provider.Github();
+    let githubProvider = new this._auth.provider.Github();
     githubProvider.setProviderScope('user:email');
     this._auth.signInWithRedirect(githubProvider);
   }
 
   _signInWithGoogle() {
-    var googleProvider = new this._auth.provider.Google();
+    let googleProvider = new this._auth.provider.Google();
     googleProvider.setProviderScope('email');
     this._auth.signInWithRedirect(googleProvider);
   }

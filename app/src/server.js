@@ -1,19 +1,20 @@
-var bodyParser = require('body-parser');
-var compression = require('compression');
-var cookieParser = require('cookie-parser');
-var dust = require('express-dustjs');
-var express = require('express');
-var logger = require('morgan');
-var manifest = require('../package.json');
-var minifyHTML = require('express-minify-html');
-var path = require('path');
+let bodyParser = require('body-parser');
+let compression = require('compression');
+let cookieParser = require('cookie-parser');
+let dust = require('express-dustjs');
+let express = require('express');
+let logger = require('morgan');
+let manifest = require('../package.json');
+let minifyHTML = require('express-minify-html');
+let path = require('path');
 
-var user = require('./routes/user');
-var whiteboard = require('./routes/whiteboard');
+let routeMap = require('./routes/route-map');
+let user = require('./routes/user');
+let whiteboard = require('./routes/whiteboard');
 
-var app = express();
+let app = express();
 
-var production = app.get('env') === 'production';
+let production = app.get('env') === 'production';
 
 // Dustjs settings
 dust._.optimizers.format = function (ctx, node) {
@@ -30,6 +31,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'dust');
 
 app.locals.production = production;
+app.locals.routeMap = routeMap;
 app.locals.version = manifest.version;
 
 if (production) {
@@ -59,7 +61,7 @@ app.use('/user', user);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
+  let err = new Error('Not Found');
   err.status = 404;
   next(err);
 });

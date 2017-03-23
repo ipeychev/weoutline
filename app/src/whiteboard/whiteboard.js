@@ -1,20 +1,22 @@
+import { ShapeType } from '../draw/shape';
 import BrowserHelper from '../helpers/browser-helper';
 import CryptHelper from '../helpers/crypt-helper';
 import Data from '../data/data';
 import Draw from '../draw/draw';
 import DrawHelper from '../helpers/draw-helper';
 import DrawLine from '../draw/draw-line';
-import EraseWhiteboardModal from './erase-whiteboard';
 import Eraser from '../draw/eraser';
+import EraseWhiteboardModal from './erase-whiteboard';
 import IndexedDB from '../storage/indexeddb';
 import Map from '../map/map';
+import ProceedToLoginModal from './proceed-to-login';
+import routeMap from '../routes/route-map';
 import ShareWhiteboardModal from './share-whiteboard';
 import StateHolder from '../state/state-holder';
 import ToolbarTools from '../toolbar/toolbar-tools';
 import ToolbarUser from '../toolbar/toolbar-user';
 import ToolbarZoom from '../toolbar/toolbar-zoom';
 import Tools from '../draw/tools';
-import { ShapeType } from '../draw/shape';
 
 class Whiteboard {
   constructor(config) {
@@ -429,59 +431,49 @@ class Whiteboard {
     return lineWidth;
   }
 
+  _getProceedToLoginModal() {
+    if (!this._proceedToLoginModal) {
+      this._proceedToLoginModal = new ProceedToLoginModal({
+        enableHide: true,
+        msg: 'You must login before share a whiteboard',
+        proceedToLoginCallback: () => {
+          location.href = routeMap.signIn + '?returnURL=' + encodeURIComponent(location.href);
+        },
+        srcNode: 'proceedToLogin'
+      });
+    }
+
+    return this._proceedToLoginModal;
+  }
+
   _getShareWhiteboardData() {
-    let data;
     let whiteboardBookmark;
     let state = this._stateHolder.getState();
     let whiteboardId = state.whiteboardId || this._generateWhiteboardId();
 
     let url = window.location.origin + '/wb/' + whiteboardId;
 
-    if (this._config.whiteboard.currentUser && state.whiteboardId) {
-      return this._data.getWhiteboardBookmark(this._config.whiteboard.currentUser.id, state.whiteboardId)
-        .then((data) => {
-          whiteboardBookmark = data ? data[0] : null;
+    return this._data.getWhiteboardBookmark(this._config.whiteboard.currentUser.id, state.whiteboardId)
+      .then((data) => {
+        whiteboardBookmark = data ? data[0] : null;
 
-          if (whiteboardBookmark) {
-            data = {
-              action: 'logged user + existing bookmark',
-              url: url,
-              whiteboardBookmark: whiteboardBookmark,
-              whiteboardId: whiteboardId
-            };
-          } else {
-            data = {
-              action: 'logged user + new bookmark',
-              url: url,
-              whiteboardId: whiteboardId
-            };
-          }
+        if (whiteboardBookmark) {
+          data = {
+            action: 'logged user + existing bookmark',
+            url: url,
+            whiteboardBookmark: whiteboardBookmark,
+            whiteboardId: whiteboardId
+          };
+        } else {
+          data = {
+            action: 'logged user + new bookmark',
+            url: url,
+            whiteboardId: whiteboardId
+          };
+        }
 
-          return data;
-        });
-    } else {
-      if (this._config.whiteboard.currentUser) {
-        data = {
-          action: 'logged user + new bookmark',
-          url: url,
-          whiteboardId: whiteboardId
-        };
-      } else if (state.whiteboardId) {
-        data = {
-          action: 'anonymous user + existing whiteboard',
-          url: url,
-          whiteboardId: whiteboardId
-        };
-      } else {
-        data = {
-          action: 'anonymous user + new whiteboard',
-          url: url,
-          whiteboardId: whiteboardId
-        };
-      }
-
-      return Promise.resolve(data);
-    }
+        return data;
+      });
   }
 
   _getShareWhiteboardModal() {
@@ -691,30 +683,34 @@ class Whiteboard {
   }
 
   _onShareWhiteboardLinkCallback() {
-    let shareWhiteboardModal = this._getShareWhiteboardModal();
-    shareWhiteboardModal.show();
+    if (this._config.whiteboard.currentUser) {
+      let shareWhiteboardModal = this._getShareWhiteboardModal();
+      shareWhiteboardModal.show();
 
-    this._getShareWhiteboardData()
-      .then((data) => {
-        shareWhiteboardModal.setConfig({
-          shareWhiteboardCallback: (payload) => {
-            this._stateHolder.setProp('whiteboardId', payload.whiteboardId, {
-              data: {
-                bookmarkId: data.whiteboardBookmark ? data.whiteboardBookmark.id : null,
-                createBookmark: payload.createBookmark,
-                whiteboardName: payload.whiteboardName
-              }
-            });
-          }
+      this._getShareWhiteboardData()
+        .then((data) => {
+          shareWhiteboardModal.setConfig({
+            shareWhiteboardCallback: (payload) => {
+              this._stateHolder.setProp('whiteboardId', payload.whiteboardId, {
+                data: {
+                  bookmarkId: data.whiteboardBookmark ? data.whiteboardBookmark.id : null,
+                  createBookmark: payload.createBookmark,
+                  whiteboardName: payload.whiteboardName
+                }
+              });
+            }
+          });
+
+          shareWhiteboardModal.setData(data);
+        })
+        .catch((error) => {
+          alert('Error retrieving whiteboard bookmark');
+          console.error(error);
+          shareWhiteboardModal.hide();
         });
-
-        shareWhiteboardModal.setData(data);
-      })
-      .catch((error) => {
-        alert('Error retrieving whiteboard bookmark');
-        console.error(error);
-        shareWhiteboardModal.hide();
-      });
+    } else {
+      this._getProceedToLoginModal().show();
+    }
   }
 
   _onTouchMove(event) {

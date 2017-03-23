@@ -2,7 +2,7 @@ import BrowserHelper from '../helpers/browser-helper';
 
 class Toolbar {
   _deactivateOptions(rootNode) {
-    var nodes = rootNode.querySelectorAll('.toolbar-item-option');
+    let nodes = rootNode.querySelectorAll('.toolbar-item-option');
 
     for (let i = 0; nodes && i < nodes.length; i++) {
       nodes.item(i).classList.remove('active');
@@ -10,7 +10,7 @@ class Toolbar {
   }
 
   _deactivateValues() {
-    var nodes = this._element.querySelectorAll('.toolbar-item-value');
+    let nodes = this._element.querySelectorAll('.toolbar-item-value');
 
     for (let i = 0; nodes && i < nodes.length; i++) {
       nodes.item(i).classList.remove('active');

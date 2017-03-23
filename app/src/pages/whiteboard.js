@@ -3,13 +3,15 @@ require('../assets/whiteboard/skin.scss');
 
 import Tools from '../draw/tools';
 import Whiteboard from '../whiteboard/whiteboard';
+import ProceedToLoginDialog from '../whiteboard/proceed-to-login';
+import routeMap from '../routes/route-map';
 
 window.addEventListener('load', () => {
   let auth = WeDeploy.auth('auth.weoutline.wedeploy.io');
 
   let whiteboard;
 
-  function createWhiteboard() {
+  function createWhiteboard(whiteboardId) {
     let whiteboardHeight = 3000;
     let whiteboardWidth = 3000;
 
@@ -22,7 +24,7 @@ window.addEventListener('load', () => {
       penSize: 4,
       scale: 1,
       shapes: [],
-      whiteboardId: getWhiteboardId(),
+      whiteboardId: whiteboardId,
       zoomModeEnabled: false
     };
 
@@ -83,10 +85,25 @@ window.addEventListener('load', () => {
       whiteboard.destroy();
     }
 
-    createWhiteboard();
+    createWhiteboard(getWhiteboardId());
   };
 
-  createWhiteboard();
+  let whiteboardId = getWhiteboardId();
+
+  if (whiteboardId && !auth.currentUser) {
+    new ProceedToLoginDialog({
+      msg: 'You must login before access a shared whiteboard',
+      proceedToLoginCallback: () => {
+        location.href = routeMap.signIn + '?returnURL=' + encodeURIComponent(location.href);
+      },
+      srcNode: 'proceedToLogin'
+    })
+    .show();
+
+    document.getElementById('loadSpinner').classList.add('hidden');
+  } else {
+    createWhiteboard(whiteboardId);
+  }
 }, {
   once: true
 });

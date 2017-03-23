@@ -1,19 +1,25 @@
-var express = require('express');
-var router = express.Router();
+let express = require('express');
+let routeMap = require('../routes/route-map');
 
-router.get('/sign-in', function(req, res) {
+let router = express.Router();
+
+let stripUser = (path) => {
+  return path.substring(5); // '/user'.length
+};
+
+router.get(stripUser(routeMap.signIn), function(req, res) {
   res.render('user/sign-in');
 });
 
-router.get('/profile', function(req, res) {
+router.get(stripUser(routeMap.profile), function(req, res) {
   res.render('user/profile');
 });
 
-router.get('/sign-up', function(req, res) {
+router.get(stripUser(routeMap.signUp), function(req, res) {
   res.render('user/sign-up');
 });
 
-router.get('/reset', function(req, res) {
+router.get(stripUser(routeMap.reset), function(req, res) {
   res.render('user/reset');
 });
 

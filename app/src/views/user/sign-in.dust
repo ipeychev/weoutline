@@ -44,8 +44,8 @@
 			</div>
 
 			<div class="container links">
-				<a id="signUp" href="/user/sign-up">Create an account</a>
-				<a id="reset" href="/user/reset">Did you forget your password?</a>
+				<a id="signUp" href="{routeMap.signUp}">Create an account</a>
+				<a id="reset" href="{routeMap.reset}">Did you forget your password?</a>
 			</div>
 		</form>
 	</div>

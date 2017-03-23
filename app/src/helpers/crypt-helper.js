@@ -8,7 +8,7 @@ class CryptHelper {
 
     let str = '';
 
-    for (var i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
         let rand = Math.floor(Math.random() * ALPHABET.length);
 
         str += ALPHABET.substring(rand, rand + 1);
