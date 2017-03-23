@@ -76,7 +76,7 @@ window.addEventListener('load', () => {
   function userSignOut() {
     auth.signOut()
       .then(() => {
-        location.reload();
+        location.href = routeMap.whiteboard;
       });
   }
 
