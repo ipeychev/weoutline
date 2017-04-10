@@ -1,5 +1,4 @@
-[
-	{
+[{
 		"auth": {
 			"validator": "$auth != null"
 		},
@@ -8,14 +7,9 @@
 	},
 	{
 		"auth": {
-			"validator": "$auth != null"
+			"validator": "$auth !== null && $auth.id === $params.userId"
 		},
 		"data": true,
-		"path": "/user2whiteboard",
-		"parameters": {
-			"filter": {
-				"value": {"userId":{"operator":"=","value":"$auth.id"}}
-			}
-		}
+		"path": "/user2whiteboard"
 	}
 ]
