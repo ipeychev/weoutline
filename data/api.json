@@ -7,6 +7,9 @@
 		"path": "/*"
 	},
 	{
+		"auth": {
+			"validator": "$auth != null"
+		},
 		"data": true,
 		"path": "/user2whiteboard",
 		"parameters": {
