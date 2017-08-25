@@ -4,7 +4,7 @@ require('../../assets/user/sign-up/skin.scss');
 import UserSignUp from '../../user/sign-up';
 
 window.addEventListener('load', () => {
-  let auth = WeDeploy.auth('auth.weoutline.wedeploy.io');
+  let auth = WeDeploy.auth('auth-weoutline.wedeploy.io');
 
   new UserSignUp({
     auth: auth

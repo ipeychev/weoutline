@@ -1,6 +1,5 @@
 {
 	"id": "app",
-	"type": "wedeploy/nodejs",
 	"hooks": {
 		"build": "npm install"
 	}

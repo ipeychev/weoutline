@@ -7,7 +7,7 @@ import ProceedToLoginDialog from '../whiteboard/proceed-to-login';
 import routeMap from '../routes/route-map';
 
 window.addEventListener('load', () => {
-  let auth = WeDeploy.auth('auth.weoutline.wedeploy.io');
+  let auth = WeDeploy.auth('auth-weoutline.wedeploy.io');
 
   let whiteboard;
 
@@ -50,7 +50,7 @@ window.addEventListener('load', () => {
       },
       whiteboard: {
         currentUser: auth.currentUser,
-        dataURL: 'data.weoutline.wedeploy.io',
+        dataURL: 'data-weoutline.wedeploy.io',
         height: whiteboardHeight,
         loadSpinnerId: 'loadSpinner',
         mainContainer: 'mainContainer',
