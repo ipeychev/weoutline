@@ -5,7 +5,7 @@
 {/cssResources}
 
 {<jsResources}
-	<script src="https://cdn.wedeploy.com/api/3.0.2/wedeploy.js" defer></script>
+	<script src="https://cdn.wedeploy.com/api/2.3.1/wedeploy.js" defer></script>
 	<script src="/commons.{version}.{?production}min.{/production}js" defer></script>
 {/jsResources}
 
