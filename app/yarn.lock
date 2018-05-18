@@ -3528,7 +3528,7 @@ lodash.restparam@^3.0.0:
   version "3.6.1"
   resolved "https://registry.yarnpkg.com/lodash.restparam/-/lodash.restparam-3.6.1.tgz#936a4e309ef330a7645ed4145986c85ae5b20805"
 
-lodash.some@^4.2.2:
+lodash.some@^4.2.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/lodash.some/-/lodash.some-4.6.0.tgz#1bb9f314ef6b8baded13b549169b2a945eb68e4d"
 
@@ -5899,7 +5899,7 @@ webpack-stream@3.2.0:
   dependencies:
     gulp-util "^3.0.7"
     lodash.clone "^4.3.2"
-    lodash.some "^4.2.2"
+    lodash.some "^4.2.0"
     memory-fs "^0.3.0"
     through "^2.3.8"
     vinyl "^1.1.0"
