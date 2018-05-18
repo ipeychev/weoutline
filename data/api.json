@@ -7,9 +7,9 @@
 	},
 	{
 		"auth": {
-			"validator": "$auth !== null && $auth.id === $params.userId"
+			"validator": "$auth !== null"
 		},
 		"data": true,
-		"path": "/user2whiteboard/*"
+		"path": "/user2whiteboard"
 	}
 ]
