@@ -1,7 +1,7 @@
 [{
 		"auth": {
-      "validator": "$auth != null"
-    },
+			"validator": "$auth != null"
+		},
 		"data": true,
 		"path": "/*"
 	},
@@ -10,6 +10,6 @@
 			"validator": "$auth !== null && $auth.id === $params.userId"
 		},
 		"data": true,
-		"path": "/user2whiteboard/*"
+		"path": "/user2whiteboard"
 	}
 ]
